@@ -200,7 +200,12 @@ class IntelligentCrawler:
                         queue.append(next_url)
 
         # FR3: Dynamic DOM + async API communication inspection.
-        discovered_points.extend(self._crawl_dynamic(base_url))
+        # ChromeDriver가 없거나 Selenium 오류가 발생해도 정적 크롤 결과는 보존한다.
+        try:
+            discovered_points.extend(self._crawl_dynamic(base_url))
+        except Exception as exc:
+            print(f"[WARN] _crawl_dynamic 건너뜀 (Selenium 오류): {exc}")
+
         self.last_visited_urls = sorted(visited)
         self.last_form_inputs = self._deduplicate_form_inputs(discovered_forms)
         return self._deduplicate_points(discovered_points)
@@ -440,7 +445,12 @@ class VulnerabilityScannerEngine:
     def _validate_xss_with_selenium(
         self, url: str, method: str, param: str, payload: str
     ) -> bool:
-        driver = _build_headless_driver(enable_performance_logs=False)
+        try:
+            driver = _build_headless_driver(enable_performance_logs=False)
+        except Exception as exc:
+            print(f"[WARN] Selenium 초기화 실패, XSS 검증 건너뜀: {exc}")
+            return False
+
         try:
             test_url = url
             if method.upper() == "GET":
@@ -478,6 +488,9 @@ class VulnerabilityScannerEngine:
             WebDriverWait(driver, 5).until(EC.alert_is_present())
             return True
         except TimeoutException:
+            return False
+        except Exception as exc:
+            print(f"[WARN] XSS Selenium 검증 오류: {exc}")
             return False
         finally:
             driver.quit()

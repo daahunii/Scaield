@@ -1,14 +1,29 @@
 """
-Scanner AI Shield - HTML Dashboard (Flask)
+Scanner AI Shield - Flask Web App
+
+2-Stage 분석 파이프라인:
+  Stage 1 — VulnerabilityScannerEngine  : SQLi / XSS 탐지
+  Stage 2 — AIReporter (Gemini)         : 취약점 원인·수정 방법 AI 분석
 
 Run:
+    export GEMINI_API_KEY="your-key"
     flask --app app run --debug
 """
 
 from __future__ import annotations
 
 import json
+import os
+import sys
 from collections import Counter
+
+# pentest 모듈 경로를 sys.path에 추가
+_PENTEST_DIR = os.path.normpath(
+    os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "pentest")
+)
+if _PENTEST_DIR not in sys.path:
+    sys.path.insert(0, _PENTEST_DIR)
+
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List
@@ -16,11 +31,19 @@ from urllib.parse import urlparse
 
 from flask import Flask, render_template, request
 
+from ai_reporter import AIReporter
 from scanner_core import VulnerabilityScannerEngine
+from engine import ScannerEngine as PentestScannerEngine
+from adapter import findings_to_ai_input as pentest_to_ai_input
 
 app = Flask(__name__)
 HISTORY_PATH = Path(__file__).with_name("scan_history.json")
+PENTEST_INPUT_PATH = Path(_PENTEST_DIR) / "pentest_input.json"
 
+
+# ---------------------------------------------------------------------------
+# 유틸리티
+# ---------------------------------------------------------------------------
 
 def _parse_domain_input(domain_text: str) -> List[str]:
     return [d.strip() for d in domain_text.split(",") if d.strip()]
@@ -75,13 +98,23 @@ def _build_chart_data(history: List[Dict[str, Any]]) -> Dict[str, Any]:
     }
 
 
+# ---------------------------------------------------------------------------
+# 라우트
+# ---------------------------------------------------------------------------
+
 @app.route("/", methods=["GET", "POST"])
 def index() -> str:
-    # FR8: scan logs for dashboard console panel.
     scan_logs: List[str] = []
-    results: List[Dict[str, Any]] = []
+
+    # Stage 1 결과 (VulnerabilityFinding dicts)
+    stage1_results: List[Dict[str, Any]] = []
+
+    # Stage 2 결과 (finding + ai_analysis 병합 dicts)
+    stage2_results: List[Dict[str, Any]] = []
+
     error_message = ""
     success_message = ""
+    ai_enabled = bool(os.environ.get("GEMINI_API_KEY"))
 
     target_url = "http://localhost:8000/search?q=test"
     approved_domains_text = "localhost,example.com"
@@ -94,6 +127,7 @@ def index() -> str:
             "approved_domains_text", approved_domains_text
         ).strip()
         timeout = int(request.form.get("timeout", timeout))
+        run_ai = request.form.get("run_ai") == "on"
 
         approved_domains = _build_effective_domains(target_url, approved_domains_text)
         approved_domains_text = ",".join(approved_domains)
@@ -101,29 +135,107 @@ def index() -> str:
         def log_callback(message: str) -> None:
             scan_logs.append(message)
 
+        # ── Stage 1: Scanner ───────────────────────────────────────────────
         try:
+            log_callback("[Stage 1] 스캐너 시작")
             engine = VulnerabilityScannerEngine(
                 pre_approved_domains=approved_domains,
                 timeout=timeout,
                 log_callback=log_callback,
             )
-            results = engine.scan(target_url)
+            stage1_results = engine.scan(target_url)
             scan_context = engine.last_scan_context
-            success_message = f"스캔 완료: 취약점 {len(results)}건 탐지"
+            log_callback(f"[Stage 1] 완료 — 취약점 {len(stage1_results)}건 탐지")
 
-            history = _load_history()
-            history.append(
-                {
-                    "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                    "target_url": target_url,
-                    "approved_domains": approved_domains,
-                    "timeout": timeout,
-                    "results": results,
-                }
-            )
-            _save_history(history)
+            # pentest/engine.py 연동용 입력 파일 자동 저장
+            if scan_context.get("input_forms"):
+                PENTEST_INPUT_PATH.write_text(
+                    json.dumps(scan_context["input_forms"], ensure_ascii=False, indent=2),
+                    encoding="utf-8",
+                )
+                log_callback(f"[Stage 1] pentest 입력 파일 저장: {PENTEST_INPUT_PATH}")
+
+        except PermissionError as exc:
+            error_message = f"[Stage 1] 인가되지 않은 타겟: {exc}"
+
         except Exception as exc:
-            error_message = f"스캔 중 오류가 발생했습니다: {exc}"
+            error_message = f"[Stage 1] 스캔 중 오류: {exc}"
+
+        # ── Stage 1.5: pentest/engine.py 확장 스캔 ────────────────────────
+        if not error_message and scan_context.get("input_forms"):
+            try:
+                log_callback("[Stage 1.5] pentest 확장 스캔 시작")
+                pentest_engine = PentestScannerEngine(config={})
+                pentest_findings = pentest_engine.run_from_form_inputs(
+                    scan_context["input_forms"]
+                )
+                pentest_results = pentest_to_ai_input(pentest_findings)
+
+                # (target_url, parameter, vulnerability_type)가 같은 중복 항목 제외
+                existing_keys = {
+                    (r.get("target_url"), r.get("parameter"), r.get("vulnerability_type"))
+                    for r in stage1_results
+                }
+                deduped = [
+                    r for r in pentest_results
+                    if (r.get("target_url"), r.get("parameter"), r.get("vulnerability_type"))
+                    not in existing_keys
+                ]
+                stage1_results.extend(deduped)
+                log_callback(
+                    f"[Stage 1.5] 완료 — pentest 추가 탐지 {len(deduped)}건 "
+                    f"(전체 {len(stage1_results)}건)"
+                )
+
+            except Exception as exc:
+                log_callback(f"[Stage 1.5] pentest 스캔 오류 (무시하고 계속): {exc}")
+
+        # ── Stage 2: Gemini AI 분석 ────────────────────────────────────────
+        if stage1_results and run_ai:
+            try:
+                log_callback("[Stage 2] Gemini AI 분석 시작")
+                reporter = AIReporter(log_callback=log_callback)
+                stage2_results = reporter.analyze_all(
+                    stage1_results,
+                    log_callback=log_callback,
+                )
+                log_callback(f"[Stage 2] 완료 — AI 리포트 {len(stage2_results)}건 생성")
+                success_message = (
+                    f"스캔 완료: 취약점 {len(stage1_results)}건 탐지, "
+                    f"AI 분석 {len(stage2_results)}건 완료"
+                )
+
+            except EnvironmentError as exc:
+                # GEMINI_API_KEY 미설정
+                log_callback(f"[Stage 2] 건너뜀 — {exc}")
+                stage2_results = []
+                success_message = (
+                    f"스캔 완료: 취약점 {len(stage1_results)}건 탐지 "
+                    f"(AI 분석 미실행: API 키 없음)"
+                )
+
+            except Exception as exc:
+                log_callback(f"[Stage 2] AI 분석 오류: {exc}")
+                stage2_results = []
+                success_message = (
+                    f"스캔 완료: 취약점 {len(stage1_results)}건 탐지 "
+                    f"(AI 분석 실패: {exc})"
+                )
+
+        elif stage1_results and not run_ai:
+            success_message = f"스캔 완료: 취약점 {len(stage1_results)}건 탐지 (AI 분석 미선택)"
+
+        # ── 히스토리 저장 ─────────────────────────────────────────────────
+        if stage1_results:
+            history = _load_history()
+            history.append({
+                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "target_url": target_url,
+                "approved_domains": approved_domains,
+                "timeout": timeout,
+                "results": stage2_results if stage2_results else stage1_results,
+            })
+            _save_history(history)
 
     history = _load_history()
     chart_data = _build_chart_data(history)
@@ -134,9 +246,15 @@ def index() -> str:
         approved_domains_text=approved_domains_text,
         timeout=timeout,
         scan_logs=scan_logs,
-        results=results,
-        results_json=json.dumps(results, ensure_ascii=False, indent=2),
-        history=history[::-1],  # latest first
+        # Stage 1
+        stage1_results=stage1_results,
+        stage1_results_json=json.dumps(stage1_results, ensure_ascii=False, indent=2),
+        # Stage 2
+        stage2_results=stage2_results,
+        stage2_results_json=json.dumps(stage2_results, ensure_ascii=False, indent=2),
+        # 공통
+        ai_enabled=ai_enabled,
+        history=history[::-1],
         chart_data=chart_data,
         error_message=error_message,
         success_message=success_message,

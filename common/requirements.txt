@@ -3,3 +3,4 @@ beautifulsoup4
 selenium
 streamlit
 flask
+google-generativeai
