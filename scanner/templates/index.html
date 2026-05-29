@@ -16,20 +16,68 @@
 
     <div class="card">
       <h2>스캔 설정</h2>
-      <form method="post">
+      <form id="scan-form" method="post">
         <label for="target_url">Target URL</label>
-        <input id="target_url" name="target_url" value="{{ target_url }}" required />
+        <input id="target_url" name="target_url" value="{{ target_url }}" placeholder="http://example.com" required />
 
         <label for="approved_domains_text">Pre-approved Domains (comma-separated)</label>
-        <input id="approved_domains_text" name="approved_domains_text" value="{{ approved_domains_text }}" required />
-        <div class="small">자동 반영: localhost + Target URL의 도메인이 자동으로 승인 목록에 포함됩니다.</div>
+        <input id="approved_domains_text" name="approved_domains_text" value="{{ approved_domains_text }}" placeholder="Target URL 도메인이 자동으로 추가됩니다." />
+        <div class="small">Target URL을 입력하면 호스트명이 실시간으로 추출되어 자동으로 포함됩니다.</div>
+
+        <label for="session_cookies">Session Cookies <span style="font-weight:400; color:#64748b;">(인증이 필요한 사이트, 선택사항)</span></label>
+        <textarea id="session_cookies" name="session_cookies" rows="2" placeholder="PHPSESSID=abc123; security=low">{{ cookie_text }}</textarea>
+        <div class="small">브라우저 DevTools → Application → Cookies에서 복사하여 붙여넣으세요. (예: PHPSESSID=xxxx; security=low)</div>
+
+        <details style="margin-bottom: 10px;">
+          <summary style="cursor:pointer; font-weight:600; color:#1d4ed8; user-select:none;">🔐 자동 로그인 설정 (ID/PW 입력 시 세션 자동 획득)</summary>
+          <div style="margin-top:10px; padding:14px; background:#f0f7ff; border-radius:10px; border:1px solid #bfdbfe;">
+            <div class="small" style="margin-bottom:10px; color:#1e40af;">✅ 아이디/비밀번호를 입력하면 스캔 전 자동 로그인하여 세션 쿠키를 획득합니다. Session Cookies를 수동으로 복사할 필요가 없습니다.</div>
+            <label for="login_url">로그인 URL</label>
+            <input id="login_url" name="login_url" value="{{ login_url }}" placeholder="http://localhost:55000/login.php" />
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+              <div>
+                <label for="login_username_field">아이디 필드명 (name 속성)</label>
+                <input id="login_username_field" name="login_username_field" value="{{ login_username_field }}" placeholder="username" />
+              </div>
+              <div>
+                <label for="login_password_field">비밀번호 필드명 (name 속성)</label>
+                <input id="login_password_field" name="login_password_field" value="{{ login_password_field }}" placeholder="password" />
+              </div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+              <div>
+                <label for="login_username_value">아이디</label>
+                <input id="login_username_value" name="login_username_value" value="{{ login_username_value }}" placeholder="admin" />
+              </div>
+              <div>
+                <label for="login_password_value">비밀번호</label>
+                <input id="login_password_value" name="login_password_value" type="password" value="{{ login_password_value }}" placeholder="password" />
+              </div>
+            </div>
+            <label for="login_success_marker">로그인 성공 확인 문자열 <span style="font-weight:400; color:#64748b;">(선택사항 — URL 또는 응답에 포함되면 성공 판정)</span></label>
+            <input id="login_success_marker" name="login_success_marker" value="{{ login_success_marker }}" placeholder="index.php 또는 Logged In" />
+          </div>
+        </details>
 
         <label for="timeout">HTTP Timeout (sec)</label>
         <input id="timeout" name="timeout" type="number" min="3" max="60" value="{{ timeout }}" required />
 
-        <button type="submit">스캔 시작</button>
+        <button type="submit" id="submit-btn">스캔 시작</button>
       </form>
     </div>
+
+    <!-- 실시간 스캔 상태 바 -->
+    <div id="progress-card" class="card" style="display: none; border: 2px solid #3b82f6;">
+      <h2>실시간 스캔 진행 현황</h2>
+      <div class="progress-bar-bg">
+        <div id="progress-bar-fill" class="progress-bar-fill" style="width: 0%;"></div>
+      </div>
+      <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+        <span id="progress-stage" style="font-weight: 600; color: #1d4ed8;">스캔 대기 중...</span>
+        <span id="progress-percent" style="font-weight: 600; color: #475569;">0%</span>
+      </div>
+    </div>
+
 
     {% if success_message %}
       <div class="ok">{{ success_message }}</div>
@@ -80,58 +128,14 @@
       </div>
     </div>
 
-    <div class="grid">
-      <div class="card">
-        <h2>스캔 로그</h2>
-        <pre>{% if scan_logs %}{{ scan_logs | join('\n') }}{% else %}아직 로그가 없습니다.{% endif %}</pre>
-      </div>
-      <div class="card">
-        <h2>표준 JSON 결과</h2>
-        <pre>{{ results_json }}</pre>
-      </div>
+    <div class="card">
+      <h2>스캔 로그</h2>
+      <pre id="log-display">{% if scan_logs %}{{ scan_logs | join('\n') }}{% else %}아직 로그가 없습니다.{% endif %}</pre>
     </div>
 
     <div class="card">
-      <h2>이번 실행 결과 요약</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>취약점 유형</th>
-            <th>URL</th>
-            <th>파라미터</th>
-            <th>HTTP 메서드</th>
-            <th>Status</th>
-            <th>탐지 방식</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% if results %}
-            {% for item in results %}
-            <tr>
-              <td>{{ item.vulnerability_type }}</td>
-              <td>{{ item.target_url }}</td>
-              <td>{{ item.parameter }}</td>
-              <td>{{ item.http_method }}</td>
-              <td>{{ item.status_code }}</td>
-              <td>{{ item.evidence.detection_method if item.evidence else '' }}</td>
-            </tr>
-            {% endfor %}
-          {% else %}
-            <tr><td colspan="6">아직 실행된 결과가 없습니다.</td></tr>
-          {% endif %}
-        </tbody>
-      </table>
-    </div>
-
-    <div class="grid">
-      <div class="card">
-        <h2>취약점 유형 분포 (누적)</h2>
-        <canvas id="vulnTypeChart"></canvas>
-      </div>
-      <div class="card">
-        <h2>실행별 탐지 건수 (최근 20회)</h2>
-        <canvas id="runTrendChart"></canvas>
-      </div>
+      <h2>탐지된 공격 표면 (Raw JSON)</h2>
+      <pre style="max-height: 400px; overflow-y: auto;">{% if results %}{{ results | tojson(indent=2) }}{% else %}아직 탐지된 공격 표면이 없습니다.{% endif %}</pre>
     </div>
 
     <div class="card">

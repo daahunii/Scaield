@@ -796,5 +796,1792 @@
         }
       }
     ]
+  },
+  {
+    "timestamp": "2026-05-28 21:49:04",
+    "target_url": "http://localhost:55000/login.php",
+    "approved_domains": [
+      "localhost",
+      "example.com"
+    ],
+    "timeout": 10,
+    "results": []
+  },
+  {
+    "timestamp": "2026-05-28 21:49:08",
+    "target_url": "http://localhost:55000/login.php",
+    "approved_domains": [
+      "localhost",
+      "localhost:55000/login.php"
+    ],
+    "timeout": 10,
+    "results": []
+  },
+  {
+    "timestamp": "2026-05-28 22:02:30",
+    "target_url": "http://localhost:55000/vulnerabilities/xss_d/?default=English",
+    "approved_domains": [
+      "localhost",
+      "localhost:55000"
+    ],
+    "timeout": 10,
+    "results": []
+  },
+  {
+    "timestamp": "2026-05-28 22:02:53",
+    "target_url": "http://localhost:55000/vulnerabilities/sqli/?id=admin&Submit=Submit#",
+    "approved_domains": [
+      "localhost",
+      "localhost:55000/login.php"
+    ],
+    "timeout": 10,
+    "results": []
+  },
+  {
+    "timestamp": "2026-05-28 22:08:47",
+    "target_url": "http://localhost:55000/vulnerabilities/xss_d/?default=English",
+    "approved_domains": [
+      "localhost",
+      "상태 조회 오류"
+    ],
+    "timeout": 10,
+    "results": []
+  },
+  {
+    "timestamp": "2026-05-28 22:27:37",
+    "target_url": "http://localhost:55000/vulnerabilities/xss_d/?default=English",
+    "approved_domains": [
+      "localhost"
+    ],
+    "timeout": 10,
+    "results": []
+  },
+  {
+    "timestamp": "2026-05-28 22:35:56",
+    "target_url": "http://localhost:8000/search?q=test",
+    "approved_domains": [
+      "localhost"
+    ],
+    "timeout": 10,
+    "results": []
+  },
+  {
+    "timestamp": "2026-05-28 22:36:00",
+    "target_url": "http://localhost:8000/search?q=test",
+    "approved_domains": [
+      "localhost"
+    ],
+    "timeout": 10,
+    "results": []
+  },
+  {
+    "timestamp": "2026-05-28 22:36:36",
+    "target_url": "http://localhost:8000/search?q=test",
+    "approved_domains": [
+      "localhost"
+    ],
+    "timeout": 10,
+    "results": []
+  },
+  {
+    "timestamp": "2026-05-28 22:36:50",
+    "target_url": "http://localhost:8000/search?q=test",
+    "approved_domains": [
+      "localhost"
+    ],
+    "timeout": 10,
+    "results": []
+  },
+  {
+    "timestamp": "2026-05-28 22:37:19",
+    "target_url": "http://localhost:55000/vulnerabilities/sqli/",
+    "approved_domains": [
+      "localhost"
+    ],
+    "timeout": 10,
+    "results": []
+  },
+  {
+    "timestamp": "2026-05-29 02:35:19",
+    "target_url": "http://localhost:55000/vulnerabilities/sqli/",
+    "approved_domains": [
+      "localhost"
+    ],
+    "timeout": 10,
+    "results": []
+  },
+  {
+    "timestamp": "2026-05-29 02:46:10",
+    "target_url": "http://localhost:55000/vulnerabilities/sqli/",
+    "approved_domains": [
+      "localhost"
+    ],
+    "timeout": 10,
+    "results": []
+  },
+  {
+    "timestamp": "2026-05-29 02:46:28",
+    "target_url": "http://localhost:55000/vulnerabilities/sqli/",
+    "approved_domains": [
+      "localhost"
+    ],
+    "timeout": 10,
+    "results": []
+  },
+  {
+    "timestamp": "2026-05-29 02:46:35",
+    "target_url": "http://localhost:55000/vulnerabilities/sqli/",
+    "approved_domains": [
+      "localhost"
+    ],
+    "timeout": 10,
+    "results": []
+  },
+  {
+    "timestamp": "2026-05-29 02:49:23",
+    "target_url": "http://localhost:55000/vulnerabilities/sqli/",
+    "approved_domains": [
+      "localhost"
+    ],
+    "timeout": 10,
+    "results": []
+  },
+  {
+    "timestamp": "2026-05-29 02:55:16",
+    "target_url": "http://localhost:55000/vulnerabilities/sqli/",
+    "approved_domains": [
+      "localhost"
+    ],
+    "timeout": 10,
+    "results": []
+  },
+  {
+    "timestamp": "2026-05-29 02:57:31",
+    "target_url": "http://localhost:8000/search?q=test",
+    "approved_domains": [
+      "localhost"
+    ],
+    "timeout": 10,
+    "results": []
+  },
+  {
+    "timestamp": "2026-05-29 12:43:55",
+    "target_url": "http://localhost:55000/vulnerabilities/sqli/",
+    "approved_domains": [
+      "localhost"
+    ],
+    "timeout": 10,
+    "results": [
+      {
+        "url": "http://localhost:55000/vulnerabilities/sqli/",
+        "method": "GET",
+        "parameter_name": "id",
+        "parameter_type": "text",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "",
+          "form_inputs": [
+            {
+              "name": "id",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "Submit",
+              "type": "submit",
+              "default": "Submit"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/setup.php",
+        "method": "POST",
+        "parameter_name": "user_token",
+        "parameter_type": "hidden",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "a8bae64c6e36bdf2bc863af3ab2c1feb",
+          "form_inputs": [
+            {
+              "name": "create_db",
+              "type": "submit",
+              "default": "Create / Reset Database"
+            },
+            {
+              "name": "user_token",
+              "type": "hidden",
+              "default": "a8bae64c6e36bdf2bc863af3ab2c1feb"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/brute/",
+        "method": "GET",
+        "parameter_name": "username",
+        "parameter_type": "text",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "",
+          "form_inputs": [
+            {
+              "name": "username",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "password",
+              "type": "password",
+              "default": ""
+            },
+            {
+              "name": "Login",
+              "type": "submit",
+              "default": "Login"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/brute/",
+        "method": "GET",
+        "parameter_name": "password",
+        "parameter_type": "password",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "",
+          "form_inputs": [
+            {
+              "name": "username",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "password",
+              "type": "password",
+              "default": ""
+            },
+            {
+              "name": "Login",
+              "type": "submit",
+              "default": "Login"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/exec/",
+        "method": "POST",
+        "parameter_name": "ip",
+        "parameter_type": "text",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "",
+          "form_inputs": [
+            {
+              "name": "ip",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "Submit",
+              "type": "submit",
+              "default": "Submit"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/csrf/",
+        "method": "GET",
+        "parameter_name": "password_new",
+        "parameter_type": "password",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "",
+          "form_inputs": [
+            {
+              "name": "password_new",
+              "type": "password",
+              "default": ""
+            },
+            {
+              "name": "password_conf",
+              "type": "password",
+              "default": ""
+            },
+            {
+              "name": "Change",
+              "type": "submit",
+              "default": "Change"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/csrf/",
+        "method": "GET",
+        "parameter_name": "password_conf",
+        "parameter_type": "password",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "",
+          "form_inputs": [
+            {
+              "name": "password_new",
+              "type": "password",
+              "default": ""
+            },
+            {
+              "name": "password_conf",
+              "type": "password",
+              "default": ""
+            },
+            {
+              "name": "Change",
+              "type": "submit",
+              "default": "Change"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/fi/?page=include.php",
+        "method": "GET",
+        "parameter_name": "page",
+        "parameter_type": "text",
+        "extra_data": {}
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/upload/",
+        "method": "POST",
+        "parameter_name": "MAX_FILE_SIZE",
+        "parameter_type": "hidden",
+        "extra_data": {
+          "enctype": "multipart/form-data",
+          "default_value": "100000",
+          "form_inputs": [
+            {
+              "name": "MAX_FILE_SIZE",
+              "type": "hidden",
+              "default": "100000"
+            },
+            {
+              "name": "uploaded",
+              "type": "file",
+              "default": ""
+            },
+            {
+              "name": "Upload",
+              "type": "submit",
+              "default": "Upload"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/captcha/",
+        "method": "POST",
+        "parameter_name": "step",
+        "parameter_type": "hidden",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "1",
+          "form_inputs": [
+            {
+              "name": "step",
+              "type": "hidden",
+              "default": "1"
+            },
+            {
+              "name": "password_new",
+              "type": "password",
+              "default": ""
+            },
+            {
+              "name": "password_conf",
+              "type": "password",
+              "default": ""
+            },
+            {
+              "name": "Change",
+              "type": "submit",
+              "default": "Change"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/captcha/",
+        "method": "POST",
+        "parameter_name": "password_new",
+        "parameter_type": "password",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "",
+          "form_inputs": [
+            {
+              "name": "step",
+              "type": "hidden",
+              "default": "1"
+            },
+            {
+              "name": "password_new",
+              "type": "password",
+              "default": ""
+            },
+            {
+              "name": "password_conf",
+              "type": "password",
+              "default": ""
+            },
+            {
+              "name": "Change",
+              "type": "submit",
+              "default": "Change"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/captcha/",
+        "method": "POST",
+        "parameter_name": "password_conf",
+        "parameter_type": "password",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "",
+          "form_inputs": [
+            {
+              "name": "step",
+              "type": "hidden",
+              "default": "1"
+            },
+            {
+              "name": "password_new",
+              "type": "password",
+              "default": ""
+            },
+            {
+              "name": "password_conf",
+              "type": "password",
+              "default": ""
+            },
+            {
+              "name": "Change",
+              "type": "submit",
+              "default": "Change"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/sqli_blind/",
+        "method": "GET",
+        "parameter_name": "id",
+        "parameter_type": "text",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "",
+          "form_inputs": [
+            {
+              "name": "id",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "Submit",
+              "type": "submit",
+              "default": "Submit"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/xss_d/",
+        "method": "GET",
+        "parameter_name": "default",
+        "parameter_type": "text",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "",
+          "form_inputs": [
+            {
+              "name": "default",
+              "type": "text",
+              "default": ""
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/xss_r/",
+        "method": "GET",
+        "parameter_name": "name",
+        "parameter_type": "text",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "",
+          "form_inputs": [
+            {
+              "name": "name",
+              "type": "text",
+              "default": ""
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/xss_s/",
+        "method": "POST",
+        "parameter_name": "txtName",
+        "parameter_type": "text",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "",
+          "form_inputs": [
+            {
+              "name": "txtName",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "mtxMessage",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "btnSign",
+              "type": "submit",
+              "default": "Sign Guestbook"
+            },
+            {
+              "name": "btnClear",
+              "type": "submit",
+              "default": "Clear Guestbook"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/xss_s/",
+        "method": "POST",
+        "parameter_name": "mtxMessage",
+        "parameter_type": "text",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "",
+          "form_inputs": [
+            {
+              "name": "txtName",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "mtxMessage",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "btnSign",
+              "type": "submit",
+              "default": "Sign Guestbook"
+            },
+            {
+              "name": "btnClear",
+              "type": "submit",
+              "default": "Clear Guestbook"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/csp/",
+        "method": "POST",
+        "parameter_name": "include",
+        "parameter_type": "text",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "",
+          "form_inputs": [
+            {
+              "name": "include",
+              "type": "text",
+              "default": ""
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/javascript/",
+        "method": "POST",
+        "parameter_name": "token",
+        "parameter_type": "hidden",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "",
+          "form_inputs": [
+            {
+              "name": "token",
+              "type": "hidden",
+              "default": ""
+            },
+            {
+              "name": "phrase",
+              "type": "text",
+              "default": "ChangeMe"
+            },
+            {
+              "name": "send",
+              "type": "submit",
+              "default": "Submit"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/javascript/",
+        "method": "POST",
+        "parameter_name": "phrase",
+        "parameter_type": "text",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "ChangeMe",
+          "form_inputs": [
+            {
+              "name": "token",
+              "type": "hidden",
+              "default": ""
+            },
+            {
+              "name": "phrase",
+              "type": "text",
+              "default": "ChangeMe"
+            },
+            {
+              "name": "send",
+              "type": "submit",
+              "default": "Submit"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/security.php",
+        "method": "POST",
+        "parameter_name": "security",
+        "parameter_type": "text",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "",
+          "form_inputs": [
+            {
+              "name": "security",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "seclev_submit",
+              "type": "submit",
+              "default": "Submit"
+            },
+            {
+              "name": "user_token",
+              "type": "hidden",
+              "default": "589f9c48f0478ffc12163520e26c6f95"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/security.php",
+        "method": "POST",
+        "parameter_name": "user_token",
+        "parameter_type": "hidden",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "589f9c48f0478ffc12163520e26c6f95",
+          "form_inputs": [
+            {
+              "name": "security",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "seclev_submit",
+              "type": "submit",
+              "default": "Submit"
+            },
+            {
+              "name": "user_token",
+              "type": "hidden",
+              "default": "589f9c48f0478ffc12163520e26c6f95"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/instructions.php?doc=readme",
+        "method": "GET",
+        "parameter_name": "doc",
+        "parameter_type": "text",
+        "extra_data": {}
+      },
+      {
+        "url": "http://localhost:55000/instructions.php?doc=PDF",
+        "method": "GET",
+        "parameter_name": "doc",
+        "parameter_type": "text",
+        "extra_data": {}
+      },
+      {
+        "url": "http://localhost:55000/instructions.php?doc=changelog",
+        "method": "GET",
+        "parameter_name": "doc",
+        "parameter_type": "text",
+        "extra_data": {}
+      },
+      {
+        "url": "http://localhost:55000/instructions.php?doc=copying",
+        "method": "GET",
+        "parameter_name": "doc",
+        "parameter_type": "text",
+        "extra_data": {}
+      },
+      {
+        "url": "http://localhost:55000/instructions.php?doc=PHPIDS-license",
+        "method": "GET",
+        "parameter_name": "doc",
+        "parameter_type": "text",
+        "extra_data": {}
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/fi/?page=file1.php",
+        "method": "GET",
+        "parameter_name": "page",
+        "parameter_type": "text",
+        "extra_data": {}
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/fi/?page=file2.php",
+        "method": "GET",
+        "parameter_name": "page",
+        "parameter_type": "text",
+        "extra_data": {}
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/fi/?page=file3.php",
+        "method": "GET",
+        "parameter_name": "page",
+        "parameter_type": "text",
+        "extra_data": {}
+      },
+      {
+        "url": "http://localhost:55000/security.php?phpids=on",
+        "method": "GET",
+        "parameter_name": "phpids",
+        "parameter_type": "text",
+        "extra_data": {}
+      },
+      {
+        "url": "http://localhost:55000/security.php?phpids=on",
+        "method": "POST",
+        "parameter_name": "security",
+        "parameter_type": "text",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "",
+          "form_inputs": [
+            {
+              "name": "security",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "seclev_submit",
+              "type": "submit",
+              "default": "Submit"
+            },
+            {
+              "name": "user_token",
+              "type": "hidden",
+              "default": "6a66e3f292046c9c7506f2b5e0d9d8a5"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/security.php?phpids=on",
+        "method": "POST",
+        "parameter_name": "user_token",
+        "parameter_type": "hidden",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "6a66e3f292046c9c7506f2b5e0d9d8a5",
+          "form_inputs": [
+            {
+              "name": "security",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "seclev_submit",
+              "type": "submit",
+              "default": "Submit"
+            },
+            {
+              "name": "user_token",
+              "type": "hidden",
+              "default": "6a66e3f292046c9c7506f2b5e0d9d8a5"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/login.php",
+        "method": "POST",
+        "parameter_name": "username",
+        "parameter_type": "text",
+        "extra_data": {
+          "source": "dynamic_dom",
+          "form_inputs": [
+            {
+              "name": "username",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "password",
+              "type": "password",
+              "default": ""
+            },
+            {
+              "name": "Login",
+              "type": "submit",
+              "default": "Login"
+            },
+            {
+              "name": "user_token",
+              "type": "hidden",
+              "default": "7637dc6b9a6d6ef0b9d2763662542386"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/login.php",
+        "method": "POST",
+        "parameter_name": "password",
+        "parameter_type": "password",
+        "extra_data": {
+          "source": "dynamic_dom",
+          "form_inputs": [
+            {
+              "name": "username",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "password",
+              "type": "password",
+              "default": ""
+            },
+            {
+              "name": "Login",
+              "type": "submit",
+              "default": "Login"
+            },
+            {
+              "name": "user_token",
+              "type": "hidden",
+              "default": "7637dc6b9a6d6ef0b9d2763662542386"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/login.php",
+        "method": "POST",
+        "parameter_name": "user_token",
+        "parameter_type": "hidden",
+        "extra_data": {
+          "source": "dynamic_dom",
+          "form_inputs": [
+            {
+              "name": "username",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "password",
+              "type": "password",
+              "default": ""
+            },
+            {
+              "name": "Login",
+              "type": "submit",
+              "default": "Login"
+            },
+            {
+              "name": "user_token",
+              "type": "hidden",
+              "default": "7637dc6b9a6d6ef0b9d2763662542386"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/security.php?phpids=off",
+        "method": "GET",
+        "parameter_name": "phpids",
+        "parameter_type": "text",
+        "extra_data": {
+          "source": "async_api_trace",
+          "initiator": "other"
+        }
+      },
+      {
+        "url": "http://localhost:55000/setup.php#",
+        "method": "POST",
+        "parameter_name": "user_token",
+        "parameter_type": "hidden",
+        "extra_data": {
+          "source": "dynamic_dom",
+          "form_inputs": [
+            {
+              "name": "create_db",
+              "type": "submit",
+              "default": "Create / Reset Database"
+            },
+            {
+              "name": "user_token",
+              "type": "hidden",
+              "default": "b1a37ea91b85e8850d6fe108be836b40"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/security.php?test=%22%3E%3Cscript%3Eeval(window.name)%3C/script%3E",
+        "method": "GET",
+        "parameter_name": "test",
+        "parameter_type": "text",
+        "extra_data": {
+          "source": "async_api_trace",
+          "initiator": "other"
+        }
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-05-29 12:46:31",
+    "target_url": "http://localhost:55000/vulnerabilities/sqli/",
+    "approved_domains": [
+      "localhost"
+    ],
+    "timeout": 10,
+    "results": [
+      {
+        "url": "http://localhost:55000/vulnerabilities/sqli/",
+        "method": "GET",
+        "parameter_name": "id",
+        "parameter_type": "text",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "",
+          "form_inputs": [
+            {
+              "name": "id",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "Submit",
+              "type": "submit",
+              "default": "Submit"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/setup.php",
+        "method": "POST",
+        "parameter_name": "user_token",
+        "parameter_type": "hidden",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "7e4041b95e884bb4ad676dfb88d6a07b",
+          "form_inputs": [
+            {
+              "name": "create_db",
+              "type": "submit",
+              "default": "Create / Reset Database"
+            },
+            {
+              "name": "user_token",
+              "type": "hidden",
+              "default": "7e4041b95e884bb4ad676dfb88d6a07b"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/brute/",
+        "method": "GET",
+        "parameter_name": "username",
+        "parameter_type": "text",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "",
+          "form_inputs": [
+            {
+              "name": "username",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "password",
+              "type": "password",
+              "default": ""
+            },
+            {
+              "name": "Login",
+              "type": "submit",
+              "default": "Login"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/brute/",
+        "method": "GET",
+        "parameter_name": "password",
+        "parameter_type": "password",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "",
+          "form_inputs": [
+            {
+              "name": "username",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "password",
+              "type": "password",
+              "default": ""
+            },
+            {
+              "name": "Login",
+              "type": "submit",
+              "default": "Login"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/exec/",
+        "method": "POST",
+        "parameter_name": "ip",
+        "parameter_type": "text",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "",
+          "form_inputs": [
+            {
+              "name": "ip",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "Submit",
+              "type": "submit",
+              "default": "Submit"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/csrf/",
+        "method": "GET",
+        "parameter_name": "password_new",
+        "parameter_type": "password",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "",
+          "form_inputs": [
+            {
+              "name": "password_new",
+              "type": "password",
+              "default": ""
+            },
+            {
+              "name": "password_conf",
+              "type": "password",
+              "default": ""
+            },
+            {
+              "name": "Change",
+              "type": "submit",
+              "default": "Change"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/csrf/",
+        "method": "GET",
+        "parameter_name": "password_conf",
+        "parameter_type": "password",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "",
+          "form_inputs": [
+            {
+              "name": "password_new",
+              "type": "password",
+              "default": ""
+            },
+            {
+              "name": "password_conf",
+              "type": "password",
+              "default": ""
+            },
+            {
+              "name": "Change",
+              "type": "submit",
+              "default": "Change"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/fi/?page=include.php",
+        "method": "GET",
+        "parameter_name": "page",
+        "parameter_type": "text",
+        "extra_data": {}
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/upload/",
+        "method": "POST",
+        "parameter_name": "MAX_FILE_SIZE",
+        "parameter_type": "hidden",
+        "extra_data": {
+          "enctype": "multipart/form-data",
+          "default_value": "100000",
+          "form_inputs": [
+            {
+              "name": "MAX_FILE_SIZE",
+              "type": "hidden",
+              "default": "100000"
+            },
+            {
+              "name": "uploaded",
+              "type": "file",
+              "default": ""
+            },
+            {
+              "name": "Upload",
+              "type": "submit",
+              "default": "Upload"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/captcha/",
+        "method": "POST",
+        "parameter_name": "step",
+        "parameter_type": "hidden",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "1",
+          "form_inputs": [
+            {
+              "name": "step",
+              "type": "hidden",
+              "default": "1"
+            },
+            {
+              "name": "password_new",
+              "type": "password",
+              "default": ""
+            },
+            {
+              "name": "password_conf",
+              "type": "password",
+              "default": ""
+            },
+            {
+              "name": "Change",
+              "type": "submit",
+              "default": "Change"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/captcha/",
+        "method": "POST",
+        "parameter_name": "password_new",
+        "parameter_type": "password",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "",
+          "form_inputs": [
+            {
+              "name": "step",
+              "type": "hidden",
+              "default": "1"
+            },
+            {
+              "name": "password_new",
+              "type": "password",
+              "default": ""
+            },
+            {
+              "name": "password_conf",
+              "type": "password",
+              "default": ""
+            },
+            {
+              "name": "Change",
+              "type": "submit",
+              "default": "Change"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/captcha/",
+        "method": "POST",
+        "parameter_name": "password_conf",
+        "parameter_type": "password",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "",
+          "form_inputs": [
+            {
+              "name": "step",
+              "type": "hidden",
+              "default": "1"
+            },
+            {
+              "name": "password_new",
+              "type": "password",
+              "default": ""
+            },
+            {
+              "name": "password_conf",
+              "type": "password",
+              "default": ""
+            },
+            {
+              "name": "Change",
+              "type": "submit",
+              "default": "Change"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/sqli_blind/",
+        "method": "GET",
+        "parameter_name": "id",
+        "parameter_type": "text",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "",
+          "form_inputs": [
+            {
+              "name": "id",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "Submit",
+              "type": "submit",
+              "default": "Submit"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/xss_d/",
+        "method": "GET",
+        "parameter_name": "default",
+        "parameter_type": "text",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "",
+          "form_inputs": [
+            {
+              "name": "default",
+              "type": "text",
+              "default": ""
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/xss_r/",
+        "method": "GET",
+        "parameter_name": "name",
+        "parameter_type": "text",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "",
+          "form_inputs": [
+            {
+              "name": "name",
+              "type": "text",
+              "default": ""
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/xss_s/",
+        "method": "POST",
+        "parameter_name": "txtName",
+        "parameter_type": "text",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "",
+          "form_inputs": [
+            {
+              "name": "txtName",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "mtxMessage",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "btnSign",
+              "type": "submit",
+              "default": "Sign Guestbook"
+            },
+            {
+              "name": "btnClear",
+              "type": "submit",
+              "default": "Clear Guestbook"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/xss_s/",
+        "method": "POST",
+        "parameter_name": "mtxMessage",
+        "parameter_type": "text",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "",
+          "form_inputs": [
+            {
+              "name": "txtName",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "mtxMessage",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "btnSign",
+              "type": "submit",
+              "default": "Sign Guestbook"
+            },
+            {
+              "name": "btnClear",
+              "type": "submit",
+              "default": "Clear Guestbook"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/csp/",
+        "method": "POST",
+        "parameter_name": "include",
+        "parameter_type": "text",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "",
+          "form_inputs": [
+            {
+              "name": "include",
+              "type": "text",
+              "default": ""
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/javascript/",
+        "method": "POST",
+        "parameter_name": "token",
+        "parameter_type": "hidden",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "",
+          "form_inputs": [
+            {
+              "name": "token",
+              "type": "hidden",
+              "default": ""
+            },
+            {
+              "name": "phrase",
+              "type": "text",
+              "default": "ChangeMe"
+            },
+            {
+              "name": "send",
+              "type": "submit",
+              "default": "Submit"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/javascript/",
+        "method": "POST",
+        "parameter_name": "phrase",
+        "parameter_type": "text",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "ChangeMe",
+          "form_inputs": [
+            {
+              "name": "token",
+              "type": "hidden",
+              "default": ""
+            },
+            {
+              "name": "phrase",
+              "type": "text",
+              "default": "ChangeMe"
+            },
+            {
+              "name": "send",
+              "type": "submit",
+              "default": "Submit"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/security.php",
+        "method": "POST",
+        "parameter_name": "security",
+        "parameter_type": "text",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "",
+          "form_inputs": [
+            {
+              "name": "security",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "seclev_submit",
+              "type": "submit",
+              "default": "Submit"
+            },
+            {
+              "name": "user_token",
+              "type": "hidden",
+              "default": "9a322167e308721fabcdd32dd131f9c7"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/security.php",
+        "method": "POST",
+        "parameter_name": "user_token",
+        "parameter_type": "hidden",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "9a322167e308721fabcdd32dd131f9c7",
+          "form_inputs": [
+            {
+              "name": "security",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "seclev_submit",
+              "type": "submit",
+              "default": "Submit"
+            },
+            {
+              "name": "user_token",
+              "type": "hidden",
+              "default": "9a322167e308721fabcdd32dd131f9c7"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/instructions.php?doc=readme",
+        "method": "GET",
+        "parameter_name": "doc",
+        "parameter_type": "text",
+        "extra_data": {}
+      },
+      {
+        "url": "http://localhost:55000/instructions.php?doc=PDF",
+        "method": "GET",
+        "parameter_name": "doc",
+        "parameter_type": "text",
+        "extra_data": {}
+      },
+      {
+        "url": "http://localhost:55000/instructions.php?doc=changelog",
+        "method": "GET",
+        "parameter_name": "doc",
+        "parameter_type": "text",
+        "extra_data": {}
+      },
+      {
+        "url": "http://localhost:55000/instructions.php?doc=copying",
+        "method": "GET",
+        "parameter_name": "doc",
+        "parameter_type": "text",
+        "extra_data": {}
+      },
+      {
+        "url": "http://localhost:55000/instructions.php?doc=PHPIDS-license",
+        "method": "GET",
+        "parameter_name": "doc",
+        "parameter_type": "text",
+        "extra_data": {}
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/fi/?page=file1.php",
+        "method": "GET",
+        "parameter_name": "page",
+        "parameter_type": "text",
+        "extra_data": {}
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/fi/?page=file2.php",
+        "method": "GET",
+        "parameter_name": "page",
+        "parameter_type": "text",
+        "extra_data": {}
+      },
+      {
+        "url": "http://localhost:55000/vulnerabilities/fi/?page=file3.php",
+        "method": "GET",
+        "parameter_name": "page",
+        "parameter_type": "text",
+        "extra_data": {}
+      },
+      {
+        "url": "http://localhost:55000/security.php?phpids=on",
+        "method": "GET",
+        "parameter_name": "phpids",
+        "parameter_type": "text",
+        "extra_data": {}
+      },
+      {
+        "url": "http://localhost:55000/security.php?phpids=on",
+        "method": "POST",
+        "parameter_name": "security",
+        "parameter_type": "text",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "",
+          "form_inputs": [
+            {
+              "name": "security",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "seclev_submit",
+              "type": "submit",
+              "default": "Submit"
+            },
+            {
+              "name": "user_token",
+              "type": "hidden",
+              "default": "1228f558b869ac1c5a1b594757341d63"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/security.php?phpids=on",
+        "method": "POST",
+        "parameter_name": "user_token",
+        "parameter_type": "hidden",
+        "extra_data": {
+          "enctype": "application/x-www-form-urlencoded",
+          "default_value": "1228f558b869ac1c5a1b594757341d63",
+          "form_inputs": [
+            {
+              "name": "security",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "seclev_submit",
+              "type": "submit",
+              "default": "Submit"
+            },
+            {
+              "name": "user_token",
+              "type": "hidden",
+              "default": "1228f558b869ac1c5a1b594757341d63"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/login.php",
+        "method": "POST",
+        "parameter_name": "username",
+        "parameter_type": "text",
+        "extra_data": {
+          "source": "dynamic_dom",
+          "form_inputs": [
+            {
+              "name": "username",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "password",
+              "type": "password",
+              "default": ""
+            },
+            {
+              "name": "Login",
+              "type": "submit",
+              "default": "Login"
+            },
+            {
+              "name": "user_token",
+              "type": "hidden",
+              "default": "4fb41f6de24b301e1044274a0cfc4143"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/login.php",
+        "method": "POST",
+        "parameter_name": "password",
+        "parameter_type": "password",
+        "extra_data": {
+          "source": "dynamic_dom",
+          "form_inputs": [
+            {
+              "name": "username",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "password",
+              "type": "password",
+              "default": ""
+            },
+            {
+              "name": "Login",
+              "type": "submit",
+              "default": "Login"
+            },
+            {
+              "name": "user_token",
+              "type": "hidden",
+              "default": "4fb41f6de24b301e1044274a0cfc4143"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/login.php",
+        "method": "POST",
+        "parameter_name": "user_token",
+        "parameter_type": "hidden",
+        "extra_data": {
+          "source": "dynamic_dom",
+          "form_inputs": [
+            {
+              "name": "username",
+              "type": "text",
+              "default": ""
+            },
+            {
+              "name": "password",
+              "type": "password",
+              "default": ""
+            },
+            {
+              "name": "Login",
+              "type": "submit",
+              "default": "Login"
+            },
+            {
+              "name": "user_token",
+              "type": "hidden",
+              "default": "4fb41f6de24b301e1044274a0cfc4143"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/security.php?test=%22%3E%3Cscript%3Eeval(window.name)%3C/script%3E",
+        "method": "GET",
+        "parameter_name": "test",
+        "parameter_type": "text",
+        "extra_data": {
+          "source": "async_api_trace",
+          "initiator": "other"
+        }
+      },
+      {
+        "url": "http://localhost:55000/setup.php#",
+        "method": "POST",
+        "parameter_name": "user_token",
+        "parameter_type": "hidden",
+        "extra_data": {
+          "source": "dynamic_dom",
+          "form_inputs": [
+            {
+              "name": "create_db",
+              "type": "submit",
+              "default": "Create / Reset Database"
+            },
+            {
+              "name": "user_token",
+              "type": "hidden",
+              "default": "28f39ae528d94dd14f4845d23b6a6d48"
+            }
+          ]
+        }
+      },
+      {
+        "url": "http://localhost:55000/security.php?phpids=off",
+        "method": "GET",
+        "parameter_name": "phpids",
+        "parameter_type": "text",
+        "extra_data": {
+          "source": "async_api_trace",
+          "initiator": "other"
+        }
+      }
+    ]
   }
 ]

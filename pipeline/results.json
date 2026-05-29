@@ -1,108 +1,840 @@
 {
   "meta": {
-    "target_url": "http://127.0.0.1:5000",
-    "scanned_at": "2026-05-29T15:37:01",
-    "input_points": 6,
-    "total_findings": 7
+    "target_url": "http://localhost:55000",
+    "scanned_at": "2026-05-30T18:45:37",
+    "input_points": 36,
+    "total_findings": 36
   },
   "findings": [
     {
-      "target_url": "http://127.0.0.1:5000/search",
+      "target_url": "http://localhost:55000/setup.php",
       "vulnerability_type": "Reflected XSS",
-      "parameter": "q",
+      "parameter": "user_token",
+      "payload": "<script>alert('XSS_TEST')</script>",
+      "http_method": "POST",
+      "status_code": 200,
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Setup :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=\"favicon.ico\" />\r\n\r\n\t\t<script type=\"text/javascript\"",
+      "confidence": "medium",
+      "evidence": {
+        "detection_method": "reflection_check",
+        "detail": "Step2(token '<script'): 이스케이프 없이 태그 존재 → '<script type=\"text/javascript\" src=\"dvwa/js/dvwaPage.js\"></s'"
+      }
+    },
+    {
+      "target_url": "http://localhost:55000/vulnerabilities/brute/",
+      "vulnerability_type": "Reflected XSS",
+      "parameter": "username",
       "payload": "<script>alert('XSS_TEST')</script>",
       "http_method": "GET",
       "status_code": 200,
-      "response_body_excerpt": "\n<!doctype html>\n<html><body>\n<h2>Search (vulnerable)</h2>\n<form method=\"GET\" action=\"/search\">\n  <input name=\"q\" value=\"&lt;script&gt;alert(&#39;XSS_TEST&#39;)&lt;/script&gt;\">\n  <button type=\"submit\">Search</button>\n</form>\n<div>Results for: <script>alert('XSS_TEST')</script></div>\n<p><a href=\"/\">home</a></p>\n</body></html>",
-      "confidence": "high",
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Vulnerability: Brute Force :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"../../dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=\"../../favicon.ico\" />\r\n\r",
+      "confidence": "medium",
       "evidence": {
         "detection_method": "reflection_check",
-        "detail": "Step1(exact): 페이로드 원문 그대로 반사 → '<script>alert(\\'XSS_TEST\\')</script></div>\\n<p><a href=\"/\">home'"
+        "detail": "Step2(token '<script'): 이스케이프 없이 태그 존재 → '<script type=\"text/javascript\" src=\"../../dvwa/js/dvwaPage.j'"
       }
     },
     {
-      "target_url": "http://127.0.0.1:5000/search-safe",
+      "target_url": "http://localhost:55000/vulnerabilities/brute/",
       "vulnerability_type": "Reflected XSS",
-      "parameter": "q",
-      "payload": "javascript:alert(1)",
-      "http_method": "GET",
-      "status_code": 200,
-      "response_body_excerpt": "\n<!doctype html>\n<html><body>\n<h2>Search (safe — autoescaped)</h2>\n<form method=\"GET\" action=\"/search-safe\">\n  <input name=\"q\" value=\"javascript:alert(1)\">\n  <button type=\"submit\">Search</button>\n</form>\n<div>Results for: javascript:alert(1)</div>\n<p><a href=\"/\">home</a></p>\n</body></html>",
-      "confidence": "high",
-      "evidence": {
-        "detection_method": "reflection_check",
-        "detail": "Step1(exact): 페이로드 원문 그대로 반사 → 'javascript:alert(1)\">\\n  <button type=\"submit\">Search</button'"
-      }
-    },
-    {
-      "target_url": "http://127.0.0.1:5000/login",
-      "vulnerability_type": "SQL Injection (Error-based)",
-      "parameter": "username",
-      "payload": "'",
-      "http_method": "POST",
-      "status_code": 500,
-      "response_body_excerpt": "\n<!doctype html>\n<html><body>\n<h2>Login (vulnerable to error-based SQLi)</h2>\n<form method=\"POST\" action=\"/login\">\n  <input name=\"username\" placeholder=\"username\">\n  <input name=\"password\" placeholder=\"password\" type=\"password\">\n  <button type=\"submit\">Login</button>\n</form>\n\n<pre style=\"color:red;\">SQLite error: unrecognized token: &#34;&#39;&#39;&#39; AND password = &#39;&#39;&#34; | failing query: SELECT id, username, email FROM users WHERE username = &#39;&#39;&#39; AND password = &#39;&#39;",
-      "confidence": "high",
-      "evidence": {
-        "detection_method": "error_based",
-        "detail": "SQL error signature found: 'SQLite'"
-      }
-    },
-    {
-      "target_url": "http://127.0.0.1:5000/login",
-      "vulnerability_type": "SQL Injection (Error-based)",
       "parameter": "password",
-      "payload": "'",
+      "payload": "<script>alert('XSS_TEST')</script>",
+      "http_method": "GET",
+      "status_code": 200,
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Vulnerability: Brute Force :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"../../dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=\"../../favicon.ico\" />\r\n\r",
+      "confidence": "medium",
+      "evidence": {
+        "detection_method": "reflection_check",
+        "detail": "Step2(token '<script'): 이스케이프 없이 태그 존재 → '<script type=\"text/javascript\" src=\"../../dvwa/js/dvwaPage.j'"
+      }
+    },
+    {
+      "target_url": "http://localhost:55000/vulnerabilities/exec/",
+      "vulnerability_type": "Reflected XSS",
+      "parameter": "ip",
+      "payload": "<script>alert('XSS_TEST')</script>",
       "http_method": "POST",
-      "status_code": 500,
-      "response_body_excerpt": "\n<!doctype html>\n<html><body>\n<h2>Login (vulnerable to error-based SQLi)</h2>\n<form method=\"POST\" action=\"/login\">\n  <input name=\"username\" placeholder=\"username\">\n  <input name=\"password\" placeholder=\"password\" type=\"password\">\n  <button type=\"submit\">Login</button>\n</form>\n\n<pre style=\"color:red;\">SQLite error: unrecognized token: &#34;&#39;&#39;&#39;&#34; | failing query: SELECT id, username, email FROM users WHERE username = &#39;&#39; AND password = &#39;&#39;&#39;</pre>\n<p><a href=\"/\">home",
-      "confidence": "high",
+      "status_code": 200,
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Vulnerability: Command Injection :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"../../dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=\"../../favicon.ico\"",
+      "confidence": "medium",
       "evidence": {
-        "detection_method": "error_based",
-        "detail": "SQL error signature found: 'SQLite'"
+        "detection_method": "reflection_check",
+        "detail": "Step2(token '<script'): 이스케이프 없이 태그 존재 → '<script type=\"text/javascript\" src=\"../../dvwa/js/dvwaPage.j'"
       }
     },
     {
-      "target_url": "http://127.0.0.1:5000/user",
+      "target_url": "http://localhost:55000/vulnerabilities/csrf/",
       "vulnerability_type": "Reflected XSS",
-      "parameter": "id",
-      "payload": "javascript:alert(1)",
+      "parameter": "password_new",
+      "payload": "<script>alert('XSS_TEST')</script>",
       "http_method": "GET",
       "status_code": 200,
-      "response_body_excerpt": "\n<!doctype html>\n<html><body>\n<h2>User Lookup (vulnerable to SQLi)</h2>\n<form method=\"GET\" action=\"/user\">\n  <input name=\"id\" value=\"javascript:alert(1)\">\n  <button type=\"submit\">Lookup</button>\n</form>\n\n  <div>No user found</div>\n\n<pre style=\"color:red;\">SQLite error: near &#34;:alert(1)&#34;: syntax error | failing query: SELECT id, username, password, email FROM users WHERE id = javascript:alert(1)</pre>\n<p><a href=\"/\">home</a></p>\n</body></html>",
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Vulnerability: Cross Site Request Forgery (CSRF) :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"../../dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=\"..",
+      "confidence": "medium",
+      "evidence": {
+        "detection_method": "reflection_check",
+        "detail": "Step2(token '<script'): 이스케이프 없이 태그 존재 → '<script type=\"text/javascript\" src=\"../../dvwa/js/dvwaPage.j'"
+      }
+    },
+    {
+      "target_url": "http://localhost:55000/vulnerabilities/csrf/",
+      "vulnerability_type": "Reflected XSS",
+      "parameter": "password_conf",
+      "payload": "<script>alert('XSS_TEST')</script>",
+      "http_method": "GET",
+      "status_code": 200,
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Vulnerability: Cross Site Request Forgery (CSRF) :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"../../dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=\"..",
+      "confidence": "medium",
+      "evidence": {
+        "detection_method": "reflection_check",
+        "detail": "Step2(token '<script'): 이스케이프 없이 태그 존재 → '<script type=\"text/javascript\" src=\"../../dvwa/js/dvwaPage.j'"
+      }
+    },
+    {
+      "target_url": "http://localhost:55000/vulnerabilities/fi/?page=include.php",
+      "vulnerability_type": "Reflected XSS",
+      "parameter": "page",
+      "payload": "<script>alert('XSS_TEST')</script>",
+      "http_method": "GET",
+      "status_code": 200,
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Vulnerability: File Inclusion :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"../../dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=\"../../favicon.ico\" />",
+      "confidence": "medium",
+      "evidence": {
+        "detection_method": "reflection_check",
+        "detail": "Step2(token '<script'): 이스케이프 없이 태그 존재 → '<script type=\"text/javascript\" src=\"../../dvwa/js/dvwaPage.j'"
+      }
+    },
+    {
+      "target_url": "http://localhost:55000/vulnerabilities/upload/",
+      "vulnerability_type": "Reflected XSS",
+      "parameter": "MAX_FILE_SIZE",
+      "payload": "<script>alert('XSS_TEST')</script>",
+      "http_method": "POST",
+      "status_code": 200,
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Vulnerability: File Upload :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"../../dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=\"../../favicon.ico\" />\r\n\r",
+      "confidence": "medium",
+      "evidence": {
+        "detection_method": "reflection_check",
+        "detail": "Step2(token '<script'): 이스케이프 없이 태그 존재 → '<script type=\"text/javascript\" src=\"../../dvwa/js/dvwaPage.j'"
+      }
+    },
+    {
+      "target_url": "http://localhost:55000/vulnerabilities/captcha/",
+      "vulnerability_type": "Reflected XSS",
+      "parameter": "step",
+      "payload": "<script>alert('XSS_TEST')</script>",
+      "http_method": "POST",
+      "status_code": 200,
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Vulnerability: Insecure CAPTCHA :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"../../dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=\"../../favicon.ico\" ",
+      "confidence": "medium",
+      "evidence": {
+        "detection_method": "reflection_check",
+        "detail": "Step2(token '<script'): 이스케이프 없이 태그 존재 → '<script type=\"text/javascript\" src=\"../../dvwa/js/dvwaPage.j'"
+      }
+    },
+    {
+      "target_url": "http://localhost:55000/vulnerabilities/captcha/",
+      "vulnerability_type": "Reflected XSS",
+      "parameter": "password_new",
+      "payload": "<script>alert('XSS_TEST')</script>",
+      "http_method": "POST",
+      "status_code": 200,
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Vulnerability: Insecure CAPTCHA :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"../../dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=\"../../favicon.ico\" ",
+      "confidence": "medium",
+      "evidence": {
+        "detection_method": "reflection_check",
+        "detail": "Step2(token '<script'): 이스케이프 없이 태그 존재 → '<script type=\"text/javascript\" src=\"../../dvwa/js/dvwaPage.j'"
+      }
+    },
+    {
+      "target_url": "http://localhost:55000/vulnerabilities/captcha/",
+      "vulnerability_type": "Reflected XSS",
+      "parameter": "password_conf",
+      "payload": "<script>alert('XSS_TEST')</script>",
+      "http_method": "POST",
+      "status_code": 200,
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Vulnerability: Insecure CAPTCHA :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"../../dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=\"../../favicon.ico\" ",
+      "confidence": "medium",
+      "evidence": {
+        "detection_method": "reflection_check",
+        "detail": "Step2(token '<script'): 이스케이프 없이 태그 존재 → '<script type=\"text/javascript\" src=\"../../dvwa/js/dvwaPage.j'"
+      }
+    },
+    {
+      "target_url": "http://localhost:55000/vulnerabilities/sqli/",
+      "vulnerability_type": "Reflected XSS",
+      "parameter": "id",
+      "payload": "<script>alert('XSS_TEST')</script>",
+      "http_method": "GET",
+      "status_code": 200,
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Vulnerability: SQL Injection :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"../../dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=\"../../favicon.ico\" />\r",
+      "confidence": "medium",
+      "evidence": {
+        "detection_method": "reflection_check",
+        "detail": "Step2(token '<script'): 이스케이프 없이 태그 존재 → '<script type=\"text/javascript\" src=\"../../dvwa/js/dvwaPage.j'"
+      }
+    },
+    {
+      "target_url": "http://localhost:55000/vulnerabilities/sqli_blind/",
+      "vulnerability_type": "Reflected XSS",
+      "parameter": "id",
+      "payload": "<script>alert('XSS_TEST')</script>",
+      "http_method": "GET",
+      "status_code": 200,
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Vulnerability: SQL Injection (Blind) :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"../../dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=\"../../favicon.",
+      "confidence": "medium",
+      "evidence": {
+        "detection_method": "reflection_check",
+        "detail": "Step2(token '<script'): 이스케이프 없이 태그 존재 → '<script type=\"text/javascript\" src=\"../../dvwa/js/dvwaPage.j'"
+      }
+    },
+    {
+      "target_url": "http://localhost:55000/vulnerabilities/xss_d/",
+      "vulnerability_type": "Reflected XSS",
+      "parameter": "default",
+      "payload": "<script>alert('XSS_TEST')</script>",
+      "http_method": "GET",
+      "status_code": 200,
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Vulnerability: DOM Based Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"../../dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=",
+      "confidence": "medium",
+      "evidence": {
+        "detection_method": "reflection_check",
+        "detail": "Step2(token '<script'): 이스케이프 없이 태그 존재 → '<script type=\"text/javascript\" src=\"../../dvwa/js/dvwaPage.j'"
+      }
+    },
+    {
+      "target_url": "http://localhost:55000/vulnerabilities/xss_r/",
+      "vulnerability_type": "Reflected XSS",
+      "parameter": "name",
+      "payload": "<script>alert('XSS_TEST')</script>",
+      "http_method": "GET",
+      "status_code": 200,
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Vulnerability: Reflected Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"../../dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=",
       "confidence": "high",
       "evidence": {
         "detection_method": "reflection_check",
-        "detail": "Step1(exact): 페이로드 원문 그대로 반사 → 'javascript:alert(1)\">\\n  <button type=\"submit\">Lookup</button'"
+        "detail": "Step1(exact): 페이로드 원문 그대로 반사 → \"<script>alert('XSS_TEST')</script></pre>\\r\\n\\t</div>\\r\\n\\r\\n\\t<h2>Mo\""
       }
     },
     {
-      "target_url": "http://127.0.0.1:5000/user",
-      "vulnerability_type": "SQL Injection (Error-based)",
-      "parameter": "id",
-      "payload": "'",
-      "http_method": "GET",
-      "status_code": 200,
-      "response_body_excerpt": "\n<!doctype html>\n<html><body>\n<h2>User Lookup (vulnerable to SQLi)</h2>\n<form method=\"GET\" action=\"/user\">\n  <input name=\"id\" value=\"&#39;\">\n  <button type=\"submit\">Lookup</button>\n</form>\n\n  <div>No user found</div>\n\n<pre style=\"color:red;\">SQLite error: unrecognized token: &#34;&#39;&#34; | failing query: SELECT id, username, password, email FROM users WHERE id = &#39;</pre>\n<p><a href=\"/\">home</a></p>\n</body></html>",
-      "confidence": "high",
-      "evidence": {
-        "detection_method": "error_based",
-        "detail": "SQL error signature found: 'SQLite'"
-      }
-    },
-    {
-      "target_url": "http://127.0.0.1:5000/user-safe",
+      "target_url": "http://localhost:55000/vulnerabilities/xss_s/",
       "vulnerability_type": "Reflected XSS",
-      "parameter": "id",
-      "payload": "javascript:alert(1)",
-      "http_method": "GET",
+      "parameter": "txtName",
+      "payload": "<script>alert('XSS_TEST')</script>",
+      "http_method": "POST",
       "status_code": 200,
-      "response_body_excerpt": "\n<!doctype html>\n<html><body>\n<h2>User Lookup (parameterized, safe)</h2>\n<form method=\"GET\" action=\"/user-safe\">\n  <input name=\"id\" value=\"javascript:alert(1)\">\n  <button type=\"submit\">Lookup</button>\n</form>\n\n  <div>No user found</div>\n\n<p><a href=\"/\">home</a></p>\n</body></html>",
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Vulnerability: Stored Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"../../dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=\"..",
+      "confidence": "medium",
+      "evidence": {
+        "detection_method": "reflection_check",
+        "detail": "Step2(token '<script'): 이스케이프 없이 태그 존재 → '<script type=\"text/javascript\" src=\"../../dvwa/js/dvwaPage.j'"
+      }
+    },
+    {
+      "target_url": "http://localhost:55000/vulnerabilities/xss_s/",
+      "vulnerability_type": "Reflected XSS",
+      "parameter": "mtxMessage",
+      "payload": "<script>alert('XSS_TEST')</script>",
+      "http_method": "POST",
+      "status_code": 200,
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Vulnerability: Stored Cross Site Scripting (XSS) :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"../../dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=\"..",
+      "confidence": "medium",
+      "evidence": {
+        "detection_method": "reflection_check",
+        "detail": "Step2(token '<script'): 이스케이프 없이 태그 존재 → '<script type=\"text/javascript\" src=\"../../dvwa/js/dvwaPage.j'"
+      }
+    },
+    {
+      "target_url": "http://localhost:55000/vulnerabilities/csp/",
+      "vulnerability_type": "Reflected XSS",
+      "parameter": "include",
+      "payload": "<script>alert('XSS_TEST')</script>",
+      "http_method": "POST",
+      "status_code": 200,
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Vulnerability: Content Security Policy (CSP) Bypass :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"../../dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=",
       "confidence": "high",
       "evidence": {
         "detection_method": "reflection_check",
-        "detail": "Step1(exact): 페이로드 원문 그대로 반사 → 'javascript:alert(1)\">\\n  <button type=\"submit\">Lookup</button'"
+        "detail": "Step1(exact): 페이로드 원문 그대로 반사 → '<script>alert(\\'XSS_TEST\\')</script>\\'></script>\\n\\n<form name=\"c'"
       }
+    },
+    {
+      "target_url": "http://localhost:55000/vulnerabilities/javascript/",
+      "vulnerability_type": "Reflected XSS",
+      "parameter": "token",
+      "payload": "<script>alert('XSS_TEST')</script>",
+      "http_method": "POST",
+      "status_code": 200,
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Vulnerability: JavaScript Attacks :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"../../dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=\"../../favicon.ico",
+      "confidence": "medium",
+      "evidence": {
+        "detection_method": "reflection_check",
+        "detail": "Step2(token '<script'): 이스케이프 없이 태그 존재 → '<script type=\"text/javascript\" src=\"../../dvwa/js/dvwaPage.j'"
+      }
+    },
+    {
+      "target_url": "http://localhost:55000/vulnerabilities/javascript/",
+      "vulnerability_type": "Reflected XSS",
+      "parameter": "phrase",
+      "payload": "<script>alert('XSS_TEST')</script>",
+      "http_method": "POST",
+      "status_code": 200,
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Vulnerability: JavaScript Attacks :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"../../dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=\"../../favicon.ico",
+      "confidence": "medium",
+      "evidence": {
+        "detection_method": "reflection_check",
+        "detail": "Step2(token '<script'): 이스케이프 없이 태그 존재 → '<script type=\"text/javascript\" src=\"../../dvwa/js/dvwaPage.j'"
+      }
+    },
+    {
+      "target_url": "http://localhost:55000/security.php",
+      "vulnerability_type": "Reflected XSS",
+      "parameter": "security",
+      "payload": "<script>alert('XSS_TEST')</script>",
+      "http_method": "POST",
+      "status_code": 200,
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>DVWA Security :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=\"favicon.ico\" />\r\n\r\n\t\t<script type=\"text/jav",
+      "confidence": "medium",
+      "evidence": {
+        "detection_method": "reflection_check",
+        "detail": "Step2(token '<script'): 이스케이프 없이 태그 존재 → '<script type=\"text/javascript\" src=\"dvwa/js/dvwaPage.js\"></s'"
+      }
+    },
+    {
+      "target_url": "http://localhost:55000/security.php",
+      "vulnerability_type": "Reflected XSS",
+      "parameter": "user_token",
+      "payload": "<script>alert('XSS_TEST')</script>",
+      "http_method": "POST",
+      "status_code": 200,
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>DVWA Security :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=\"favicon.ico\" />\r\n\r\n\t\t<script type=\"text/jav",
+      "confidence": "medium",
+      "evidence": {
+        "detection_method": "reflection_check",
+        "detail": "Step2(token '<script'): 이스케이프 없이 태그 존재 → '<script type=\"text/javascript\" src=\"dvwa/js/dvwaPage.js\"></s'"
+      }
+    },
+    {
+      "target_url": "http://localhost:55000/instructions.php?doc=readme",
+      "vulnerability_type": "Reflected XSS",
+      "parameter": "doc",
+      "payload": "<script>alert('XSS_TEST')</script>",
+      "http_method": "GET",
+      "status_code": 200,
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Instructions :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=\"favicon.ico\" />\r\n\r\n\t\t<script type=\"text/java",
+      "confidence": "medium",
+      "evidence": {
+        "detection_method": "reflection_check",
+        "detail": "Step2(token '<script'): 이스케이프 없이 태그 존재 → '<script type=\"text/javascript\" src=\"dvwa/js/dvwaPage.js\"></s'"
+      }
+    },
+    {
+      "target_url": "http://localhost:55000/instructions.php?doc=PDF",
+      "vulnerability_type": "Reflected XSS",
+      "parameter": "doc",
+      "payload": "<script>alert('XSS_TEST')</script>",
+      "http_method": "GET",
+      "status_code": 200,
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Instructions :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=\"favicon.ico\" />\r\n\r\n\t\t<script type=\"text/java",
+      "confidence": "medium",
+      "evidence": {
+        "detection_method": "reflection_check",
+        "detail": "Step2(token '<script'): 이스케이프 없이 태그 존재 → '<script type=\"text/javascript\" src=\"dvwa/js/dvwaPage.js\"></s'"
+      }
+    },
+    {
+      "target_url": "http://localhost:55000/instructions.php?doc=changelog",
+      "vulnerability_type": "Reflected XSS",
+      "parameter": "doc",
+      "payload": "<script>alert('XSS_TEST')</script>",
+      "http_method": "GET",
+      "status_code": 200,
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Instructions :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=\"favicon.ico\" />\r\n\r\n\t\t<script type=\"text/java",
+      "confidence": "medium",
+      "evidence": {
+        "detection_method": "reflection_check",
+        "detail": "Step2(token '<script'): 이스케이프 없이 태그 존재 → '<script type=\"text/javascript\" src=\"dvwa/js/dvwaPage.js\"></s'"
+      }
+    },
+    {
+      "target_url": "http://localhost:55000/instructions.php?doc=copying",
+      "vulnerability_type": "Reflected XSS",
+      "parameter": "doc",
+      "payload": "<script>alert('XSS_TEST')</script>",
+      "http_method": "GET",
+      "status_code": 200,
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Instructions :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=\"favicon.ico\" />\r\n\r\n\t\t<script type=\"text/java",
+      "confidence": "medium",
+      "evidence": {
+        "detection_method": "reflection_check",
+        "detail": "Step2(token '<script'): 이스케이프 없이 태그 존재 → '<script type=\"text/javascript\" src=\"dvwa/js/dvwaPage.js\"></s'"
+      }
+    },
+    {
+      "target_url": "http://localhost:55000/instructions.php?doc=PHPIDS-license",
+      "vulnerability_type": "Reflected XSS",
+      "parameter": "doc",
+      "payload": "<script>alert('XSS_TEST')</script>",
+      "http_method": "GET",
+      "status_code": 200,
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Instructions :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=\"favicon.ico\" />\r\n\r\n\t\t<script type=\"text/java",
+      "confidence": "medium",
+      "evidence": {
+        "detection_method": "reflection_check",
+        "detail": "Step2(token '<script'): 이스케이프 없이 태그 존재 → '<script type=\"text/javascript\" src=\"dvwa/js/dvwaPage.js\"></s'"
+      }
+    },
+    {
+      "target_url": "http://localhost:55000/vulnerabilities/fi/?page=file1.php",
+      "vulnerability_type": "Reflected XSS",
+      "parameter": "page",
+      "payload": "<script>alert('XSS_TEST')</script>",
+      "http_method": "GET",
+      "status_code": 200,
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Vulnerability: File Inclusion :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"../../dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=\"../../favicon.ico\" />",
+      "confidence": "medium",
+      "evidence": {
+        "detection_method": "reflection_check",
+        "detail": "Step2(token '<script'): 이스케이프 없이 태그 존재 → '<script type=\"text/javascript\" src=\"../../dvwa/js/dvwaPage.j'"
+      }
+    },
+    {
+      "target_url": "http://localhost:55000/vulnerabilities/fi/?page=file2.php",
+      "vulnerability_type": "Reflected XSS",
+      "parameter": "page",
+      "payload": "<script>alert('XSS_TEST')</script>",
+      "http_method": "GET",
+      "status_code": 200,
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Vulnerability: File Inclusion :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"../../dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=\"../../favicon.ico\" />",
+      "confidence": "medium",
+      "evidence": {
+        "detection_method": "reflection_check",
+        "detail": "Step2(token '<script'): 이스케이프 없이 태그 존재 → '<script type=\"text/javascript\" src=\"../../dvwa/js/dvwaPage.j'"
+      }
+    },
+    {
+      "target_url": "http://localhost:55000/vulnerabilities/fi/?page=file3.php",
+      "vulnerability_type": "Reflected XSS",
+      "parameter": "page",
+      "payload": "<script>alert('XSS_TEST')</script>",
+      "http_method": "GET",
+      "status_code": 200,
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Vulnerability: File Inclusion :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"../../dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=\"../../favicon.ico\" />",
+      "confidence": "medium",
+      "evidence": {
+        "detection_method": "reflection_check",
+        "detail": "Step2(token '<script'): 이스케이프 없이 태그 존재 → '<script type=\"text/javascript\" src=\"../../dvwa/js/dvwaPage.j'"
+      }
+    },
+    {
+      "target_url": "http://localhost:55000/login.php",
+      "vulnerability_type": "Reflected XSS",
+      "parameter": "username",
+      "payload": "<img src=x onerror=alert('XSS_TEST')>",
+      "http_method": "POST",
+      "status_code": 200,
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Login :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"dvwa/css/login.css\" />\r\n\r\n\t</head>\r\n\r\n\t<body>\r\n\r\n\t<div id=\"wrapper\">\r\n\r\n\t<div id=\"header\">\r\n\r\n\t<br />\r\n\r\n\t<p><img src",
+      "confidence": "medium",
+      "evidence": {
+        "detection_method": "reflection_check",
+        "detail": "Step2(token '<img'): 이스케이프 없이 태그 존재 → '<img src=\"dvwa/images/login_logo.png\" /></p>\\r\\n\\r\\n\\t<br />\\r\\n\\r\\n\\t'"
+      }
+    },
+    {
+      "target_url": "http://localhost:55000/login.php",
+      "vulnerability_type": "Reflected XSS",
+      "parameter": "password",
+      "payload": "<img src=x onerror=alert('XSS_TEST')>",
+      "http_method": "POST",
+      "status_code": 200,
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Login :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"dvwa/css/login.css\" />\r\n\r\n\t</head>\r\n\r\n\t<body>\r\n\r\n\t<div id=\"wrapper\">\r\n\r\n\t<div id=\"header\">\r\n\r\n\t<br />\r\n\r\n\t<p><img src",
+      "confidence": "medium",
+      "evidence": {
+        "detection_method": "reflection_check",
+        "detail": "Step2(token '<img'): 이스케이프 없이 태그 존재 → '<img src=\"dvwa/images/login_logo.png\" /></p>\\r\\n\\r\\n\\t<br />\\r\\n\\r\\n\\t'"
+      }
+    },
+    {
+      "target_url": "http://localhost:55000/login.php",
+      "vulnerability_type": "Reflected XSS",
+      "parameter": "user_token",
+      "payload": "<img src=x onerror=alert('XSS_TEST')>",
+      "http_method": "POST",
+      "status_code": 200,
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Login :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"dvwa/css/login.css\" />\r\n\r\n\t</head>\r\n\r\n\t<body>\r\n\r\n\t<div id=\"wrapper\">\r\n\r\n\t<div id=\"header\">\r\n\r\n\t<br />\r\n\r\n\t<p><img src",
+      "confidence": "medium",
+      "evidence": {
+        "detection_method": "reflection_check",
+        "detail": "Step2(token '<img'): 이스케이프 없이 태그 존재 → '<img src=\"dvwa/images/login_logo.png\" /></p>\\r\\n\\r\\n\\t<br />\\r\\n\\r\\n\\t'"
+      }
+    },
+    {
+      "target_url": "http://localhost:55000/security.php?phpids=on",
+      "vulnerability_type": "Reflected XSS",
+      "parameter": "phpids",
+      "payload": "<script>alert('XSS_TEST')</script>",
+      "http_method": "GET",
+      "status_code": 200,
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>DVWA Security :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=\"favicon.ico\" />\r\n\r\n\t\t<script type=\"text/jav",
+      "confidence": "medium",
+      "evidence": {
+        "detection_method": "reflection_check",
+        "detail": "Step2(token '<script'): 이스케이프 없이 태그 존재 → '<script type=\"text/javascript\" src=\"dvwa/js/dvwaPage.js\"></s'"
+      }
+    },
+    {
+      "target_url": "http://localhost:55000/setup.php#",
+      "vulnerability_type": "Reflected XSS",
+      "parameter": "user_token",
+      "payload": "<script>alert('XSS_TEST')</script>",
+      "http_method": "POST",
+      "status_code": 200,
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>Setup :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=\"favicon.ico\" />\r\n\r\n\t\t<script type=\"text/javascript\"",
+      "confidence": "medium",
+      "evidence": {
+        "detection_method": "reflection_check",
+        "detail": "Step2(token '<script'): 이스케이프 없이 태그 존재 → '<script type=\"text/javascript\" src=\"dvwa/js/dvwaPage.js\"></s'"
+      }
+    },
+    {
+      "target_url": "http://localhost:55000/security.php?test=%22%3E%3Cscript%3Eeval(window.name)%3C/script%3E",
+      "vulnerability_type": "Reflected XSS",
+      "parameter": "test",
+      "payload": "<script>alert('XSS_TEST')</script>",
+      "http_method": "GET",
+      "status_code": 200,
+      "response_body_excerpt": "\r\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n\r\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\r\n\r\n\t<head>\r\n\t\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\r\n\r\n\t\t<title>DVWA Security :: Damn Vulnerable Web Application (DVWA) v1.10 *Development*</title>\r\n\r\n\t\t<link rel=\"stylesheet\" type=\"text/css\" href=\"dvwa/css/main.css\" />\r\n\r\n\t\t<link rel=\"icon\" type=\"\\image/ico\" href=\"favicon.ico\" />\r\n\r\n\t\t<script type=\"text/jav",
+      "confidence": "medium",
+      "evidence": {
+        "detection_method": "reflection_check",
+        "detail": "Step2(token '<script'): 이스케이프 없이 태그 존재 → '<script type=\"text/javascript\" src=\"dvwa/js/dvwaPage.js\"></s'"
+      }
+    }
+  ],
+  "ai_analysis": [
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/setup.php (param: user_token)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 22.271967928s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '22s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
+    },
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/vulnerabilities/brute/ (param: username)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 18.851643303s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '18s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
+    },
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/vulnerabilities/brute/ (param: password)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 15.360713866s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '15s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
+    },
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/vulnerabilities/exec/ (param: ip)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 11.9134139s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '11s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
+    },
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/vulnerabilities/csrf/ (param: password_new)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\nPlease retry in 8.47466565s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '8s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
+    },
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/vulnerabilities/csrf/ (param: password_conf)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\nPlease retry in 5.060893957s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '5s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
+    },
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/vulnerabilities/fi/?page=include.php (param: page)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\nPlease retry in 1.535075257s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '1s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
+    },
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/vulnerabilities/upload/ (param: MAX_FILE_SIZE)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 58.101351711s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '58s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
+    },
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/vulnerabilities/captcha/ (param: step)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 54.693930354s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '54s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
+    },
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/vulnerabilities/captcha/ (param: password_new)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\nPlease retry in 51.284048883s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '51s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
+    },
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/vulnerabilities/captcha/ (param: password_conf)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\nPlease retry in 47.873233843s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '47s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
+    },
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/vulnerabilities/sqli/ (param: id)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 44.454487441s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '44s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
+    },
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/vulnerabilities/sqli_blind/ (param: id)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 41.051680893s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '41s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
+    },
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/vulnerabilities/xss_d/ (param: default)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 37.655245409s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '37s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
+    },
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/vulnerabilities/xss_r/ (param: name)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\nPlease retry in 34.225555648s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '34s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
+    },
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/vulnerabilities/xss_s/ (param: txtName)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\nPlease retry in 30.823445756s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '30s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
+    },
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/vulnerabilities/xss_s/ (param: mtxMessage)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\nPlease retry in 27.404596881s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '27s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
+    },
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/vulnerabilities/csp/ (param: include)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\nPlease retry in 23.996345372s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '23s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
+    },
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/vulnerabilities/javascript/ (param: token)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 20.582298108s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '20s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
+    },
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/vulnerabilities/javascript/ (param: phrase)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\nPlease retry in 17.18378204s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '17s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
+    },
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/security.php (param: security)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\nPlease retry in 13.767519822s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '13s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
+    },
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/security.php (param: user_token)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\nPlease retry in 10.377544371s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '10s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
+    },
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/instructions.php?doc=readme (param: doc)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 6.977012727s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '6s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
+    },
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/instructions.php?doc=PDF (param: doc)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 3.553135608s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '3s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
+    },
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/instructions.php?doc=changelog (param: doc)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 153.443379ms.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '0s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
+    },
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/instructions.php?doc=copying (param: doc)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 56.759481936s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '56s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
+    },
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/instructions.php?doc=PHPIDS-license (param: doc)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 53.334115146s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '53s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
+    },
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/vulnerabilities/fi/?page=file1.php (param: page)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\nPlease retry in 49.94530141s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '49s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
+    },
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/vulnerabilities/fi/?page=file2.php (param: page)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\nPlease retry in 46.571852174s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '46s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
+    },
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/vulnerabilities/fi/?page=file3.php (param: page)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 43.158244046s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '43s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
+    },
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/login.php (param: username)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 39.764619869s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '39s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
+    },
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/login.php (param: password)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 36.352930991s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '36s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
+    },
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/login.php (param: user_token)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\nPlease retry in 32.968463703s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '32s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
+    },
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/security.php?phpids=on (param: phpids)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\nPlease retry in 29.570895112s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '29s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
+    },
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/setup.php# (param: user_token)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 26.159293665s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '26s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
+    },
+    {
+      "vulnerability_summary": "[AI 분석 실패] Reflected XSS — http://localhost:55000/security.php?test=%22%3E%3Cscript%3Eeval(window.name)%3C/script%3E (param: test)",
+      "root_cause": "AI 분석 중 오류가 발생하여 자동 원인 분석을 수행할 수 없습니다. 오류: LLM API 호출 실패 (ClientError): 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 22.738510851s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '22s'}]}}",
+      "attack_scenario": "AI 분석 실패로 인해 공격 시나리오를 자동 생성할 수 없습니다. 보안 전문가의 수동 분석이 필요합니다.",
+      "risk_level": "Medium",
+      "secure_code_example": "AI 분석 실패로 인해 수정 코드를 자동 생성할 수 없습니다. OWASP Cheat Sheet(https://cheatsheetseries.owasp.org)를 참고하세요.",
+      "validation_steps": "1. AI 서비스 상태 및 API Key 확인\n2. 재스캔 수행\n3. 수동 분석 진행",
+      "disclaimer": "본 코드는 참고용 예시이며, 실제 서비스 적용 전 개발자의 검토가 필요합니다."
     }
   ]
 }
