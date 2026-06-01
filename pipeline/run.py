@@ -5,6 +5,7 @@ pipeline/run.py — Scaield 통합 파이프라인
   Step 1 : scanner_core 크롤링 → 입력점(InputPoint) 수집
   Step 2 : pentest/engine.py 취약점 스캔
   Step 3 : 결과 JSON 파일 저장
+  Step 4 : AI 리포트 생성
 
 사용 예시:
   python run.py --url http://127.0.0.1:5000
@@ -38,7 +39,7 @@ for _p in (_SCANNER_DIR, _PENTEST_DIR, _LLM_DIR):
 # 모듈 임포트
 # ---------------------------------------------------------------------------
 
-from scanner_core import VulnerabilityScannerEngine
+from scanner_core import VulnerabilityScannerEngine, LoginConfig
 from engine import ScannerEngine as PentestEngine
 from adapter import findings_to_ai_input
 
@@ -51,6 +52,10 @@ def run_pipeline(
     approved_domains: list[str],
     timeout: int,
     output_path: Path,
+    login_config: LoginConfig | None = None,
+    ai_provider: str = "",
+    ai_key: str = "",
+    ai_model: str = "",
 ) -> int:
     def log(msg: str) -> None:
         print(msg, file=sys.stderr)
@@ -62,10 +67,10 @@ def run_pipeline(
             pre_approved_domains=approved_domains,
             timeout=timeout,
             log_callback=log,
+            login_config=login_config,
         )
         scanner.validator.validate_or_raise(target_url)
-        scanner.crawler.crawl(target_url)
-        form_inputs = scanner.crawler.last_form_inputs
+        form_inputs = scanner.scan(target_url)
         log(f"[Step 1] 완료 — 입력점 {len(form_inputs)}개 수집")
     except PermissionError as exc:
         log(f"[Step 1] 인가되지 않은 타겟: {exc}")
@@ -81,7 +86,9 @@ def run_pipeline(
     # ── Step 2: 취약점 스캔 ───────────────────────────────────────────────
     log(f"[Step 2] 취약점 스캔 시작 ({len(form_inputs)}개 입력점)")
     try:
-        pentest_engine = PentestEngine(config={})
+        pentest_engine = PentestEngine(config={
+            "session_cookies": scanner.session.cookies.get_dict()
+        })
         findings = pentest_engine.run_from_form_inputs(form_inputs)
         results = findings_to_ai_input(findings)
         log(f"[Step 2] 완료 — 취약점 {len(results)}건 탐지")
@@ -177,18 +184,57 @@ def _parse_args() -> argparse.Namespace:
         "--output", default="results.json", metavar="PATH",
         help="결과 JSON 저장 경로 (기본 results.json)",
     )
+    parser.add_argument(
+        "--login-url", default="", help="자동 로그인을 수행할 URL"
+    )
+    parser.add_argument(
+        "--login-user-field", default="username", help="로그인 폼의 아이디 필드명 (기본: username)"
+    )
+    parser.add_argument(
+        "--login-pass-field", default="password", help="로그인 폼의 비밀번호 필드명 (기본: password)"
+    )
+    parser.add_argument(
+        "--login-user", default="", help="자동 로그인용 아이디"
+    )
+    parser.add_argument(
+        "--login-pass", default="", help="자동 로그인용 비밀번호"
+    )
+    parser.add_argument(
+        "--ai-provider", default="", help="AI 분석 LLM 제공자 (openai / gemini)"
+    )
+    parser.add_argument(
+        "--ai-key", default="", help="LLM API Key"
+    )
+    parser.add_argument(
+        "--ai-model", default="", help="LLM 모델명 (기본: 제공자별 기본값)"
+    )
     return parser.parse_args()
 
 
 def main() -> None:
     args = _parse_args()
     approved_domains = [d.strip() for d in args.approved_domains.split(",") if d.strip()]
+    
+    login_cfg = None
+    if args.login_url and args.login_user and args.login_pass:
+        login_cfg = LoginConfig(
+            login_url=args.login_url,
+            username_field=args.login_user_field,
+            password_field=args.login_pass_field,
+            username_value=args.login_user,
+            password_value=args.login_pass,
+        )
+
     sys.exit(
         run_pipeline(
             target_url=args.url,
             approved_domains=approved_domains,
             timeout=args.timeout,
             output_path=Path(args.output),
+            login_config=login_cfg,
+            ai_provider=args.ai_provider,
+            ai_key=args.ai_key,
+            ai_model=args.ai_model,
         )
     )
 
