@@ -1,13 +1,19 @@
 # Optional npm cache directory
 .npm
+
 # Environment variables
 .env
+
 # Virtual environment
 .venv/
+.venv311/
+.venv*/
 venv/
+
 # Python cache
 __pycache__/
 *.pyc
+
 # Pipeline scan results & reports
 pipeline/results.json
 pipeline/report*
