@@ -27,8 +27,9 @@ from pathlib import Path
 _ROOT        = Path(__file__).resolve().parent.parent   # Scaield/
 _SCANNER_DIR = _ROOT / "scanner"
 _PENTEST_DIR = _ROOT / "pentest"
+_LLM_DIR     = _ROOT / "LLMmodule"
 
-for _p in (_SCANNER_DIR, _PENTEST_DIR):
+for _p in (_SCANNER_DIR, _PENTEST_DIR, _LLM_DIR):
     _s = str(_p)
     if _s not in sys.path:
         sys.path.insert(0, _s)
@@ -88,6 +89,18 @@ def run_pipeline(
         log(f"[Step 2] 스캔 오류: {exc}")
         return 1
 
+    # ── 현재 날짜 및 순차적 고유 버전 찾기 ──────────────────────────────
+    date_str = datetime.now().strftime("%Y%m%d")
+    version = 1
+    base_dir = output_path.parent
+    while True:
+        results_file = base_dir / f"results_{date_str}_v{version}.json"
+        report_json_file = base_dir / f"report_{date_str}_v{version}.json"
+        report_md_file = base_dir / f"report_{date_str}_v{version}.md"
+        if not results_file.exists() and not report_json_file.exists() and not report_md_file.exists():
+            break
+        version += 1
+
     # ── Step 3: 결과 저장 ─────────────────────────────────────────────────
     output = {
         "meta": {
@@ -98,11 +111,47 @@ def run_pipeline(
         },
         "findings": results,
     }
-    output_path.write_text(
+    results_file.write_text(
         json.dumps(output, ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
-    log(f"[Step 3] 결과 저장 완료: {output_path}")
+    log(f"[Step 3] 결과 저장 완료: {results_file}")
+
+    # ── Step 4: AI 리포트 생성 ─────────────────────────────────────────────
+    log("[Step 4] AI 리포트 생성 시작")
+    try:
+        from llm import generate_report
+        ai_report = generate_report(output)
+        
+        # JSON 포맷 여부 확인 후 적절히 저장
+        try:
+            cleaned_report = ai_report.strip()
+            if cleaned_report.startswith("```"):
+                lines = cleaned_report.splitlines()
+                if lines[0].startswith("```"):
+                    lines = lines[1:]
+                if lines and lines[-1].startswith("```"):
+                    lines = lines[:-1]
+                cleaned_report = "\n".join(lines).strip()
+            
+            parsed_json = json.loads(cleaned_report)
+            
+            # report json 내에 날짜 정보(scanned_at) 주입
+            parsed_json["scanned_at"] = datetime.now().isoformat(timespec="seconds")
+            
+            report_json_file.write_text(
+                json.dumps(parsed_json, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+            log(f"[Step 4] AI 리포트 저장 완료 (JSON): {report_json_file}")
+        except Exception:
+            # JSON 파싱 실패 시 일반 텍스트/MD 형식으로 저장
+            report_md_file.write_text(ai_report, encoding="utf-8")
+            log(f"[Step 4] AI 리포트 저장 완료 (MD/TXT): {report_md_file}")
+    except Exception as exc:
+        log(f"[Step 4] AI 리포트 생성 오류: {exc}")
+        return 1
+
     return 0
 
 
