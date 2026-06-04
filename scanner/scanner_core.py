@@ -395,16 +395,20 @@ class IntelligentCrawler:
 
         # ── Phase 2: Dynamic rendering for JS-heavy pages ───────────────
         if self.dynamic_enabled and self._dynamic_candidates:
+            # Create a copy of the set to avoid "Set changed size during iteration" error
+            candidates_copy = set(self._dynamic_candidates)
             dynamic_points = self._crawl_dynamic(
                 base_url=targetUrl,
-                candidates=self._dynamic_candidates,
+                candidates=candidates_copy,
                 base_netloc=base_netloc,
             )
             raw_points.extend(dynamic_points)
 
         # ── Consolidate results into public attributes ───────────────────
+        # Create a copy to avoid "Set changed size during iteration" error
+        visited_copy = set(self._visited)
         self.discoveredLinks = sorted(
-            {self._canonicalize(u) for u in self._visited}
+            {self._canonicalize(u) for u in visited_copy}
         )
         self.forms = self._deduplicate_form_inputs(raw_forms)
         self.parameters = self._deduplicate_points(raw_points)
