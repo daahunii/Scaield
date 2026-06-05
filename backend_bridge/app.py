@@ -154,6 +154,7 @@ def _run_scan(scan_id: str) -> None:
     started = time.monotonic()
 
     def log(message: str) -> None:
+        print(f"[SCAN LOG] {message}", flush=True)
         scan["logs"].append(message)
         scan["current_step"] = _stage_from_log(message)
         scan["progress"] = max(scan["progress"], _progress_from_log(message))
@@ -194,8 +195,15 @@ def _run_scan(scan_id: str) -> None:
         if skipped_external_count:
             log(f"[SKIP] 외부 API 입력 지점 {skipped_external_count}개 제외")
 
+        unique_pages = sorted(_dedupe_urls(pages))
+        print(f"=== 발견된 페이지(서브 링크) 목록 (총 {len(unique_pages)}개) ===\n{json.dumps(unique_pages, ensure_ascii=False, indent=2)}\n===================", flush=True)
+        if unique_pages:
+            log(f"총 {len(unique_pages)}개의 하위 페이지(경로)를 발견했습니다.")
+
         findings: list[dict[str, Any]]
         if form_inputs:
+            print(f"=== form_inputs ===\n{json.dumps(form_inputs, ensure_ascii=False, indent=2)}\n===================", flush=True)
+            log(f"수집된 form_inputs 항목 확인 완료 (총 {len(form_inputs)}개)")
             log("[Step 2] SQL Injection/XSS Payload 주입 중")
             pentest = PentestEngine(
                 config={"session_cookies": crawler.session.cookies.get_dict()}
