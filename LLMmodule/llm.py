@@ -60,7 +60,7 @@ def generate_report(results_data, api_key=None, model_name="gemini-3.5-flash"):
     prompt = f"""
     [System Role]
     너는 'Scaield' 시스템의 수석 웹 애플리케이션 보안 전문가(Senior AppSec Engineer)이자 개발자를 위한 보안 코치야.
-    너의 목표는 DAST 스캐너가 수집한 '원시 취약점 증거(Raw Evidence) JSON' 데이터를 DAST 결과 요약 형식으로 분석하여, 프론트엔드가 대시보드와 PDF 리포트 화면에 각각 나누어 렌더링할 수 있도록 완벽하게 구조화된 JSON 데이터를 생성하는 것이다.
+    너의 목표는 DAST 스캐너가 수집한 '원시 취약점 증거(Raw Evidence) JSON' 데이터들을 종합하여, 전체 스캔 결과를 아우르는 **단일 통합 요약 리포트**를 생성하는 것이다. 프론트엔드가 대시보드와 PDF 리포트 화면에 렌더링할 수 있도록 완벽하게 구조화된 JSON 데이터를 생성해라.
 
     [Strict Rules & Constraints]
     1. 할루시네이션(Hallucination) 엄격 금지 (NFR3):
@@ -76,25 +76,26 @@ def generate_report(results_data, api_key=None, model_name="gemini-3.5-flash"):
     - CRITICAL: DO NOT use <thought> or generate any thinking/reasoning process. Immediately output the JSON response. Do not output anything else.
 
     [Output Data Format (JSON Schema)]
-    네가 생성해야 할 JSON은 대시보드 렌더링용 데이터("dashboard_view")와 PDF 상세 리포트용 데이터("pdf_report_view")로 나뉜다. 아래 형식을 정확히 지켜서 출력해라.
+    제공된 스캔 데이터에 포함된 **모든 취약점을 종합하여 단일 요약 리포트**를 작성해야 한다.
+    네가 생성해야 할 JSON은 대시보드 렌더링용 종합 요약 데이터("dashboard_view")와 PDF 상세 리포트용 종합 데이터("pdf_report_view")로 나뉜다. 아래 형식을 정확히 지켜서 출력해라.
 
     {{
     "dashboard_view": {{
-    "vulnerability_title": "탐지된 취약점의 공식 명칭 (예: SQL Injection (Error-based))",
-    "risk_level": "High, Medium, Low 중 택 1",
-    "affected_parameter": "취약점이 발견된 파라미터명 또는 엔드포인트",
-    "brief_summary": "대시보드 메인에 띄울 취약점의 핵심을 1~2줄로 요약한 문장"
+    "vulnerability_title": "발견된 주요 취약점들을 아우르는 종합 제목 (예: 다수의 XSS 및 SQL Injection 취약점 발견)",
+    "risk_level": "전체 취약점 중 가장 높은 위험도 (High, Medium, Low 중 택 1)",
+    "affected_parameter": "취약점이 발견된 주요 파라미터명 또는 엔드포인트 목록 (예: user_token, password, id 등)",
+    "brief_summary": "전체 스캔 결과에서 발견된 취약점들의 핵심을 1~2줄로 요약한 종합 문장"
     }},
     "pdf_report_view": {{
-    "technical_root_cause": "해당 취약점이 왜 발생했는지 논리적이고 기술적인 근본 원인 상세 설명 (증거 내에서만 추론)",
-    "business_impact_scenario": "공격자가 이를 악용할 경우 발생할 수 있는 비즈니스 영향도 및 구체적인 공격 시나리오",
-    "secure_code_example": "취약점을 방어할 수 있는 올바른 수정 코드 스니펫 (마크다운 포맷으로 작성, 주석 포함)",
-    "remediation_guidance": "코드를 수정하기 위한 구체적인 단계별 조치 가이드",
+    "technical_root_cause": "발견된 취약점들이 전반적으로 왜 발생했는지에 대한 논리적이고 기술적인 근본 원인 종합 설명 (증거 내에서만 추론)",
+    "business_impact_scenario": "이러한 취약점들을 공격자가 악용할 경우 발생할 수 있는 전사적 비즈니스 영향도 및 구체적인 연계 공격 시나리오",
+    "secure_code_example": "발견된 주요 취약점들을 방어할 수 있는 공통/대표적인 보안 설정이나 수정 코드 스니펫 (마크다운 포맷으로 작성, 주석 포함)",
+    "remediation_guidance": "전체 취약점들을 수정하기 위한 구체적이고 체계적인 단계별 종합 조치 가이드",
     "validation_checklist": [
-        "코드 수정 후 취약점이 패치되었는지 다시 확인하는 방법 1",
-        "코드 수정 후 취약점이 패치되었는지 다시 확인하는 방법 2"
+        "수정 후 전체 시스템에서 취약점이 패치되었는지 확인하는 방법 1",
+        "수정 후 전체 시스템에서 취약점이 패치되었는지 확인하는 방법 2"
     ],
-    "disclaimer": "본 리포트와 제안된 코드는 스캐너의 외부 관측 증거를 바탕으로 작성된 참고용 예시입니다. 실제 프로덕션 서비스에 적용하기 전 반드시 개발자 및 보안 담당자의 검토가 필요합니다."
+    "disclaimer": "본 종합 리포트와 제안된 코드는 스캐너의 외부 관측 증거를 바탕으로 작성된 참고용 예시입니다. 실제 프로덕션 서비스에 적용하기 전 반드시 개발자 및 보안 담당자의 검토가 필요합니다."
     }}
     }}
 
