@@ -60,15 +60,13 @@
     "method": "GET",
     "parameter": "q",
     "expected_vuln_types": [],
-    "known_scanner_limitation": true,
-    "description": "안전(이스케이프 적용)하지만 페이지에 <script> 태그 존재 → XSS 오탐 가능"
+    "description": "안전(이스케이프 적용) + 페이지에 <script> 태그 존재 — 베이스라인 비교로 오탐 제거"
   },
   {
     "endpoint_path": "/fp-has-sqlite",
     "method": "GET",
     "parameter": "q",
     "expected_vuln_types": [],
-    "known_scanner_limitation": true,
-    "description": "안전(파라미터화 쿼리)하지만 페이지에 'SQLite' 문자열 존재 → SQLi 오탐 가능"
+    "description": "안전(파라미터화 쿼리) + 페이지에 'SQLite' 문자열 존재 — 베이스라인 비교로 오탐 제거"
   }
 ]

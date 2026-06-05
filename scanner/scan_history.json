@@ -2745,5 +2745,41 @@
         "extra_data": {}
       }
     ]
+  },
+  {
+    "timestamp": "2026-06-06 01:48:32",
+    "target_url": "http://127.0.0.1:61342/xss-vuln?q=test",
+    "approved_domains": [
+      "localhost",
+      "127.0.0.1"
+    ],
+    "timeout": 10,
+    "results": [
+      {
+        "url": "http://127.0.0.1:61342/xss-vuln?q=test",
+        "method": "GET",
+        "parameter": "q",
+        "parameter_type": "text",
+        "extra_data": {}
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-06-06 01:51:58",
+    "target_url": "http://127.0.0.1:61767/xss-vuln?q=test",
+    "approved_domains": [
+      "localhost",
+      "127.0.0.1"
+    ],
+    "timeout": 10,
+    "results": [
+      {
+        "url": "http://127.0.0.1:61767/xss-vuln?q=test",
+        "method": "GET",
+        "parameter": "q",
+        "parameter_type": "text",
+        "extra_data": {}
+      }
+    ]
   }
 ]
