@@ -43,7 +43,7 @@ AI 리포트까지 생성하려면 `/Users/jonghyun/Desktop/Scaield/.env` 또는
 AI 리포트를 실제 Gemini API로 생성하려면 추가 패키지도 설치합니다.
 
 ```bash
-pip install google-generativeai
+pip install google-genai
 ```
 
 이 패키지가 없어도 브릿지 서버와 기본 스캔 API는 실행됩니다. 이 경우 AI 리포트는 fallback 안내 문구로 표시됩니다.
