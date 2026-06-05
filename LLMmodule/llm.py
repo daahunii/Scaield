@@ -1,6 +1,7 @@
 import json
 import os
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
 def load_env():
     """
@@ -52,10 +53,7 @@ def generate_report(results_data, api_key=None, model_name="gemini-3.5-flash"):
     if not api_key:
         return "Error: Gemini API key not provided and GEMINI_API_KEY not found in environment."
 
-    genai.configure(api_key=api_key)
-    
-    # Initialize the model
-    model = genai.GenerativeModel(model_name)
+    client = genai.Client(api_key=api_key)
 
     prompt = f"""
     [System Role]
@@ -103,7 +101,10 @@ def generate_report(results_data, api_key=None, model_name="gemini-3.5-flash"):
 
 
     try:
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(
+            model=model_name,
+            contents=prompt,
+        )
         return response.text
     except Exception as e:
         return f"An error occurred during report generation: {e}"
