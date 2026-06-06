@@ -34,6 +34,33 @@ app = Flask(__name__)
 SCANS: dict[str, dict[str, Any]] = {}
 
 
+def _load_archived_scans() -> None:
+    scans_dir = SCAIELD_ROOT / "scans"
+    if not scans_dir.exists():
+        return
+    for file_path in scans_dir.glob("scan_*.json"):
+        try:
+            with open(file_path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            scan_id = data.get("scan_id")
+            if scan_id:
+                SCANS[scan_id] = {
+                    "scan_id": scan_id,
+                    "status": "completed",
+                    "progress": 100,
+                    "current_step": "스캔 완료",
+                    "logs": [],
+                    "error": None,
+                    "result": data,
+                    "payload": {
+                        "target_url": data.get("target_url"),
+                    },
+                    "started_at": data.get("started_at"),
+                }
+        except Exception as e:
+            print(f"Error loading archived scan {file_path}: {e}")
+
+
 def _load_env_files() -> None:
     for env_path in (SCAIELD_ROOT / ".env", Path.cwd() / ".env", Path.cwd() / ".env.local"):
         if not env_path.exists():
@@ -47,6 +74,7 @@ def _load_env_files() -> None:
 
 
 _load_env_files()
+_load_archived_scans()
 
 DEFAULT_GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash")
 
@@ -148,6 +176,28 @@ def scan_result(scan_id: str):
     return jsonify(scan["result"])
 
 
+@app.route("/scan/list", methods=["GET"])
+def list_scans():
+    results = []
+    for scan_id, scan in SCANS.items():
+        if scan["status"] == "completed" and scan.get("result"):
+            res = scan["result"]
+            started_at = res.get("started_at", "")
+            date_part = started_at.split("T")[0] if "T" in started_at else started_at
+            
+            results.append({
+                "scan_id": scan_id,
+                "target_url": res.get("target_url"),
+                "date": date_part,
+                "risk_level": res.get("risk_level", "Low"),
+                "vulnerabilities_count": len(res.get("vulnerabilities", [])),
+                "scan_time": res.get("scan_time", "0초"),
+            })
+    # Sort by date descending
+    results.sort(key=lambda x: x.get("date", ""), reverse=True)
+    return jsonify(results)
+
+
 def _run_scan(scan_id: str) -> None:
     scan = SCANS[scan_id]
     payload = scan["payload"]
@@ -233,7 +283,7 @@ def _run_scan(scan_id: str) -> None:
         elif findings:
             report_status = "AI 리포트 미생성: 요청 옵션 비활성화"
 
-        scan["result"] = _build_frontend_result(
+        result = _build_frontend_result(
             scan_id=scan_id,
             target_url=target_url,
             findings=findings,
@@ -243,9 +293,20 @@ def _run_scan(scan_id: str) -> None:
             scan_seconds=int(time.monotonic() - started),
             report_status=report_status,
         )
+        scan["result"] = result
         scan["status"] = "completed"
         scan["progress"] = 100
         scan["current_step"] = "스캔 완료"
+
+        # Save scan result to file
+        try:
+            scans_dir = SCAIELD_ROOT / "scans"
+            scans_dir.mkdir(exist_ok=True)
+            file_path = scans_dir / f"scan_{scan_id}.json"
+            with open(file_path, "w", encoding="utf-8") as f:
+                json.dump(result, f, ensure_ascii=False, indent=2)
+        except Exception as file_exc:
+            log(f"[WARN] 스캔 결과 파일 저장 중 오류 발생: {file_exc}")
     except Exception as exc:
         scan["status"] = "failed"
         scan["error"] = str(exc)

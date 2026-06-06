@@ -50,6 +50,45 @@ export async function getScanResult(scanId) {
   return response.json();
 }
 
+export async function getScanList() {
+  if (isMockApi) {
+    return Promise.resolve([
+      {
+        scan_id: "archive-01",
+        target_url: "http://localhost:8080/dvwa",
+        date: "2026-06-01",
+        risk_level: "High",
+        vulnerabilities_count: 2,
+        scan_time: "2분 14초",
+      },
+      {
+        scan_id: "archive-02",
+        target_url: "https://demo.testfire.net",
+        date: "2026-05-24",
+        risk_level: "High",
+        vulnerabilities_count: 3,
+        scan_time: "3분 05초",
+      },
+      {
+        scan_id: "archive-03",
+        target_url: "https://example.com/api",
+        date: "2026-05-18",
+        risk_level: "Low",
+        vulnerabilities_count: 0,
+        scan_time: "1분 40초",
+      },
+    ]);
+  }
+
+  const response = await fetch(`${API_BASE_URL}/scan/list`);
+
+  if (!response.ok) {
+    throw new Error("스캔 목록 조회에 실패했습니다.");
+  }
+
+  return response.json();
+}
+
 function createMockScan(payload) {
   return Promise.resolve({
     scan_id: `mock-${Date.now()}`,
