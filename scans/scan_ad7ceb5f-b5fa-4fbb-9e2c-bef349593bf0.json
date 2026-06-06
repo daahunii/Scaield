@@ -1,0 +1,415 @@
+{
+  "scan_id": "ad7ceb5f-b5fa-4fbb-9e2c-bef349593bf0",
+  "target_url": "http://localhost:8080/dvwa",
+  "scan_time": "1분 8초",
+  "started_at": "2026-06-06T18:04:26",
+  "finished_at": "2026-06-06T18:05:35",
+  "total_pages": 14,
+  "tested_inputs": 19,
+  "detected_counts": {
+    "Reflected XSS": 19
+  },
+  "risk_level": "High",
+  "report_status": "AI 리포트 생성 완료",
+  "vulnerabilities": [
+    {
+      "id": "vuln-1",
+      "type": "Reflected XSS",
+      "risk_level": "High",
+      "endpoint": "http://localhost:8080/dvwa?C=N;O=D",
+      "parameter": "C",
+      "payload": "<img src=x onerror=alert('XSS_TEST')>",
+      "status_code": 200,
+      "evidence": "Step2(token '<img'): 이스케이프 없이 태그 존재 → '<img src=\"/icons/blank.gif\" alt=\"[ICO]\"></th><th><a href=\"?C'",
+      "detection_method": "reflection_check",
+      "ai_report": {
+        "vulnerability_summary": "서버가 요청 파라미터 'C'의 값을 적절한 검증이나 HTML 엔티티 이스케이프 처리 없이 응답 본문에 그대로 반사(Reflection)하여 출력함으로써 악성 스크립트가 실행될 수 있는 취약점입니다.",
+        "root_cause": "DAST 스캔 결과, /dvwa 경로의 GET 요청 파라미터 'C'에 주입된 페이로드(<img src=x onerror=alert('XSS_TEST')>)가 서버 측에서 아무런 필터링이나 HTML 인코딩 처리를 거치지 않고 HTTP 응답 본문(Response Body)에 그대로 렌더링되는 것이 확인되었습니다. HTML 구조 내에서 특수문자(<, >, \", ' 등)가 일반 텍스트가 아닌 HTML 태그 및 속성으로 해석되어 브라우저 컨텍스트 내에서 임의의 자바스크립트 코드가 실행될 수 있는 상태입니다.",
+        "risk_level": "High",
+        "attack_scenario": "공격자는 악성 스크립트가 포함된 링크를 정교하게 제작하여 일반 사용자에게 전송할 수 있습니다. 사용자가 이 링크를 클릭하는 순간, 웹 브라우저 내에서 공격자가 의도한 악성 스크립트가 실행됩니다. 이를 통해 피해 사용자의 세션 토큰(Session Cookie) 탈취, CSRF(Cross-Site Request Forgery) 공격 연계, 웹 페이지 변조(Defacement) 또는 가짜 로그인 창 유도를 통한 사용자 크리덴셜 탈취 등의 심각한 비즈니스 피해가 발생할 수 있습니다.",
+        "secure_coding_guidance": "1단계: 사용자 입력값(특히 쿼리 파라미터 'C')이 HTML 본문, 링크(HREF), 속성(Attribute) 등 출력되는 컨텍스트(Context)를 정확히 식별합니다.\n2단계: 해당 컨텍스트에 부합하는 인코딩 솔루션을 적용합니다. HTML 본문에 출력되는 경우 HTML Entity Encoding을 적용하고, 속성 값으로 들어가는 경우 Attribute Encoding을 적용합니다.\n3단계: 사용 중인 개발 프레임워크나 템플릿 엔진(예: Thymeleaf, React, Django 등)에서 기본적으로 제공하는 자동 이스케이프(Auto-escaping) 기능이 활성화되어 있는지 확인하고, 날 것(Raw)의 데이터를 출력하는 기능(예: v-html, dangerouslySetInnerHTML 등)을 절대 사용하지 않습니다.\n4단계: 추가적인 방어선으로 HTTP 응답 헤더에 'Content-Security-Policy (CSP)'를 설정하여 신뢰할 수 없는 스크립트의 실행을 원천적으로 차단합니다.",
+        "fixed_code_example": "```html\n<!-- [안전하지 않은 기존 코드 예시 (PHP 환경 가정)] -->\n<!-- <a href=\"?C=<?php echo $_GET['C']; ?>\">Name</a> -->\n\n<!-- [올바른 보안 코딩 예시: HTML 엔티티 인코딩 적용] -->\n<a href=\"?C=<?php echo htmlspecialchars($_GET['C'], ENT_QUOTES, 'UTF-8'); ?>\">Name</a>\n\n<!-- \n  [시큐어 코딩 설명]\n  - htmlspecialchars() 함수를 사용하여 사용자가 입력한 특수문자(<, >, \", ', &)를 대응되는 안전한 HTML 엔티티(&lt;, &gt;, &quot;, &#039;, &amp;)로 변환합니다.\n  - ENT_QUOTES 옵션을 지정하여 싱글 쿼터와 더블 쿼터를 모두 변환함으로써 속성 값 내부에서의 인젝션을 방어합니다.\n  - UTF-8 인코딩을 명시하여 멀티바이트 인코딩 우회 공격을 예방합니다.\n-->\n```",
+        "validation_steps": "파라미터 'C'에 '<script>alert(1)</script>' 또는 '<img src=x onerror=alert(1)>'와 같은 특수문자가 포함된 테스트 페이로드를 전송한 후, 응답 HTML 소스코드에서 해당 문자들이 '&lt;script&gt;' 또는 '&lt;img' 등 HTML 엔티티로 변환되어 브라우저에 텍스트로 안전하게 출력되는지 확인합니다.\n웹 브라우저의 개발자 도구(F12) 콘솔 탭을 확인하여 페이로드 요청 시 경고창(alert)이 발생하거나 스크립트 실행 오류 등의 보안 정책 위반 로그 외에 악성 스크립트가 실행되지 않는지 확인합니다.",
+        "disclaimer": "본 리포트와 제안된 코드는 스캐너의 외부 관측 증거를 바탕으로 작성된 참고용 예시입니다. 실제 프로덕션 서비스에 적용하기 전 반드시 개발자 및 보안 담당자의 검토가 필요합니다."
+      }
+    },
+    {
+      "id": "vuln-2",
+      "type": "Reflected XSS",
+      "risk_level": "High",
+      "endpoint": "http://localhost:8080/dvwa?C=M;O=A",
+      "parameter": "C",
+      "payload": "<img src=x onerror=alert('XSS_TEST')>",
+      "status_code": 200,
+      "evidence": "Step2(token '<img'): 이스케이프 없이 태그 존재 → '<img src=\"/icons/blank.gif\" alt=\"[ICO]\"></th><th><a href=\"?C'",
+      "detection_method": "reflection_check",
+      "ai_report": {
+        "vulnerability_summary": "서버가 요청 파라미터 'C'의 값을 적절한 검증이나 HTML 엔티티 이스케이프 처리 없이 응답 본문에 그대로 반사(Reflection)하여 출력함으로써 악성 스크립트가 실행될 수 있는 취약점입니다.",
+        "root_cause": "DAST 스캔 결과, /dvwa 경로의 GET 요청 파라미터 'C'에 주입된 페이로드(<img src=x onerror=alert('XSS_TEST')>)가 서버 측에서 아무런 필터링이나 HTML 인코딩 처리를 거치지 않고 HTTP 응답 본문(Response Body)에 그대로 렌더링되는 것이 확인되었습니다. HTML 구조 내에서 특수문자(<, >, \", ' 등)가 일반 텍스트가 아닌 HTML 태그 및 속성으로 해석되어 브라우저 컨텍스트 내에서 임의의 자바스크립트 코드가 실행될 수 있는 상태입니다.",
+        "risk_level": "High",
+        "attack_scenario": "공격자는 악성 스크립트가 포함된 링크를 정교하게 제작하여 일반 사용자에게 전송할 수 있습니다. 사용자가 이 링크를 클릭하는 순간, 웹 브라우저 내에서 공격자가 의도한 악성 스크립트가 실행됩니다. 이를 통해 피해 사용자의 세션 토큰(Session Cookie) 탈취, CSRF(Cross-Site Request Forgery) 공격 연계, 웹 페이지 변조(Defacement) 또는 가짜 로그인 창 유도를 통한 사용자 크리덴셜 탈취 등의 심각한 비즈니스 피해가 발생할 수 있습니다.",
+        "secure_coding_guidance": "1단계: 사용자 입력값(특히 쿼리 파라미터 'C')이 HTML 본문, 링크(HREF), 속성(Attribute) 등 출력되는 컨텍스트(Context)를 정확히 식별합니다.\n2단계: 해당 컨텍스트에 부합하는 인코딩 솔루션을 적용합니다. HTML 본문에 출력되는 경우 HTML Entity Encoding을 적용하고, 속성 값으로 들어가는 경우 Attribute Encoding을 적용합니다.\n3단계: 사용 중인 개발 프레임워크나 템플릿 엔진(예: Thymeleaf, React, Django 등)에서 기본적으로 제공하는 자동 이스케이프(Auto-escaping) 기능이 활성화되어 있는지 확인하고, 날 것(Raw)의 데이터를 출력하는 기능(예: v-html, dangerouslySetInnerHTML 등)을 절대 사용하지 않습니다.\n4단계: 추가적인 방어선으로 HTTP 응답 헤더에 'Content-Security-Policy (CSP)'를 설정하여 신뢰할 수 없는 스크립트의 실행을 원천적으로 차단합니다.",
+        "fixed_code_example": "```html\n<!-- [안전하지 않은 기존 코드 예시 (PHP 환경 가정)] -->\n<!-- <a href=\"?C=<?php echo $_GET['C']; ?>\">Name</a> -->\n\n<!-- [올바른 보안 코딩 예시: HTML 엔티티 인코딩 적용] -->\n<a href=\"?C=<?php echo htmlspecialchars($_GET['C'], ENT_QUOTES, 'UTF-8'); ?>\">Name</a>\n\n<!-- \n  [시큐어 코딩 설명]\n  - htmlspecialchars() 함수를 사용하여 사용자가 입력한 특수문자(<, >, \", ', &)를 대응되는 안전한 HTML 엔티티(&lt;, &gt;, &quot;, &#039;, &amp;)로 변환합니다.\n  - ENT_QUOTES 옵션을 지정하여 싱글 쿼터와 더블 쿼터를 모두 변환함으로써 속성 값 내부에서의 인젝션을 방어합니다.\n  - UTF-8 인코딩을 명시하여 멀티바이트 인코딩 우회 공격을 예방합니다.\n-->\n```",
+        "validation_steps": "파라미터 'C'에 '<script>alert(1)</script>' 또는 '<img src=x onerror=alert(1)>'와 같은 특수문자가 포함된 테스트 페이로드를 전송한 후, 응답 HTML 소스코드에서 해당 문자들이 '&lt;script&gt;' 또는 '&lt;img' 등 HTML 엔티티로 변환되어 브라우저에 텍스트로 안전하게 출력되는지 확인합니다.\n웹 브라우저의 개발자 도구(F12) 콘솔 탭을 확인하여 페이로드 요청 시 경고창(alert)이 발생하거나 스크립트 실행 오류 등의 보안 정책 위반 로그 외에 악성 스크립트가 실행되지 않는지 확인합니다.",
+        "disclaimer": "본 리포트와 제안된 코드는 스캐너의 외부 관측 증거를 바탕으로 작성된 참고용 예시입니다. 실제 프로덕션 서비스에 적용하기 전 반드시 개발자 및 보안 담당자의 검토가 필요합니다."
+      }
+    },
+    {
+      "id": "vuln-3",
+      "type": "Reflected XSS",
+      "risk_level": "High",
+      "endpoint": "http://localhost:8080/dvwa?C=S;O=A",
+      "parameter": "C",
+      "payload": "<img src=x onerror=alert('XSS_TEST')>",
+      "status_code": 200,
+      "evidence": "Step2(token '<img'): 이스케이프 없이 태그 존재 → '<img src=\"/icons/blank.gif\" alt=\"[ICO]\"></th><th><a href=\"?C'",
+      "detection_method": "reflection_check",
+      "ai_report": {
+        "vulnerability_summary": "서버가 요청 파라미터 'C'의 값을 적절한 검증이나 HTML 엔티티 이스케이프 처리 없이 응답 본문에 그대로 반사(Reflection)하여 출력함으로써 악성 스크립트가 실행될 수 있는 취약점입니다.",
+        "root_cause": "DAST 스캔 결과, /dvwa 경로의 GET 요청 파라미터 'C'에 주입된 페이로드(<img src=x onerror=alert('XSS_TEST')>)가 서버 측에서 아무런 필터링이나 HTML 인코딩 처리를 거치지 않고 HTTP 응답 본문(Response Body)에 그대로 렌더링되는 것이 확인되었습니다. HTML 구조 내에서 특수문자(<, >, \", ' 등)가 일반 텍스트가 아닌 HTML 태그 및 속성으로 해석되어 브라우저 컨텍스트 내에서 임의의 자바스크립트 코드가 실행될 수 있는 상태입니다.",
+        "risk_level": "High",
+        "attack_scenario": "공격자는 악성 스크립트가 포함된 링크를 정교하게 제작하여 일반 사용자에게 전송할 수 있습니다. 사용자가 이 링크를 클릭하는 순간, 웹 브라우저 내에서 공격자가 의도한 악성 스크립트가 실행됩니다. 이를 통해 피해 사용자의 세션 토큰(Session Cookie) 탈취, CSRF(Cross-Site Request Forgery) 공격 연계, 웹 페이지 변조(Defacement) 또는 가짜 로그인 창 유도를 통한 사용자 크리덴셜 탈취 등의 심각한 비즈니스 피해가 발생할 수 있습니다.",
+        "secure_coding_guidance": "1단계: 사용자 입력값(특히 쿼리 파라미터 'C')이 HTML 본문, 링크(HREF), 속성(Attribute) 등 출력되는 컨텍스트(Context)를 정확히 식별합니다.\n2단계: 해당 컨텍스트에 부합하는 인코딩 솔루션을 적용합니다. HTML 본문에 출력되는 경우 HTML Entity Encoding을 적용하고, 속성 값으로 들어가는 경우 Attribute Encoding을 적용합니다.\n3단계: 사용 중인 개발 프레임워크나 템플릿 엔진(예: Thymeleaf, React, Django 등)에서 기본적으로 제공하는 자동 이스케이프(Auto-escaping) 기능이 활성화되어 있는지 확인하고, 날 것(Raw)의 데이터를 출력하는 기능(예: v-html, dangerouslySetInnerHTML 등)을 절대 사용하지 않습니다.\n4단계: 추가적인 방어선으로 HTTP 응답 헤더에 'Content-Security-Policy (CSP)'를 설정하여 신뢰할 수 없는 스크립트의 실행을 원천적으로 차단합니다.",
+        "fixed_code_example": "```html\n<!-- [안전하지 않은 기존 코드 예시 (PHP 환경 가정)] -->\n<!-- <a href=\"?C=<?php echo $_GET['C']; ?>\">Name</a> -->\n\n<!-- [올바른 보안 코딩 예시: HTML 엔티티 인코딩 적용] -->\n<a href=\"?C=<?php echo htmlspecialchars($_GET['C'], ENT_QUOTES, 'UTF-8'); ?>\">Name</a>\n\n<!-- \n  [시큐어 코딩 설명]\n  - htmlspecialchars() 함수를 사용하여 사용자가 입력한 특수문자(<, >, \", ', &)를 대응되는 안전한 HTML 엔티티(&lt;, &gt;, &quot;, &#039;, &amp;)로 변환합니다.\n  - ENT_QUOTES 옵션을 지정하여 싱글 쿼터와 더블 쿼터를 모두 변환함으로써 속성 값 내부에서의 인젝션을 방어합니다.\n  - UTF-8 인코딩을 명시하여 멀티바이트 인코딩 우회 공격을 예방합니다.\n-->\n```",
+        "validation_steps": "파라미터 'C'에 '<script>alert(1)</script>' 또는 '<img src=x onerror=alert(1)>'와 같은 특수문자가 포함된 테스트 페이로드를 전송한 후, 응답 HTML 소스코드에서 해당 문자들이 '&lt;script&gt;' 또는 '&lt;img' 등 HTML 엔티티로 변환되어 브라우저에 텍스트로 안전하게 출력되는지 확인합니다.\n웹 브라우저의 개발자 도구(F12) 콘솔 탭을 확인하여 페이로드 요청 시 경고창(alert)이 발생하거나 스크립트 실행 오류 등의 보안 정책 위반 로그 외에 악성 스크립트가 실행되지 않는지 확인합니다.",
+        "disclaimer": "본 리포트와 제안된 코드는 스캐너의 외부 관측 증거를 바탕으로 작성된 참고용 예시입니다. 실제 프로덕션 서비스에 적용하기 전 반드시 개발자 및 보안 담당자의 검토가 필요합니다."
+      }
+    },
+    {
+      "id": "vuln-4",
+      "type": "Reflected XSS",
+      "risk_level": "High",
+      "endpoint": "http://localhost:8080/dvwa?C=D;O=A",
+      "parameter": "C",
+      "payload": "<img src=x onerror=alert('XSS_TEST')>",
+      "status_code": 200,
+      "evidence": "Step2(token '<img'): 이스케이프 없이 태그 존재 → '<img src=\"/icons/blank.gif\" alt=\"[ICO]\"></th><th><a href=\"?C'",
+      "detection_method": "reflection_check",
+      "ai_report": {
+        "vulnerability_summary": "서버가 요청 파라미터 'C'의 값을 적절한 검증이나 HTML 엔티티 이스케이프 처리 없이 응답 본문에 그대로 반사(Reflection)하여 출력함으로써 악성 스크립트가 실행될 수 있는 취약점입니다.",
+        "root_cause": "DAST 스캔 결과, /dvwa 경로의 GET 요청 파라미터 'C'에 주입된 페이로드(<img src=x onerror=alert('XSS_TEST')>)가 서버 측에서 아무런 필터링이나 HTML 인코딩 처리를 거치지 않고 HTTP 응답 본문(Response Body)에 그대로 렌더링되는 것이 확인되었습니다. HTML 구조 내에서 특수문자(<, >, \", ' 등)가 일반 텍스트가 아닌 HTML 태그 및 속성으로 해석되어 브라우저 컨텍스트 내에서 임의의 자바스크립트 코드가 실행될 수 있는 상태입니다.",
+        "risk_level": "High",
+        "attack_scenario": "공격자는 악성 스크립트가 포함된 링크를 정교하게 제작하여 일반 사용자에게 전송할 수 있습니다. 사용자가 이 링크를 클릭하는 순간, 웹 브라우저 내에서 공격자가 의도한 악성 스크립트가 실행됩니다. 이를 통해 피해 사용자의 세션 토큰(Session Cookie) 탈취, CSRF(Cross-Site Request Forgery) 공격 연계, 웹 페이지 변조(Defacement) 또는 가짜 로그인 창 유도를 통한 사용자 크리덴셜 탈취 등의 심각한 비즈니스 피해가 발생할 수 있습니다.",
+        "secure_coding_guidance": "1단계: 사용자 입력값(특히 쿼리 파라미터 'C')이 HTML 본문, 링크(HREF), 속성(Attribute) 등 출력되는 컨텍스트(Context)를 정확히 식별합니다.\n2단계: 해당 컨텍스트에 부합하는 인코딩 솔루션을 적용합니다. HTML 본문에 출력되는 경우 HTML Entity Encoding을 적용하고, 속성 값으로 들어가는 경우 Attribute Encoding을 적용합니다.\n3단계: 사용 중인 개발 프레임워크나 템플릿 엔진(예: Thymeleaf, React, Django 등)에서 기본적으로 제공하는 자동 이스케이프(Auto-escaping) 기능이 활성화되어 있는지 확인하고, 날 것(Raw)의 데이터를 출력하는 기능(예: v-html, dangerouslySetInnerHTML 등)을 절대 사용하지 않습니다.\n4단계: 추가적인 방어선으로 HTTP 응답 헤더에 'Content-Security-Policy (CSP)'를 설정하여 신뢰할 수 없는 스크립트의 실행을 원천적으로 차단합니다.",
+        "fixed_code_example": "```html\n<!-- [안전하지 않은 기존 코드 예시 (PHP 환경 가정)] -->\n<!-- <a href=\"?C=<?php echo $_GET['C']; ?>\">Name</a> -->\n\n<!-- [올바른 보안 코딩 예시: HTML 엔티티 인코딩 적용] -->\n<a href=\"?C=<?php echo htmlspecialchars($_GET['C'], ENT_QUOTES, 'UTF-8'); ?>\">Name</a>\n\n<!-- \n  [시큐어 코딩 설명]\n  - htmlspecialchars() 함수를 사용하여 사용자가 입력한 특수문자(<, >, \", ', &)를 대응되는 안전한 HTML 엔티티(&lt;, &gt;, &quot;, &#039;, &amp;)로 변환합니다.\n  - ENT_QUOTES 옵션을 지정하여 싱글 쿼터와 더블 쿼터를 모두 변환함으로써 속성 값 내부에서의 인젝션을 방어합니다.\n  - UTF-8 인코딩을 명시하여 멀티바이트 인코딩 우회 공격을 예방합니다.\n-->\n```",
+        "validation_steps": "파라미터 'C'에 '<script>alert(1)</script>' 또는 '<img src=x onerror=alert(1)>'와 같은 특수문자가 포함된 테스트 페이로드를 전송한 후, 응답 HTML 소스코드에서 해당 문자들이 '&lt;script&gt;' 또는 '&lt;img' 등 HTML 엔티티로 변환되어 브라우저에 텍스트로 안전하게 출력되는지 확인합니다.\n웹 브라우저의 개발자 도구(F12) 콘솔 탭을 확인하여 페이로드 요청 시 경고창(alert)이 발생하거나 스크립트 실행 오류 등의 보안 정책 위반 로그 외에 악성 스크립트가 실행되지 않는지 확인합니다.",
+        "disclaimer": "본 리포트와 제안된 코드는 스캐너의 외부 관측 증거를 바탕으로 작성된 참고용 예시입니다. 실제 프로덕션 서비스에 적용하기 전 반드시 개발자 및 보안 담당자의 검토가 필요합니다."
+      }
+    },
+    {
+      "id": "vuln-5",
+      "type": "Reflected XSS",
+      "risk_level": "High",
+      "endpoint": "http://localhost:8080/dvwa?C=N;O=A",
+      "parameter": "C",
+      "payload": "<img src=x onerror=alert('XSS_TEST')>",
+      "status_code": 200,
+      "evidence": "Step2(token '<img'): 이스케이프 없이 태그 존재 → '<img src=\"/icons/blank.gif\" alt=\"[ICO]\"></th><th><a href=\"?C'",
+      "detection_method": "reflection_check",
+      "ai_report": {
+        "vulnerability_summary": "서버가 요청 파라미터 'C'의 값을 적절한 검증이나 HTML 엔티티 이스케이프 처리 없이 응답 본문에 그대로 반사(Reflection)하여 출력함으로써 악성 스크립트가 실행될 수 있는 취약점입니다.",
+        "root_cause": "DAST 스캔 결과, /dvwa 경로의 GET 요청 파라미터 'C'에 주입된 페이로드(<img src=x onerror=alert('XSS_TEST')>)가 서버 측에서 아무런 필터링이나 HTML 인코딩 처리를 거치지 않고 HTTP 응답 본문(Response Body)에 그대로 렌더링되는 것이 확인되었습니다. HTML 구조 내에서 특수문자(<, >, \", ' 등)가 일반 텍스트가 아닌 HTML 태그 및 속성으로 해석되어 브라우저 컨텍스트 내에서 임의의 자바스크립트 코드가 실행될 수 있는 상태입니다.",
+        "risk_level": "High",
+        "attack_scenario": "공격자는 악성 스크립트가 포함된 링크를 정교하게 제작하여 일반 사용자에게 전송할 수 있습니다. 사용자가 이 링크를 클릭하는 순간, 웹 브라우저 내에서 공격자가 의도한 악성 스크립트가 실행됩니다. 이를 통해 피해 사용자의 세션 토큰(Session Cookie) 탈취, CSRF(Cross-Site Request Forgery) 공격 연계, 웹 페이지 변조(Defacement) 또는 가짜 로그인 창 유도를 통한 사용자 크리덴셜 탈취 등의 심각한 비즈니스 피해가 발생할 수 있습니다.",
+        "secure_coding_guidance": "1단계: 사용자 입력값(특히 쿼리 파라미터 'C')이 HTML 본문, 링크(HREF), 속성(Attribute) 등 출력되는 컨텍스트(Context)를 정확히 식별합니다.\n2단계: 해당 컨텍스트에 부합하는 인코딩 솔루션을 적용합니다. HTML 본문에 출력되는 경우 HTML Entity Encoding을 적용하고, 속성 값으로 들어가는 경우 Attribute Encoding을 적용합니다.\n3단계: 사용 중인 개발 프레임워크나 템플릿 엔진(예: Thymeleaf, React, Django 등)에서 기본적으로 제공하는 자동 이스케이프(Auto-escaping) 기능이 활성화되어 있는지 확인하고, 날 것(Raw)의 데이터를 출력하는 기능(예: v-html, dangerouslySetInnerHTML 등)을 절대 사용하지 않습니다.\n4단계: 추가적인 방어선으로 HTTP 응답 헤더에 'Content-Security-Policy (CSP)'를 설정하여 신뢰할 수 없는 스크립트의 실행을 원천적으로 차단합니다.",
+        "fixed_code_example": "```html\n<!-- [안전하지 않은 기존 코드 예시 (PHP 환경 가정)] -->\n<!-- <a href=\"?C=<?php echo $_GET['C']; ?>\">Name</a> -->\n\n<!-- [올바른 보안 코딩 예시: HTML 엔티티 인코딩 적용] -->\n<a href=\"?C=<?php echo htmlspecialchars($_GET['C'], ENT_QUOTES, 'UTF-8'); ?>\">Name</a>\n\n<!-- \n  [시큐어 코딩 설명]\n  - htmlspecialchars() 함수를 사용하여 사용자가 입력한 특수문자(<, >, \", ', &)를 대응되는 안전한 HTML 엔티티(&lt;, &gt;, &quot;, &#039;, &amp;)로 변환합니다.\n  - ENT_QUOTES 옵션을 지정하여 싱글 쿼터와 더블 쿼터를 모두 변환함으로써 속성 값 내부에서의 인젝션을 방어합니다.\n  - UTF-8 인코딩을 명시하여 멀티바이트 인코딩 우회 공격을 예방합니다.\n-->\n```",
+        "validation_steps": "파라미터 'C'에 '<script>alert(1)</script>' 또는 '<img src=x onerror=alert(1)>'와 같은 특수문자가 포함된 테스트 페이로드를 전송한 후, 응답 HTML 소스코드에서 해당 문자들이 '&lt;script&gt;' 또는 '&lt;img' 등 HTML 엔티티로 변환되어 브라우저에 텍스트로 안전하게 출력되는지 확인합니다.\n웹 브라우저의 개발자 도구(F12) 콘솔 탭을 확인하여 페이로드 요청 시 경고창(alert)이 발생하거나 스크립트 실행 오류 등의 보안 정책 위반 로그 외에 악성 스크립트가 실행되지 않는지 확인합니다.",
+        "disclaimer": "본 리포트와 제안된 코드는 스캐너의 외부 관측 증거를 바탕으로 작성된 참고용 예시입니다. 실제 프로덕션 서비스에 적용하기 전 반드시 개발자 및 보안 담당자의 검토가 필요합니다."
+      }
+    },
+    {
+      "id": "vuln-6",
+      "type": "Reflected XSS",
+      "risk_level": "High",
+      "endpoint": "http://localhost:8080/dvwa?C=M;O=D",
+      "parameter": "C",
+      "payload": "<img src=x onerror=alert('XSS_TEST')>",
+      "status_code": 200,
+      "evidence": "Step2(token '<img'): 이스케이프 없이 태그 존재 → '<img src=\"/icons/blank.gif\" alt=\"[ICO]\"></th><th><a href=\"?C'",
+      "detection_method": "reflection_check",
+      "ai_report": {
+        "vulnerability_summary": "서버가 요청 파라미터 'C'의 값을 적절한 검증이나 HTML 엔티티 이스케이프 처리 없이 응답 본문에 그대로 반사(Reflection)하여 출력함으로써 악성 스크립트가 실행될 수 있는 취약점입니다.",
+        "root_cause": "DAST 스캔 결과, /dvwa 경로의 GET 요청 파라미터 'C'에 주입된 페이로드(<img src=x onerror=alert('XSS_TEST')>)가 서버 측에서 아무런 필터링이나 HTML 인코딩 처리를 거치지 않고 HTTP 응답 본문(Response Body)에 그대로 렌더링되는 것이 확인되었습니다. HTML 구조 내에서 특수문자(<, >, \", ' 등)가 일반 텍스트가 아닌 HTML 태그 및 속성으로 해석되어 브라우저 컨텍스트 내에서 임의의 자바스크립트 코드가 실행될 수 있는 상태입니다.",
+        "risk_level": "High",
+        "attack_scenario": "공격자는 악성 스크립트가 포함된 링크를 정교하게 제작하여 일반 사용자에게 전송할 수 있습니다. 사용자가 이 링크를 클릭하는 순간, 웹 브라우저 내에서 공격자가 의도한 악성 스크립트가 실행됩니다. 이를 통해 피해 사용자의 세션 토큰(Session Cookie) 탈취, CSRF(Cross-Site Request Forgery) 공격 연계, 웹 페이지 변조(Defacement) 또는 가짜 로그인 창 유도를 통한 사용자 크리덴셜 탈취 등의 심각한 비즈니스 피해가 발생할 수 있습니다.",
+        "secure_coding_guidance": "1단계: 사용자 입력값(특히 쿼리 파라미터 'C')이 HTML 본문, 링크(HREF), 속성(Attribute) 등 출력되는 컨텍스트(Context)를 정확히 식별합니다.\n2단계: 해당 컨텍스트에 부합하는 인코딩 솔루션을 적용합니다. HTML 본문에 출력되는 경우 HTML Entity Encoding을 적용하고, 속성 값으로 들어가는 경우 Attribute Encoding을 적용합니다.\n3단계: 사용 중인 개발 프레임워크나 템플릿 엔진(예: Thymeleaf, React, Django 등)에서 기본적으로 제공하는 자동 이스케이프(Auto-escaping) 기능이 활성화되어 있는지 확인하고, 날 것(Raw)의 데이터를 출력하는 기능(예: v-html, dangerouslySetInnerHTML 등)을 절대 사용하지 않습니다.\n4단계: 추가적인 방어선으로 HTTP 응답 헤더에 'Content-Security-Policy (CSP)'를 설정하여 신뢰할 수 없는 스크립트의 실행을 원천적으로 차단합니다.",
+        "fixed_code_example": "```html\n<!-- [안전하지 않은 기존 코드 예시 (PHP 환경 가정)] -->\n<!-- <a href=\"?C=<?php echo $_GET['C']; ?>\">Name</a> -->\n\n<!-- [올바른 보안 코딩 예시: HTML 엔티티 인코딩 적용] -->\n<a href=\"?C=<?php echo htmlspecialchars($_GET['C'], ENT_QUOTES, 'UTF-8'); ?>\">Name</a>\n\n<!-- \n  [시큐어 코딩 설명]\n  - htmlspecialchars() 함수를 사용하여 사용자가 입력한 특수문자(<, >, \", ', &)를 대응되는 안전한 HTML 엔티티(&lt;, &gt;, &quot;, &#039;, &amp;)로 변환합니다.\n  - ENT_QUOTES 옵션을 지정하여 싱글 쿼터와 더블 쿼터를 모두 변환함으로써 속성 값 내부에서의 인젝션을 방어합니다.\n  - UTF-8 인코딩을 명시하여 멀티바이트 인코딩 우회 공격을 예방합니다.\n-->\n```",
+        "validation_steps": "파라미터 'C'에 '<script>alert(1)</script>' 또는 '<img src=x onerror=alert(1)>'와 같은 특수문자가 포함된 테스트 페이로드를 전송한 후, 응답 HTML 소스코드에서 해당 문자들이 '&lt;script&gt;' 또는 '&lt;img' 등 HTML 엔티티로 변환되어 브라우저에 텍스트로 안전하게 출력되는지 확인합니다.\n웹 브라우저의 개발자 도구(F12) 콘솔 탭을 확인하여 페이로드 요청 시 경고창(alert)이 발생하거나 스크립트 실행 오류 등의 보안 정책 위반 로그 외에 악성 스크립트가 실행되지 않는지 확인합니다.",
+        "disclaimer": "본 리포트와 제안된 코드는 스캐너의 외부 관측 증거를 바탕으로 작성된 참고용 예시입니다. 실제 프로덕션 서비스에 적용하기 전 반드시 개발자 및 보안 담당자의 검토가 필요합니다."
+      }
+    },
+    {
+      "id": "vuln-7",
+      "type": "Reflected XSS",
+      "risk_level": "High",
+      "endpoint": "http://localhost:8080/dvwa?C=S;O=D",
+      "parameter": "C",
+      "payload": "<img src=x onerror=alert('XSS_TEST')>",
+      "status_code": 200,
+      "evidence": "Step2(token '<img'): 이스케이프 없이 태그 존재 → '<img src=\"/icons/blank.gif\" alt=\"[ICO]\"></th><th><a href=\"?C'",
+      "detection_method": "reflection_check",
+      "ai_report": {
+        "vulnerability_summary": "서버가 요청 파라미터 'C'의 값을 적절한 검증이나 HTML 엔티티 이스케이프 처리 없이 응답 본문에 그대로 반사(Reflection)하여 출력함으로써 악성 스크립트가 실행될 수 있는 취약점입니다.",
+        "root_cause": "DAST 스캔 결과, /dvwa 경로의 GET 요청 파라미터 'C'에 주입된 페이로드(<img src=x onerror=alert('XSS_TEST')>)가 서버 측에서 아무런 필터링이나 HTML 인코딩 처리를 거치지 않고 HTTP 응답 본문(Response Body)에 그대로 렌더링되는 것이 확인되었습니다. HTML 구조 내에서 특수문자(<, >, \", ' 등)가 일반 텍스트가 아닌 HTML 태그 및 속성으로 해석되어 브라우저 컨텍스트 내에서 임의의 자바스크립트 코드가 실행될 수 있는 상태입니다.",
+        "risk_level": "High",
+        "attack_scenario": "공격자는 악성 스크립트가 포함된 링크를 정교하게 제작하여 일반 사용자에게 전송할 수 있습니다. 사용자가 이 링크를 클릭하는 순간, 웹 브라우저 내에서 공격자가 의도한 악성 스크립트가 실행됩니다. 이를 통해 피해 사용자의 세션 토큰(Session Cookie) 탈취, CSRF(Cross-Site Request Forgery) 공격 연계, 웹 페이지 변조(Defacement) 또는 가짜 로그인 창 유도를 통한 사용자 크리덴셜 탈취 등의 심각한 비즈니스 피해가 발생할 수 있습니다.",
+        "secure_coding_guidance": "1단계: 사용자 입력값(특히 쿼리 파라미터 'C')이 HTML 본문, 링크(HREF), 속성(Attribute) 등 출력되는 컨텍스트(Context)를 정확히 식별합니다.\n2단계: 해당 컨텍스트에 부합하는 인코딩 솔루션을 적용합니다. HTML 본문에 출력되는 경우 HTML Entity Encoding을 적용하고, 속성 값으로 들어가는 경우 Attribute Encoding을 적용합니다.\n3단계: 사용 중인 개발 프레임워크나 템플릿 엔진(예: Thymeleaf, React, Django 등)에서 기본적으로 제공하는 자동 이스케이프(Auto-escaping) 기능이 활성화되어 있는지 확인하고, 날 것(Raw)의 데이터를 출력하는 기능(예: v-html, dangerouslySetInnerHTML 등)을 절대 사용하지 않습니다.\n4단계: 추가적인 방어선으로 HTTP 응답 헤더에 'Content-Security-Policy (CSP)'를 설정하여 신뢰할 수 없는 스크립트의 실행을 원천적으로 차단합니다.",
+        "fixed_code_example": "```html\n<!-- [안전하지 않은 기존 코드 예시 (PHP 환경 가정)] -->\n<!-- <a href=\"?C=<?php echo $_GET['C']; ?>\">Name</a> -->\n\n<!-- [올바른 보안 코딩 예시: HTML 엔티티 인코딩 적용] -->\n<a href=\"?C=<?php echo htmlspecialchars($_GET['C'], ENT_QUOTES, 'UTF-8'); ?>\">Name</a>\n\n<!-- \n  [시큐어 코딩 설명]\n  - htmlspecialchars() 함수를 사용하여 사용자가 입력한 특수문자(<, >, \", ', &)를 대응되는 안전한 HTML 엔티티(&lt;, &gt;, &quot;, &#039;, &amp;)로 변환합니다.\n  - ENT_QUOTES 옵션을 지정하여 싱글 쿼터와 더블 쿼터를 모두 변환함으로써 속성 값 내부에서의 인젝션을 방어합니다.\n  - UTF-8 인코딩을 명시하여 멀티바이트 인코딩 우회 공격을 예방합니다.\n-->\n```",
+        "validation_steps": "파라미터 'C'에 '<script>alert(1)</script>' 또는 '<img src=x onerror=alert(1)>'와 같은 특수문자가 포함된 테스트 페이로드를 전송한 후, 응답 HTML 소스코드에서 해당 문자들이 '&lt;script&gt;' 또는 '&lt;img' 등 HTML 엔티티로 변환되어 브라우저에 텍스트로 안전하게 출력되는지 확인합니다.\n웹 브라우저의 개발자 도구(F12) 콘솔 탭을 확인하여 페이로드 요청 시 경고창(alert)이 발생하거나 스크립트 실행 오류 등의 보안 정책 위반 로그 외에 악성 스크립트가 실행되지 않는지 확인합니다.",
+        "disclaimer": "본 리포트와 제안된 코드는 스캐너의 외부 관측 증거를 바탕으로 작성된 참고용 예시입니다. 실제 프로덕션 서비스에 적용하기 전 반드시 개발자 및 보안 담당자의 검토가 필요합니다."
+      }
+    },
+    {
+      "id": "vuln-8",
+      "type": "Reflected XSS",
+      "risk_level": "High",
+      "endpoint": "http://localhost:8080/dvwa?C=D;O=D",
+      "parameter": "C",
+      "payload": "<img src=x onerror=alert('XSS_TEST')>",
+      "status_code": 200,
+      "evidence": "Step2(token '<img'): 이스케이프 없이 태그 존재 → '<img src=\"/icons/blank.gif\" alt=\"[ICO]\"></th><th><a href=\"?C'",
+      "detection_method": "reflection_check",
+      "ai_report": {
+        "vulnerability_summary": "서버가 요청 파라미터 'C'의 값을 적절한 검증이나 HTML 엔티티 이스케이프 처리 없이 응답 본문에 그대로 반사(Reflection)하여 출력함으로써 악성 스크립트가 실행될 수 있는 취약점입니다.",
+        "root_cause": "DAST 스캔 결과, /dvwa 경로의 GET 요청 파라미터 'C'에 주입된 페이로드(<img src=x onerror=alert('XSS_TEST')>)가 서버 측에서 아무런 필터링이나 HTML 인코딩 처리를 거치지 않고 HTTP 응답 본문(Response Body)에 그대로 렌더링되는 것이 확인되었습니다. HTML 구조 내에서 특수문자(<, >, \", ' 등)가 일반 텍스트가 아닌 HTML 태그 및 속성으로 해석되어 브라우저 컨텍스트 내에서 임의의 자바스크립트 코드가 실행될 수 있는 상태입니다.",
+        "risk_level": "High",
+        "attack_scenario": "공격자는 악성 스크립트가 포함된 링크를 정교하게 제작하여 일반 사용자에게 전송할 수 있습니다. 사용자가 이 링크를 클릭하는 순간, 웹 브라우저 내에서 공격자가 의도한 악성 스크립트가 실행됩니다. 이를 통해 피해 사용자의 세션 토큰(Session Cookie) 탈취, CSRF(Cross-Site Request Forgery) 공격 연계, 웹 페이지 변조(Defacement) 또는 가짜 로그인 창 유도를 통한 사용자 크리덴셜 탈취 등의 심각한 비즈니스 피해가 발생할 수 있습니다.",
+        "secure_coding_guidance": "1단계: 사용자 입력값(특히 쿼리 파라미터 'C')이 HTML 본문, 링크(HREF), 속성(Attribute) 등 출력되는 컨텍스트(Context)를 정확히 식별합니다.\n2단계: 해당 컨텍스트에 부합하는 인코딩 솔루션을 적용합니다. HTML 본문에 출력되는 경우 HTML Entity Encoding을 적용하고, 속성 값으로 들어가는 경우 Attribute Encoding을 적용합니다.\n3단계: 사용 중인 개발 프레임워크나 템플릿 엔진(예: Thymeleaf, React, Django 등)에서 기본적으로 제공하는 자동 이스케이프(Auto-escaping) 기능이 활성화되어 있는지 확인하고, 날 것(Raw)의 데이터를 출력하는 기능(예: v-html, dangerouslySetInnerHTML 등)을 절대 사용하지 않습니다.\n4단계: 추가적인 방어선으로 HTTP 응답 헤더에 'Content-Security-Policy (CSP)'를 설정하여 신뢰할 수 없는 스크립트의 실행을 원천적으로 차단합니다.",
+        "fixed_code_example": "```html\n<!-- [안전하지 않은 기존 코드 예시 (PHP 환경 가정)] -->\n<!-- <a href=\"?C=<?php echo $_GET['C']; ?>\">Name</a> -->\n\n<!-- [올바른 보안 코딩 예시: HTML 엔티티 인코딩 적용] -->\n<a href=\"?C=<?php echo htmlspecialchars($_GET['C'], ENT_QUOTES, 'UTF-8'); ?>\">Name</a>\n\n<!-- \n  [시큐어 코딩 설명]\n  - htmlspecialchars() 함수를 사용하여 사용자가 입력한 특수문자(<, >, \", ', &)를 대응되는 안전한 HTML 엔티티(&lt;, &gt;, &quot;, &#039;, &amp;)로 변환합니다.\n  - ENT_QUOTES 옵션을 지정하여 싱글 쿼터와 더블 쿼터를 모두 변환함으로써 속성 값 내부에서의 인젝션을 방어합니다.\n  - UTF-8 인코딩을 명시하여 멀티바이트 인코딩 우회 공격을 예방합니다.\n-->\n```",
+        "validation_steps": "파라미터 'C'에 '<script>alert(1)</script>' 또는 '<img src=x onerror=alert(1)>'와 같은 특수문자가 포함된 테스트 페이로드를 전송한 후, 응답 HTML 소스코드에서 해당 문자들이 '&lt;script&gt;' 또는 '&lt;img' 등 HTML 엔티티로 변환되어 브라우저에 텍스트로 안전하게 출력되는지 확인합니다.\n웹 브라우저의 개발자 도구(F12) 콘솔 탭을 확인하여 페이로드 요청 시 경고창(alert)이 발생하거나 스크립트 실행 오류 등의 보안 정책 위반 로그 외에 악성 스크립트가 실행되지 않는지 확인합니다.",
+        "disclaimer": "본 리포트와 제안된 코드는 스캐너의 외부 관측 증거를 바탕으로 작성된 참고용 예시입니다. 실제 프로덕션 서비스에 적용하기 전 반드시 개발자 및 보안 담당자의 검토가 필요합니다."
+      }
+    },
+    {
+      "id": "vuln-9",
+      "type": "Reflected XSS",
+      "risk_level": "High",
+      "endpoint": "http://localhost:8080/dvwa/?C=N;O=D",
+      "parameter": "C",
+      "payload": "<img src=x onerror=alert('XSS_TEST')>",
+      "status_code": 200,
+      "evidence": "Step2(token '<img'): 이스케이프 없이 태그 존재 → '<img src=\"/icons/blank.gif\" alt=\"[ICO]\"></th><th><a href=\"?C'",
+      "detection_method": "reflection_check",
+      "ai_report": {
+        "vulnerability_summary": "서버가 요청 파라미터 'C'의 값을 적절한 검증이나 HTML 엔티티 이스케이프 처리 없이 응답 본문에 그대로 반사(Reflection)하여 출력함으로써 악성 스크립트가 실행될 수 있는 취약점입니다.",
+        "root_cause": "DAST 스캔 결과, /dvwa 경로의 GET 요청 파라미터 'C'에 주입된 페이로드(<img src=x onerror=alert('XSS_TEST')>)가 서버 측에서 아무런 필터링이나 HTML 인코딩 처리를 거치지 않고 HTTP 응답 본문(Response Body)에 그대로 렌더링되는 것이 확인되었습니다. HTML 구조 내에서 특수문자(<, >, \", ' 등)가 일반 텍스트가 아닌 HTML 태그 및 속성으로 해석되어 브라우저 컨텍스트 내에서 임의의 자바스크립트 코드가 실행될 수 있는 상태입니다.",
+        "risk_level": "High",
+        "attack_scenario": "공격자는 악성 스크립트가 포함된 링크를 정교하게 제작하여 일반 사용자에게 전송할 수 있습니다. 사용자가 이 링크를 클릭하는 순간, 웹 브라우저 내에서 공격자가 의도한 악성 스크립트가 실행됩니다. 이를 통해 피해 사용자의 세션 토큰(Session Cookie) 탈취, CSRF(Cross-Site Request Forgery) 공격 연계, 웹 페이지 변조(Defacement) 또는 가짜 로그인 창 유도를 통한 사용자 크리덴셜 탈취 등의 심각한 비즈니스 피해가 발생할 수 있습니다.",
+        "secure_coding_guidance": "1단계: 사용자 입력값(특히 쿼리 파라미터 'C')이 HTML 본문, 링크(HREF), 속성(Attribute) 등 출력되는 컨텍스트(Context)를 정확히 식별합니다.\n2단계: 해당 컨텍스트에 부합하는 인코딩 솔루션을 적용합니다. HTML 본문에 출력되는 경우 HTML Entity Encoding을 적용하고, 속성 값으로 들어가는 경우 Attribute Encoding을 적용합니다.\n3단계: 사용 중인 개발 프레임워크나 템플릿 엔진(예: Thymeleaf, React, Django 등)에서 기본적으로 제공하는 자동 이스케이프(Auto-escaping) 기능이 활성화되어 있는지 확인하고, 날 것(Raw)의 데이터를 출력하는 기능(예: v-html, dangerouslySetInnerHTML 등)을 절대 사용하지 않습니다.\n4단계: 추가적인 방어선으로 HTTP 응답 헤더에 'Content-Security-Policy (CSP)'를 설정하여 신뢰할 수 없는 스크립트의 실행을 원천적으로 차단합니다.",
+        "fixed_code_example": "```html\n<!-- [안전하지 않은 기존 코드 예시 (PHP 환경 가정)] -->\n<!-- <a href=\"?C=<?php echo $_GET['C']; ?>\">Name</a> -->\n\n<!-- [올바른 보안 코딩 예시: HTML 엔티티 인코딩 적용] -->\n<a href=\"?C=<?php echo htmlspecialchars($_GET['C'], ENT_QUOTES, 'UTF-8'); ?>\">Name</a>\n\n<!-- \n  [시큐어 코딩 설명]\n  - htmlspecialchars() 함수를 사용하여 사용자가 입력한 특수문자(<, >, \", ', &)를 대응되는 안전한 HTML 엔티티(&lt;, &gt;, &quot;, &#039;, &amp;)로 변환합니다.\n  - ENT_QUOTES 옵션을 지정하여 싱글 쿼터와 더블 쿼터를 모두 변환함으로써 속성 값 내부에서의 인젝션을 방어합니다.\n  - UTF-8 인코딩을 명시하여 멀티바이트 인코딩 우회 공격을 예방합니다.\n-->\n```",
+        "validation_steps": "파라미터 'C'에 '<script>alert(1)</script>' 또는 '<img src=x onerror=alert(1)>'와 같은 특수문자가 포함된 테스트 페이로드를 전송한 후, 응답 HTML 소스코드에서 해당 문자들이 '&lt;script&gt;' 또는 '&lt;img' 등 HTML 엔티티로 변환되어 브라우저에 텍스트로 안전하게 출력되는지 확인합니다.\n웹 브라우저의 개발자 도구(F12) 콘솔 탭을 확인하여 페이로드 요청 시 경고창(alert)이 발생하거나 스크립트 실행 오류 등의 보안 정책 위반 로그 외에 악성 스크립트가 실행되지 않는지 확인합니다.",
+        "disclaimer": "본 리포트와 제안된 코드는 스캐너의 외부 관측 증거를 바탕으로 작성된 참고용 예시입니다. 실제 프로덕션 서비스에 적용하기 전 반드시 개발자 및 보안 담당자의 검토가 필요합니다."
+      }
+    },
+    {
+      "id": "vuln-10",
+      "type": "Reflected XSS",
+      "risk_level": "High",
+      "endpoint": "http://localhost:8080/dvwa/?C=N;O=A",
+      "parameter": "C",
+      "payload": "<img src=x onerror=alert('XSS_TEST')>",
+      "status_code": 200,
+      "evidence": "Step2(token '<img'): 이스케이프 없이 태그 존재 → '<img src=\"/icons/blank.gif\" alt=\"[ICO]\"></th><th><a href=\"?C'",
+      "detection_method": "reflection_check",
+      "ai_report": {
+        "vulnerability_summary": "서버가 요청 파라미터 'C'의 값을 적절한 검증이나 HTML 엔티티 이스케이프 처리 없이 응답 본문에 그대로 반사(Reflection)하여 출력함으로써 악성 스크립트가 실행될 수 있는 취약점입니다.",
+        "root_cause": "DAST 스캔 결과, /dvwa 경로의 GET 요청 파라미터 'C'에 주입된 페이로드(<img src=x onerror=alert('XSS_TEST')>)가 서버 측에서 아무런 필터링이나 HTML 인코딩 처리를 거치지 않고 HTTP 응답 본문(Response Body)에 그대로 렌더링되는 것이 확인되었습니다. HTML 구조 내에서 특수문자(<, >, \", ' 등)가 일반 텍스트가 아닌 HTML 태그 및 속성으로 해석되어 브라우저 컨텍스트 내에서 임의의 자바스크립트 코드가 실행될 수 있는 상태입니다.",
+        "risk_level": "High",
+        "attack_scenario": "공격자는 악성 스크립트가 포함된 링크를 정교하게 제작하여 일반 사용자에게 전송할 수 있습니다. 사용자가 이 링크를 클릭하는 순간, 웹 브라우저 내에서 공격자가 의도한 악성 스크립트가 실행됩니다. 이를 통해 피해 사용자의 세션 토큰(Session Cookie) 탈취, CSRF(Cross-Site Request Forgery) 공격 연계, 웹 페이지 변조(Defacement) 또는 가짜 로그인 창 유도를 통한 사용자 크리덴셜 탈취 등의 심각한 비즈니스 피해가 발생할 수 있습니다.",
+        "secure_coding_guidance": "1단계: 사용자 입력값(특히 쿼리 파라미터 'C')이 HTML 본문, 링크(HREF), 속성(Attribute) 등 출력되는 컨텍스트(Context)를 정확히 식별합니다.\n2단계: 해당 컨텍스트에 부합하는 인코딩 솔루션을 적용합니다. HTML 본문에 출력되는 경우 HTML Entity Encoding을 적용하고, 속성 값으로 들어가는 경우 Attribute Encoding을 적용합니다.\n3단계: 사용 중인 개발 프레임워크나 템플릿 엔진(예: Thymeleaf, React, Django 등)에서 기본적으로 제공하는 자동 이스케이프(Auto-escaping) 기능이 활성화되어 있는지 확인하고, 날 것(Raw)의 데이터를 출력하는 기능(예: v-html, dangerouslySetInnerHTML 등)을 절대 사용하지 않습니다.\n4단계: 추가적인 방어선으로 HTTP 응답 헤더에 'Content-Security-Policy (CSP)'를 설정하여 신뢰할 수 없는 스크립트의 실행을 원천적으로 차단합니다.",
+        "fixed_code_example": "```html\n<!-- [안전하지 않은 기존 코드 예시 (PHP 환경 가정)] -->\n<!-- <a href=\"?C=<?php echo $_GET['C']; ?>\">Name</a> -->\n\n<!-- [올바른 보안 코딩 예시: HTML 엔티티 인코딩 적용] -->\n<a href=\"?C=<?php echo htmlspecialchars($_GET['C'], ENT_QUOTES, 'UTF-8'); ?>\">Name</a>\n\n<!-- \n  [시큐어 코딩 설명]\n  - htmlspecialchars() 함수를 사용하여 사용자가 입력한 특수문자(<, >, \", ', &)를 대응되는 안전한 HTML 엔티티(&lt;, &gt;, &quot;, &#039;, &amp;)로 변환합니다.\n  - ENT_QUOTES 옵션을 지정하여 싱글 쿼터와 더블 쿼터를 모두 변환함으로써 속성 값 내부에서의 인젝션을 방어합니다.\n  - UTF-8 인코딩을 명시하여 멀티바이트 인코딩 우회 공격을 예방합니다.\n-->\n```",
+        "validation_steps": "파라미터 'C'에 '<script>alert(1)</script>' 또는 '<img src=x onerror=alert(1)>'와 같은 특수문자가 포함된 테스트 페이로드를 전송한 후, 응답 HTML 소스코드에서 해당 문자들이 '&lt;script&gt;' 또는 '&lt;img' 등 HTML 엔티티로 변환되어 브라우저에 텍스트로 안전하게 출력되는지 확인합니다.\n웹 브라우저의 개발자 도구(F12) 콘솔 탭을 확인하여 페이로드 요청 시 경고창(alert)이 발생하거나 스크립트 실행 오류 등의 보안 정책 위반 로그 외에 악성 스크립트가 실행되지 않는지 확인합니다.",
+        "disclaimer": "본 리포트와 제안된 코드는 스캐너의 외부 관측 증거를 바탕으로 작성된 참고용 예시입니다. 실제 프로덕션 서비스에 적용하기 전 반드시 개발자 및 보안 담당자의 검토가 필요합니다."
+      }
+    },
+    {
+      "id": "vuln-11",
+      "type": "Reflected XSS",
+      "risk_level": "High",
+      "endpoint": "http://localhost:8080/dvwa/?C=S;O=D",
+      "parameter": "C",
+      "payload": "<img src=x onerror=alert('XSS_TEST')>",
+      "status_code": 200,
+      "evidence": "Step2(token '<img'): 이스케이프 없이 태그 존재 → '<img src=\"/icons/blank.gif\" alt=\"[ICO]\"></th><th><a href=\"?C'",
+      "detection_method": "reflection_check",
+      "ai_report": {
+        "vulnerability_summary": "서버가 요청 파라미터 'C'의 값을 적절한 검증이나 HTML 엔티티 이스케이프 처리 없이 응답 본문에 그대로 반사(Reflection)하여 출력함으로써 악성 스크립트가 실행될 수 있는 취약점입니다.",
+        "root_cause": "DAST 스캔 결과, /dvwa 경로의 GET 요청 파라미터 'C'에 주입된 페이로드(<img src=x onerror=alert('XSS_TEST')>)가 서버 측에서 아무런 필터링이나 HTML 인코딩 처리를 거치지 않고 HTTP 응답 본문(Response Body)에 그대로 렌더링되는 것이 확인되었습니다. HTML 구조 내에서 특수문자(<, >, \", ' 등)가 일반 텍스트가 아닌 HTML 태그 및 속성으로 해석되어 브라우저 컨텍스트 내에서 임의의 자바스크립트 코드가 실행될 수 있는 상태입니다.",
+        "risk_level": "High",
+        "attack_scenario": "공격자는 악성 스크립트가 포함된 링크를 정교하게 제작하여 일반 사용자에게 전송할 수 있습니다. 사용자가 이 링크를 클릭하는 순간, 웹 브라우저 내에서 공격자가 의도한 악성 스크립트가 실행됩니다. 이를 통해 피해 사용자의 세션 토큰(Session Cookie) 탈취, CSRF(Cross-Site Request Forgery) 공격 연계, 웹 페이지 변조(Defacement) 또는 가짜 로그인 창 유도를 통한 사용자 크리덴셜 탈취 등의 심각한 비즈니스 피해가 발생할 수 있습니다.",
+        "secure_coding_guidance": "1단계: 사용자 입력값(특히 쿼리 파라미터 'C')이 HTML 본문, 링크(HREF), 속성(Attribute) 등 출력되는 컨텍스트(Context)를 정확히 식별합니다.\n2단계: 해당 컨텍스트에 부합하는 인코딩 솔루션을 적용합니다. HTML 본문에 출력되는 경우 HTML Entity Encoding을 적용하고, 속성 값으로 들어가는 경우 Attribute Encoding을 적용합니다.\n3단계: 사용 중인 개발 프레임워크나 템플릿 엔진(예: Thymeleaf, React, Django 등)에서 기본적으로 제공하는 자동 이스케이프(Auto-escaping) 기능이 활성화되어 있는지 확인하고, 날 것(Raw)의 데이터를 출력하는 기능(예: v-html, dangerouslySetInnerHTML 등)을 절대 사용하지 않습니다.\n4단계: 추가적인 방어선으로 HTTP 응답 헤더에 'Content-Security-Policy (CSP)'를 설정하여 신뢰할 수 없는 스크립트의 실행을 원천적으로 차단합니다.",
+        "fixed_code_example": "```html\n<!-- [안전하지 않은 기존 코드 예시 (PHP 환경 가정)] -->\n<!-- <a href=\"?C=<?php echo $_GET['C']; ?>\">Name</a> -->\n\n<!-- [올바른 보안 코딩 예시: HTML 엔티티 인코딩 적용] -->\n<a href=\"?C=<?php echo htmlspecialchars($_GET['C'], ENT_QUOTES, 'UTF-8'); ?>\">Name</a>\n\n<!-- \n  [시큐어 코딩 설명]\n  - htmlspecialchars() 함수를 사용하여 사용자가 입력한 특수문자(<, >, \", ', &)를 대응되는 안전한 HTML 엔티티(&lt;, &gt;, &quot;, &#039;, &amp;)로 변환합니다.\n  - ENT_QUOTES 옵션을 지정하여 싱글 쿼터와 더블 쿼터를 모두 변환함으로써 속성 값 내부에서의 인젝션을 방어합니다.\n  - UTF-8 인코딩을 명시하여 멀티바이트 인코딩 우회 공격을 예방합니다.\n-->\n```",
+        "validation_steps": "파라미터 'C'에 '<script>alert(1)</script>' 또는 '<img src=x onerror=alert(1)>'와 같은 특수문자가 포함된 테스트 페이로드를 전송한 후, 응답 HTML 소스코드에서 해당 문자들이 '&lt;script&gt;' 또는 '&lt;img' 등 HTML 엔티티로 변환되어 브라우저에 텍스트로 안전하게 출력되는지 확인합니다.\n웹 브라우저의 개발자 도구(F12) 콘솔 탭을 확인하여 페이로드 요청 시 경고창(alert)이 발생하거나 스크립트 실행 오류 등의 보안 정책 위반 로그 외에 악성 스크립트가 실행되지 않는지 확인합니다.",
+        "disclaimer": "본 리포트와 제안된 코드는 스캐너의 외부 관측 증거를 바탕으로 작성된 참고용 예시입니다. 실제 프로덕션 서비스에 적용하기 전 반드시 개발자 및 보안 담당자의 검토가 필요합니다."
+      }
+    },
+    {
+      "id": "vuln-12",
+      "type": "Reflected XSS",
+      "risk_level": "High",
+      "endpoint": "http://localhost:8080/dvwa/?C=S;O=A",
+      "parameter": "C",
+      "payload": "<img src=x onerror=alert('XSS_TEST')>",
+      "status_code": 200,
+      "evidence": "Step2(token '<img'): 이스케이프 없이 태그 존재 → '<img src=\"/icons/blank.gif\" alt=\"[ICO]\"></th><th><a href=\"?C'",
+      "detection_method": "reflection_check",
+      "ai_report": {
+        "vulnerability_summary": "서버가 요청 파라미터 'C'의 값을 적절한 검증이나 HTML 엔티티 이스케이프 처리 없이 응답 본문에 그대로 반사(Reflection)하여 출력함으로써 악성 스크립트가 실행될 수 있는 취약점입니다.",
+        "root_cause": "DAST 스캔 결과, /dvwa 경로의 GET 요청 파라미터 'C'에 주입된 페이로드(<img src=x onerror=alert('XSS_TEST')>)가 서버 측에서 아무런 필터링이나 HTML 인코딩 처리를 거치지 않고 HTTP 응답 본문(Response Body)에 그대로 렌더링되는 것이 확인되었습니다. HTML 구조 내에서 특수문자(<, >, \", ' 등)가 일반 텍스트가 아닌 HTML 태그 및 속성으로 해석되어 브라우저 컨텍스트 내에서 임의의 자바스크립트 코드가 실행될 수 있는 상태입니다.",
+        "risk_level": "High",
+        "attack_scenario": "공격자는 악성 스크립트가 포함된 링크를 정교하게 제작하여 일반 사용자에게 전송할 수 있습니다. 사용자가 이 링크를 클릭하는 순간, 웹 브라우저 내에서 공격자가 의도한 악성 스크립트가 실행됩니다. 이를 통해 피해 사용자의 세션 토큰(Session Cookie) 탈취, CSRF(Cross-Site Request Forgery) 공격 연계, 웹 페이지 변조(Defacement) 또는 가짜 로그인 창 유도를 통한 사용자 크리덴셜 탈취 등의 심각한 비즈니스 피해가 발생할 수 있습니다.",
+        "secure_coding_guidance": "1단계: 사용자 입력값(특히 쿼리 파라미터 'C')이 HTML 본문, 링크(HREF), 속성(Attribute) 등 출력되는 컨텍스트(Context)를 정확히 식별합니다.\n2단계: 해당 컨텍스트에 부합하는 인코딩 솔루션을 적용합니다. HTML 본문에 출력되는 경우 HTML Entity Encoding을 적용하고, 속성 값으로 들어가는 경우 Attribute Encoding을 적용합니다.\n3단계: 사용 중인 개발 프레임워크나 템플릿 엔진(예: Thymeleaf, React, Django 등)에서 기본적으로 제공하는 자동 이스케이프(Auto-escaping) 기능이 활성화되어 있는지 확인하고, 날 것(Raw)의 데이터를 출력하는 기능(예: v-html, dangerouslySetInnerHTML 등)을 절대 사용하지 않습니다.\n4단계: 추가적인 방어선으로 HTTP 응답 헤더에 'Content-Security-Policy (CSP)'를 설정하여 신뢰할 수 없는 스크립트의 실행을 원천적으로 차단합니다.",
+        "fixed_code_example": "```html\n<!-- [안전하지 않은 기존 코드 예시 (PHP 환경 가정)] -->\n<!-- <a href=\"?C=<?php echo $_GET['C']; ?>\">Name</a> -->\n\n<!-- [올바른 보안 코딩 예시: HTML 엔티티 인코딩 적용] -->\n<a href=\"?C=<?php echo htmlspecialchars($_GET['C'], ENT_QUOTES, 'UTF-8'); ?>\">Name</a>\n\n<!-- \n  [시큐어 코딩 설명]\n  - htmlspecialchars() 함수를 사용하여 사용자가 입력한 특수문자(<, >, \", ', &)를 대응되는 안전한 HTML 엔티티(&lt;, &gt;, &quot;, &#039;, &amp;)로 변환합니다.\n  - ENT_QUOTES 옵션을 지정하여 싱글 쿼터와 더블 쿼터를 모두 변환함으로써 속성 값 내부에서의 인젝션을 방어합니다.\n  - UTF-8 인코딩을 명시하여 멀티바이트 인코딩 우회 공격을 예방합니다.\n-->\n```",
+        "validation_steps": "파라미터 'C'에 '<script>alert(1)</script>' 또는 '<img src=x onerror=alert(1)>'와 같은 특수문자가 포함된 테스트 페이로드를 전송한 후, 응답 HTML 소스코드에서 해당 문자들이 '&lt;script&gt;' 또는 '&lt;img' 등 HTML 엔티티로 변환되어 브라우저에 텍스트로 안전하게 출력되는지 확인합니다.\n웹 브라우저의 개발자 도구(F12) 콘솔 탭을 확인하여 페이로드 요청 시 경고창(alert)이 발생하거나 스크립트 실행 오류 등의 보안 정책 위반 로그 외에 악성 스크립트가 실행되지 않는지 확인합니다.",
+        "disclaimer": "본 리포트와 제안된 코드는 스캐너의 외부 관측 증거를 바탕으로 작성된 참고용 예시입니다. 실제 프로덕션 서비스에 적용하기 전 반드시 개발자 및 보안 담당자의 검토가 필요합니다."
+      }
+    },
+    {
+      "id": "vuln-13",
+      "type": "Reflected XSS",
+      "risk_level": "High",
+      "endpoint": "http://localhost:8080/dvwa/?C=M;O=D",
+      "parameter": "C",
+      "payload": "<img src=x onerror=alert('XSS_TEST')>",
+      "status_code": 200,
+      "evidence": "Step2(token '<img'): 이스케이프 없이 태그 존재 → '<img src=\"/icons/blank.gif\" alt=\"[ICO]\"></th><th><a href=\"?C'",
+      "detection_method": "reflection_check",
+      "ai_report": {
+        "vulnerability_summary": "서버가 요청 파라미터 'C'의 값을 적절한 검증이나 HTML 엔티티 이스케이프 처리 없이 응답 본문에 그대로 반사(Reflection)하여 출력함으로써 악성 스크립트가 실행될 수 있는 취약점입니다.",
+        "root_cause": "DAST 스캔 결과, /dvwa 경로의 GET 요청 파라미터 'C'에 주입된 페이로드(<img src=x onerror=alert('XSS_TEST')>)가 서버 측에서 아무런 필터링이나 HTML 인코딩 처리를 거치지 않고 HTTP 응답 본문(Response Body)에 그대로 렌더링되는 것이 확인되었습니다. HTML 구조 내에서 특수문자(<, >, \", ' 등)가 일반 텍스트가 아닌 HTML 태그 및 속성으로 해석되어 브라우저 컨텍스트 내에서 임의의 자바스크립트 코드가 실행될 수 있는 상태입니다.",
+        "risk_level": "High",
+        "attack_scenario": "공격자는 악성 스크립트가 포함된 링크를 정교하게 제작하여 일반 사용자에게 전송할 수 있습니다. 사용자가 이 링크를 클릭하는 순간, 웹 브라우저 내에서 공격자가 의도한 악성 스크립트가 실행됩니다. 이를 통해 피해 사용자의 세션 토큰(Session Cookie) 탈취, CSRF(Cross-Site Request Forgery) 공격 연계, 웹 페이지 변조(Defacement) 또는 가짜 로그인 창 유도를 통한 사용자 크리덴셜 탈취 등의 심각한 비즈니스 피해가 발생할 수 있습니다.",
+        "secure_coding_guidance": "1단계: 사용자 입력값(특히 쿼리 파라미터 'C')이 HTML 본문, 링크(HREF), 속성(Attribute) 등 출력되는 컨텍스트(Context)를 정확히 식별합니다.\n2단계: 해당 컨텍스트에 부합하는 인코딩 솔루션을 적용합니다. HTML 본문에 출력되는 경우 HTML Entity Encoding을 적용하고, 속성 값으로 들어가는 경우 Attribute Encoding을 적용합니다.\n3단계: 사용 중인 개발 프레임워크나 템플릿 엔진(예: Thymeleaf, React, Django 등)에서 기본적으로 제공하는 자동 이스케이프(Auto-escaping) 기능이 활성화되어 있는지 확인하고, 날 것(Raw)의 데이터를 출력하는 기능(예: v-html, dangerouslySetInnerHTML 등)을 절대 사용하지 않습니다.\n4단계: 추가적인 방어선으로 HTTP 응답 헤더에 'Content-Security-Policy (CSP)'를 설정하여 신뢰할 수 없는 스크립트의 실행을 원천적으로 차단합니다.",
+        "fixed_code_example": "```html\n<!-- [안전하지 않은 기존 코드 예시 (PHP 환경 가정)] -->\n<!-- <a href=\"?C=<?php echo $_GET['C']; ?>\">Name</a> -->\n\n<!-- [올바른 보안 코딩 예시: HTML 엔티티 인코딩 적용] -->\n<a href=\"?C=<?php echo htmlspecialchars($_GET['C'], ENT_QUOTES, 'UTF-8'); ?>\">Name</a>\n\n<!-- \n  [시큐어 코딩 설명]\n  - htmlspecialchars() 함수를 사용하여 사용자가 입력한 특수문자(<, >, \", ', &)를 대응되는 안전한 HTML 엔티티(&lt;, &gt;, &quot;, &#039;, &amp;)로 변환합니다.\n  - ENT_QUOTES 옵션을 지정하여 싱글 쿼터와 더블 쿼터를 모두 변환함으로써 속성 값 내부에서의 인젝션을 방어합니다.\n  - UTF-8 인코딩을 명시하여 멀티바이트 인코딩 우회 공격을 예방합니다.\n-->\n```",
+        "validation_steps": "파라미터 'C'에 '<script>alert(1)</script>' 또는 '<img src=x onerror=alert(1)>'와 같은 특수문자가 포함된 테스트 페이로드를 전송한 후, 응답 HTML 소스코드에서 해당 문자들이 '&lt;script&gt;' 또는 '&lt;img' 등 HTML 엔티티로 변환되어 브라우저에 텍스트로 안전하게 출력되는지 확인합니다.\n웹 브라우저의 개발자 도구(F12) 콘솔 탭을 확인하여 페이로드 요청 시 경고창(alert)이 발생하거나 스크립트 실행 오류 등의 보안 정책 위반 로그 외에 악성 스크립트가 실행되지 않는지 확인합니다.",
+        "disclaimer": "본 리포트와 제안된 코드는 스캐너의 외부 관측 증거를 바탕으로 작성된 참고용 예시입니다. 실제 프로덕션 서비스에 적용하기 전 반드시 개발자 및 보안 담당자의 검토가 필요합니다."
+      }
+    },
+    {
+      "id": "vuln-14",
+      "type": "Reflected XSS",
+      "risk_level": "High",
+      "endpoint": "http://localhost:8080/dvwa/?C=D;O=D",
+      "parameter": "C",
+      "payload": "<img src=x onerror=alert('XSS_TEST')>",
+      "status_code": 200,
+      "evidence": "Step2(token '<img'): 이스케이프 없이 태그 존재 → '<img src=\"/icons/blank.gif\" alt=\"[ICO]\"></th><th><a href=\"?C'",
+      "detection_method": "reflection_check",
+      "ai_report": {
+        "vulnerability_summary": "서버가 요청 파라미터 'C'의 값을 적절한 검증이나 HTML 엔티티 이스케이프 처리 없이 응답 본문에 그대로 반사(Reflection)하여 출력함으로써 악성 스크립트가 실행될 수 있는 취약점입니다.",
+        "root_cause": "DAST 스캔 결과, /dvwa 경로의 GET 요청 파라미터 'C'에 주입된 페이로드(<img src=x onerror=alert('XSS_TEST')>)가 서버 측에서 아무런 필터링이나 HTML 인코딩 처리를 거치지 않고 HTTP 응답 본문(Response Body)에 그대로 렌더링되는 것이 확인되었습니다. HTML 구조 내에서 특수문자(<, >, \", ' 등)가 일반 텍스트가 아닌 HTML 태그 및 속성으로 해석되어 브라우저 컨텍스트 내에서 임의의 자바스크립트 코드가 실행될 수 있는 상태입니다.",
+        "risk_level": "High",
+        "attack_scenario": "공격자는 악성 스크립트가 포함된 링크를 정교하게 제작하여 일반 사용자에게 전송할 수 있습니다. 사용자가 이 링크를 클릭하는 순간, 웹 브라우저 내에서 공격자가 의도한 악성 스크립트가 실행됩니다. 이를 통해 피해 사용자의 세션 토큰(Session Cookie) 탈취, CSRF(Cross-Site Request Forgery) 공격 연계, 웹 페이지 변조(Defacement) 또는 가짜 로그인 창 유도를 통한 사용자 크리덴셜 탈취 등의 심각한 비즈니스 피해가 발생할 수 있습니다.",
+        "secure_coding_guidance": "1단계: 사용자 입력값(특히 쿼리 파라미터 'C')이 HTML 본문, 링크(HREF), 속성(Attribute) 등 출력되는 컨텍스트(Context)를 정확히 식별합니다.\n2단계: 해당 컨텍스트에 부합하는 인코딩 솔루션을 적용합니다. HTML 본문에 출력되는 경우 HTML Entity Encoding을 적용하고, 속성 값으로 들어가는 경우 Attribute Encoding을 적용합니다.\n3단계: 사용 중인 개발 프레임워크나 템플릿 엔진(예: Thymeleaf, React, Django 등)에서 기본적으로 제공하는 자동 이스케이프(Auto-escaping) 기능이 활성화되어 있는지 확인하고, 날 것(Raw)의 데이터를 출력하는 기능(예: v-html, dangerouslySetInnerHTML 등)을 절대 사용하지 않습니다.\n4단계: 추가적인 방어선으로 HTTP 응답 헤더에 'Content-Security-Policy (CSP)'를 설정하여 신뢰할 수 없는 스크립트의 실행을 원천적으로 차단합니다.",
+        "fixed_code_example": "```html\n<!-- [안전하지 않은 기존 코드 예시 (PHP 환경 가정)] -->\n<!-- <a href=\"?C=<?php echo $_GET['C']; ?>\">Name</a> -->\n\n<!-- [올바른 보안 코딩 예시: HTML 엔티티 인코딩 적용] -->\n<a href=\"?C=<?php echo htmlspecialchars($_GET['C'], ENT_QUOTES, 'UTF-8'); ?>\">Name</a>\n\n<!-- \n  [시큐어 코딩 설명]\n  - htmlspecialchars() 함수를 사용하여 사용자가 입력한 특수문자(<, >, \", ', &)를 대응되는 안전한 HTML 엔티티(&lt;, &gt;, &quot;, &#039;, &amp;)로 변환합니다.\n  - ENT_QUOTES 옵션을 지정하여 싱글 쿼터와 더블 쿼터를 모두 변환함으로써 속성 값 내부에서의 인젝션을 방어합니다.\n  - UTF-8 인코딩을 명시하여 멀티바이트 인코딩 우회 공격을 예방합니다.\n-->\n```",
+        "validation_steps": "파라미터 'C'에 '<script>alert(1)</script>' 또는 '<img src=x onerror=alert(1)>'와 같은 특수문자가 포함된 테스트 페이로드를 전송한 후, 응답 HTML 소스코드에서 해당 문자들이 '&lt;script&gt;' 또는 '&lt;img' 등 HTML 엔티티로 변환되어 브라우저에 텍스트로 안전하게 출력되는지 확인합니다.\n웹 브라우저의 개발자 도구(F12) 콘솔 탭을 확인하여 페이로드 요청 시 경고창(alert)이 발생하거나 스크립트 실행 오류 등의 보안 정책 위반 로그 외에 악성 스크립트가 실행되지 않는지 확인합니다.",
+        "disclaimer": "본 리포트와 제안된 코드는 스캐너의 외부 관측 증거를 바탕으로 작성된 참고용 예시입니다. 실제 프로덕션 서비스에 적용하기 전 반드시 개발자 및 보안 담당자의 검토가 필요합니다."
+      }
+    },
+    {
+      "id": "vuln-15",
+      "type": "Reflected XSS",
+      "risk_level": "High",
+      "endpoint": "http://localhost:8080/dvwa/?C=M;O=A",
+      "parameter": "C",
+      "payload": "<img src=x onerror=alert('XSS_TEST')>",
+      "status_code": 200,
+      "evidence": "Step2(token '<img'): 이스케이프 없이 태그 존재 → '<img src=\"/icons/blank.gif\" alt=\"[ICO]\"></th><th><a href=\"?C'",
+      "detection_method": "reflection_check",
+      "ai_report": {
+        "vulnerability_summary": "서버가 요청 파라미터 'C'의 값을 적절한 검증이나 HTML 엔티티 이스케이프 처리 없이 응답 본문에 그대로 반사(Reflection)하여 출력함으로써 악성 스크립트가 실행될 수 있는 취약점입니다.",
+        "root_cause": "DAST 스캔 결과, /dvwa 경로의 GET 요청 파라미터 'C'에 주입된 페이로드(<img src=x onerror=alert('XSS_TEST')>)가 서버 측에서 아무런 필터링이나 HTML 인코딩 처리를 거치지 않고 HTTP 응답 본문(Response Body)에 그대로 렌더링되는 것이 확인되었습니다. HTML 구조 내에서 특수문자(<, >, \", ' 등)가 일반 텍스트가 아닌 HTML 태그 및 속성으로 해석되어 브라우저 컨텍스트 내에서 임의의 자바스크립트 코드가 실행될 수 있는 상태입니다.",
+        "risk_level": "High",
+        "attack_scenario": "공격자는 악성 스크립트가 포함된 링크를 정교하게 제작하여 일반 사용자에게 전송할 수 있습니다. 사용자가 이 링크를 클릭하는 순간, 웹 브라우저 내에서 공격자가 의도한 악성 스크립트가 실행됩니다. 이를 통해 피해 사용자의 세션 토큰(Session Cookie) 탈취, CSRF(Cross-Site Request Forgery) 공격 연계, 웹 페이지 변조(Defacement) 또는 가짜 로그인 창 유도를 통한 사용자 크리덴셜 탈취 등의 심각한 비즈니스 피해가 발생할 수 있습니다.",
+        "secure_coding_guidance": "1단계: 사용자 입력값(특히 쿼리 파라미터 'C')이 HTML 본문, 링크(HREF), 속성(Attribute) 등 출력되는 컨텍스트(Context)를 정확히 식별합니다.\n2단계: 해당 컨텍스트에 부합하는 인코딩 솔루션을 적용합니다. HTML 본문에 출력되는 경우 HTML Entity Encoding을 적용하고, 속성 값으로 들어가는 경우 Attribute Encoding을 적용합니다.\n3단계: 사용 중인 개발 프레임워크나 템플릿 엔진(예: Thymeleaf, React, Django 등)에서 기본적으로 제공하는 자동 이스케이프(Auto-escaping) 기능이 활성화되어 있는지 확인하고, 날 것(Raw)의 데이터를 출력하는 기능(예: v-html, dangerouslySetInnerHTML 등)을 절대 사용하지 않습니다.\n4단계: 추가적인 방어선으로 HTTP 응답 헤더에 'Content-Security-Policy (CSP)'를 설정하여 신뢰할 수 없는 스크립트의 실행을 원천적으로 차단합니다.",
+        "fixed_code_example": "```html\n<!-- [안전하지 않은 기존 코드 예시 (PHP 환경 가정)] -->\n<!-- <a href=\"?C=<?php echo $_GET['C']; ?>\">Name</a> -->\n\n<!-- [올바른 보안 코딩 예시: HTML 엔티티 인코딩 적용] -->\n<a href=\"?C=<?php echo htmlspecialchars($_GET['C'], ENT_QUOTES, 'UTF-8'); ?>\">Name</a>\n\n<!-- \n  [시큐어 코딩 설명]\n  - htmlspecialchars() 함수를 사용하여 사용자가 입력한 특수문자(<, >, \", ', &)를 대응되는 안전한 HTML 엔티티(&lt;, &gt;, &quot;, &#039;, &amp;)로 변환합니다.\n  - ENT_QUOTES 옵션을 지정하여 싱글 쿼터와 더블 쿼터를 모두 변환함으로써 속성 값 내부에서의 인젝션을 방어합니다.\n  - UTF-8 인코딩을 명시하여 멀티바이트 인코딩 우회 공격을 예방합니다.\n-->\n```",
+        "validation_steps": "파라미터 'C'에 '<script>alert(1)</script>' 또는 '<img src=x onerror=alert(1)>'와 같은 특수문자가 포함된 테스트 페이로드를 전송한 후, 응답 HTML 소스코드에서 해당 문자들이 '&lt;script&gt;' 또는 '&lt;img' 등 HTML 엔티티로 변환되어 브라우저에 텍스트로 안전하게 출력되는지 확인합니다.\n웹 브라우저의 개발자 도구(F12) 콘솔 탭을 확인하여 페이로드 요청 시 경고창(alert)이 발생하거나 스크립트 실행 오류 등의 보안 정책 위반 로그 외에 악성 스크립트가 실행되지 않는지 확인합니다.",
+        "disclaimer": "본 리포트와 제안된 코드는 스캐너의 외부 관측 증거를 바탕으로 작성된 참고용 예시입니다. 실제 프로덕션 서비스에 적용하기 전 반드시 개발자 및 보안 담당자의 검토가 필요합니다."
+      }
+    },
+    {
+      "id": "vuln-16",
+      "type": "Reflected XSS",
+      "risk_level": "High",
+      "endpoint": "http://localhost:8080/dvwa/?C=D;O=A",
+      "parameter": "C",
+      "payload": "<img src=x onerror=alert('XSS_TEST')>",
+      "status_code": 200,
+      "evidence": "Step2(token '<img'): 이스케이프 없이 태그 존재 → '<img src=\"/icons/blank.gif\" alt=\"[ICO]\"></th><th><a href=\"?C'",
+      "detection_method": "reflection_check",
+      "ai_report": {
+        "vulnerability_summary": "서버가 요청 파라미터 'C'의 값을 적절한 검증이나 HTML 엔티티 이스케이프 처리 없이 응답 본문에 그대로 반사(Reflection)하여 출력함으로써 악성 스크립트가 실행될 수 있는 취약점입니다.",
+        "root_cause": "DAST 스캔 결과, /dvwa 경로의 GET 요청 파라미터 'C'에 주입된 페이로드(<img src=x onerror=alert('XSS_TEST')>)가 서버 측에서 아무런 필터링이나 HTML 인코딩 처리를 거치지 않고 HTTP 응답 본문(Response Body)에 그대로 렌더링되는 것이 확인되었습니다. HTML 구조 내에서 특수문자(<, >, \", ' 등)가 일반 텍스트가 아닌 HTML 태그 및 속성으로 해석되어 브라우저 컨텍스트 내에서 임의의 자바스크립트 코드가 실행될 수 있는 상태입니다.",
+        "risk_level": "High",
+        "attack_scenario": "공격자는 악성 스크립트가 포함된 링크를 정교하게 제작하여 일반 사용자에게 전송할 수 있습니다. 사용자가 이 링크를 클릭하는 순간, 웹 브라우저 내에서 공격자가 의도한 악성 스크립트가 실행됩니다. 이를 통해 피해 사용자의 세션 토큰(Session Cookie) 탈취, CSRF(Cross-Site Request Forgery) 공격 연계, 웹 페이지 변조(Defacement) 또는 가짜 로그인 창 유도를 통한 사용자 크리덴셜 탈취 등의 심각한 비즈니스 피해가 발생할 수 있습니다.",
+        "secure_coding_guidance": "1단계: 사용자 입력값(특히 쿼리 파라미터 'C')이 HTML 본문, 링크(HREF), 속성(Attribute) 등 출력되는 컨텍스트(Context)를 정확히 식별합니다.\n2단계: 해당 컨텍스트에 부합하는 인코딩 솔루션을 적용합니다. HTML 본문에 출력되는 경우 HTML Entity Encoding을 적용하고, 속성 값으로 들어가는 경우 Attribute Encoding을 적용합니다.\n3단계: 사용 중인 개발 프레임워크나 템플릿 엔진(예: Thymeleaf, React, Django 등)에서 기본적으로 제공하는 자동 이스케이프(Auto-escaping) 기능이 활성화되어 있는지 확인하고, 날 것(Raw)의 데이터를 출력하는 기능(예: v-html, dangerouslySetInnerHTML 등)을 절대 사용하지 않습니다.\n4단계: 추가적인 방어선으로 HTTP 응답 헤더에 'Content-Security-Policy (CSP)'를 설정하여 신뢰할 수 없는 스크립트의 실행을 원천적으로 차단합니다.",
+        "fixed_code_example": "```html\n<!-- [안전하지 않은 기존 코드 예시 (PHP 환경 가정)] -->\n<!-- <a href=\"?C=<?php echo $_GET['C']; ?>\">Name</a> -->\n\n<!-- [올바른 보안 코딩 예시: HTML 엔티티 인코딩 적용] -->\n<a href=\"?C=<?php echo htmlspecialchars($_GET['C'], ENT_QUOTES, 'UTF-8'); ?>\">Name</a>\n\n<!-- \n  [시큐어 코딩 설명]\n  - htmlspecialchars() 함수를 사용하여 사용자가 입력한 특수문자(<, >, \", ', &)를 대응되는 안전한 HTML 엔티티(&lt;, &gt;, &quot;, &#039;, &amp;)로 변환합니다.\n  - ENT_QUOTES 옵션을 지정하여 싱글 쿼터와 더블 쿼터를 모두 변환함으로써 속성 값 내부에서의 인젝션을 방어합니다.\n  - UTF-8 인코딩을 명시하여 멀티바이트 인코딩 우회 공격을 예방합니다.\n-->\n```",
+        "validation_steps": "파라미터 'C'에 '<script>alert(1)</script>' 또는 '<img src=x onerror=alert(1)>'와 같은 특수문자가 포함된 테스트 페이로드를 전송한 후, 응답 HTML 소스코드에서 해당 문자들이 '&lt;script&gt;' 또는 '&lt;img' 등 HTML 엔티티로 변환되어 브라우저에 텍스트로 안전하게 출력되는지 확인합니다.\n웹 브라우저의 개발자 도구(F12) 콘솔 탭을 확인하여 페이로드 요청 시 경고창(alert)이 발생하거나 스크립트 실행 오류 등의 보안 정책 위반 로그 외에 악성 스크립트가 실행되지 않는지 확인합니다.",
+        "disclaimer": "본 리포트와 제안된 코드는 스캐너의 외부 관측 증거를 바탕으로 작성된 참고용 예시입니다. 실제 프로덕션 서비스에 적용하기 전 반드시 개발자 및 보안 담당자의 검토가 필요합니다."
+      }
+    },
+    {
+      "id": "vuln-17",
+      "type": "Reflected XSS",
+      "risk_level": "High",
+      "endpoint": "http://localhost:8080/login.php",
+      "parameter": "username",
+      "payload": "<img src=x onerror=alert('XSS_TEST')>",
+      "status_code": 200,
+      "evidence": "Step2(token '<img'): 이스케이프 없이 태그 존재 → '<img src=\"dvwa/images/login_logo.png\" /></p>\\r\\n\\r\\n\\t<br />\\r\\n\\r\\n\\t'",
+      "detection_method": "reflection_check",
+      "ai_report": {
+        "vulnerability_summary": "서버가 요청 파라미터 'C'의 값을 적절한 검증이나 HTML 엔티티 이스케이프 처리 없이 응답 본문에 그대로 반사(Reflection)하여 출력함으로써 악성 스크립트가 실행될 수 있는 취약점입니다.",
+        "root_cause": "DAST 스캔 결과, /dvwa 경로의 GET 요청 파라미터 'C'에 주입된 페이로드(<img src=x onerror=alert('XSS_TEST')>)가 서버 측에서 아무런 필터링이나 HTML 인코딩 처리를 거치지 않고 HTTP 응답 본문(Response Body)에 그대로 렌더링되는 것이 확인되었습니다. HTML 구조 내에서 특수문자(<, >, \", ' 등)가 일반 텍스트가 아닌 HTML 태그 및 속성으로 해석되어 브라우저 컨텍스트 내에서 임의의 자바스크립트 코드가 실행될 수 있는 상태입니다.",
+        "risk_level": "High",
+        "attack_scenario": "공격자는 악성 스크립트가 포함된 링크를 정교하게 제작하여 일반 사용자에게 전송할 수 있습니다. 사용자가 이 링크를 클릭하는 순간, 웹 브라우저 내에서 공격자가 의도한 악성 스크립트가 실행됩니다. 이를 통해 피해 사용자의 세션 토큰(Session Cookie) 탈취, CSRF(Cross-Site Request Forgery) 공격 연계, 웹 페이지 변조(Defacement) 또는 가짜 로그인 창 유도를 통한 사용자 크리덴셜 탈취 등의 심각한 비즈니스 피해가 발생할 수 있습니다.",
+        "secure_coding_guidance": "1단계: 사용자 입력값(특히 쿼리 파라미터 'C')이 HTML 본문, 링크(HREF), 속성(Attribute) 등 출력되는 컨텍스트(Context)를 정확히 식별합니다.\n2단계: 해당 컨텍스트에 부합하는 인코딩 솔루션을 적용합니다. HTML 본문에 출력되는 경우 HTML Entity Encoding을 적용하고, 속성 값으로 들어가는 경우 Attribute Encoding을 적용합니다.\n3단계: 사용 중인 개발 프레임워크나 템플릿 엔진(예: Thymeleaf, React, Django 등)에서 기본적으로 제공하는 자동 이스케이프(Auto-escaping) 기능이 활성화되어 있는지 확인하고, 날 것(Raw)의 데이터를 출력하는 기능(예: v-html, dangerouslySetInnerHTML 등)을 절대 사용하지 않습니다.\n4단계: 추가적인 방어선으로 HTTP 응답 헤더에 'Content-Security-Policy (CSP)'를 설정하여 신뢰할 수 없는 스크립트의 실행을 원천적으로 차단합니다.",
+        "fixed_code_example": "```html\n<!-- [안전하지 않은 기존 코드 예시 (PHP 환경 가정)] -->\n<!-- <a href=\"?C=<?php echo $_GET['C']; ?>\">Name</a> -->\n\n<!-- [올바른 보안 코딩 예시: HTML 엔티티 인코딩 적용] -->\n<a href=\"?C=<?php echo htmlspecialchars($_GET['C'], ENT_QUOTES, 'UTF-8'); ?>\">Name</a>\n\n<!-- \n  [시큐어 코딩 설명]\n  - htmlspecialchars() 함수를 사용하여 사용자가 입력한 특수문자(<, >, \", ', &)를 대응되는 안전한 HTML 엔티티(&lt;, &gt;, &quot;, &#039;, &amp;)로 변환합니다.\n  - ENT_QUOTES 옵션을 지정하여 싱글 쿼터와 더블 쿼터를 모두 변환함으로써 속성 값 내부에서의 인젝션을 방어합니다.\n  - UTF-8 인코딩을 명시하여 멀티바이트 인코딩 우회 공격을 예방합니다.\n-->\n```",
+        "validation_steps": "파라미터 'C'에 '<script>alert(1)</script>' 또는 '<img src=x onerror=alert(1)>'와 같은 특수문자가 포함된 테스트 페이로드를 전송한 후, 응답 HTML 소스코드에서 해당 문자들이 '&lt;script&gt;' 또는 '&lt;img' 등 HTML 엔티티로 변환되어 브라우저에 텍스트로 안전하게 출력되는지 확인합니다.\n웹 브라우저의 개발자 도구(F12) 콘솔 탭을 확인하여 페이로드 요청 시 경고창(alert)이 발생하거나 스크립트 실행 오류 등의 보안 정책 위반 로그 외에 악성 스크립트가 실행되지 않는지 확인합니다.",
+        "disclaimer": "본 리포트와 제안된 코드는 스캐너의 외부 관측 증거를 바탕으로 작성된 참고용 예시입니다. 실제 프로덕션 서비스에 적용하기 전 반드시 개발자 및 보안 담당자의 검토가 필요합니다."
+      }
+    },
+    {
+      "id": "vuln-18",
+      "type": "Reflected XSS",
+      "risk_level": "High",
+      "endpoint": "http://localhost:8080/login.php",
+      "parameter": "password",
+      "payload": "<img src=x onerror=alert('XSS_TEST')>",
+      "status_code": 200,
+      "evidence": "Step2(token '<img'): 이스케이프 없이 태그 존재 → '<img src=\"dvwa/images/login_logo.png\" /></p>\\r\\n\\r\\n\\t<br />\\r\\n\\r\\n\\t'",
+      "detection_method": "reflection_check",
+      "ai_report": {
+        "vulnerability_summary": "서버가 요청 파라미터 'C'의 값을 적절한 검증이나 HTML 엔티티 이스케이프 처리 없이 응답 본문에 그대로 반사(Reflection)하여 출력함으로써 악성 스크립트가 실행될 수 있는 취약점입니다.",
+        "root_cause": "DAST 스캔 결과, /dvwa 경로의 GET 요청 파라미터 'C'에 주입된 페이로드(<img src=x onerror=alert('XSS_TEST')>)가 서버 측에서 아무런 필터링이나 HTML 인코딩 처리를 거치지 않고 HTTP 응답 본문(Response Body)에 그대로 렌더링되는 것이 확인되었습니다. HTML 구조 내에서 특수문자(<, >, \", ' 등)가 일반 텍스트가 아닌 HTML 태그 및 속성으로 해석되어 브라우저 컨텍스트 내에서 임의의 자바스크립트 코드가 실행될 수 있는 상태입니다.",
+        "risk_level": "High",
+        "attack_scenario": "공격자는 악성 스크립트가 포함된 링크를 정교하게 제작하여 일반 사용자에게 전송할 수 있습니다. 사용자가 이 링크를 클릭하는 순간, 웹 브라우저 내에서 공격자가 의도한 악성 스크립트가 실행됩니다. 이를 통해 피해 사용자의 세션 토큰(Session Cookie) 탈취, CSRF(Cross-Site Request Forgery) 공격 연계, 웹 페이지 변조(Defacement) 또는 가짜 로그인 창 유도를 통한 사용자 크리덴셜 탈취 등의 심각한 비즈니스 피해가 발생할 수 있습니다.",
+        "secure_coding_guidance": "1단계: 사용자 입력값(특히 쿼리 파라미터 'C')이 HTML 본문, 링크(HREF), 속성(Attribute) 등 출력되는 컨텍스트(Context)를 정확히 식별합니다.\n2단계: 해당 컨텍스트에 부합하는 인코딩 솔루션을 적용합니다. HTML 본문에 출력되는 경우 HTML Entity Encoding을 적용하고, 속성 값으로 들어가는 경우 Attribute Encoding을 적용합니다.\n3단계: 사용 중인 개발 프레임워크나 템플릿 엔진(예: Thymeleaf, React, Django 등)에서 기본적으로 제공하는 자동 이스케이프(Auto-escaping) 기능이 활성화되어 있는지 확인하고, 날 것(Raw)의 데이터를 출력하는 기능(예: v-html, dangerouslySetInnerHTML 등)을 절대 사용하지 않습니다.\n4단계: 추가적인 방어선으로 HTTP 응답 헤더에 'Content-Security-Policy (CSP)'를 설정하여 신뢰할 수 없는 스크립트의 실행을 원천적으로 차단합니다.",
+        "fixed_code_example": "```html\n<!-- [안전하지 않은 기존 코드 예시 (PHP 환경 가정)] -->\n<!-- <a href=\"?C=<?php echo $_GET['C']; ?>\">Name</a> -->\n\n<!-- [올바른 보안 코딩 예시: HTML 엔티티 인코딩 적용] -->\n<a href=\"?C=<?php echo htmlspecialchars($_GET['C'], ENT_QUOTES, 'UTF-8'); ?>\">Name</a>\n\n<!-- \n  [시큐어 코딩 설명]\n  - htmlspecialchars() 함수를 사용하여 사용자가 입력한 특수문자(<, >, \", ', &)를 대응되는 안전한 HTML 엔티티(&lt;, &gt;, &quot;, &#039;, &amp;)로 변환합니다.\n  - ENT_QUOTES 옵션을 지정하여 싱글 쿼터와 더블 쿼터를 모두 변환함으로써 속성 값 내부에서의 인젝션을 방어합니다.\n  - UTF-8 인코딩을 명시하여 멀티바이트 인코딩 우회 공격을 예방합니다.\n-->\n```",
+        "validation_steps": "파라미터 'C'에 '<script>alert(1)</script>' 또는 '<img src=x onerror=alert(1)>'와 같은 특수문자가 포함된 테스트 페이로드를 전송한 후, 응답 HTML 소스코드에서 해당 문자들이 '&lt;script&gt;' 또는 '&lt;img' 등 HTML 엔티티로 변환되어 브라우저에 텍스트로 안전하게 출력되는지 확인합니다.\n웹 브라우저의 개발자 도구(F12) 콘솔 탭을 확인하여 페이로드 요청 시 경고창(alert)이 발생하거나 스크립트 실행 오류 등의 보안 정책 위반 로그 외에 악성 스크립트가 실행되지 않는지 확인합니다.",
+        "disclaimer": "본 리포트와 제안된 코드는 스캐너의 외부 관측 증거를 바탕으로 작성된 참고용 예시입니다. 실제 프로덕션 서비스에 적용하기 전 반드시 개발자 및 보안 담당자의 검토가 필요합니다."
+      }
+    },
+    {
+      "id": "vuln-19",
+      "type": "Reflected XSS",
+      "risk_level": "High",
+      "endpoint": "http://localhost:8080/login.php",
+      "parameter": "user_token",
+      "payload": "<img src=x onerror=alert('XSS_TEST')>",
+      "status_code": 200,
+      "evidence": "Step2(token '<img'): 이스케이프 없이 태그 존재 → '<img src=\"dvwa/images/login_logo.png\" /></p>\\r\\n\\r\\n\\t<br />\\r\\n\\r\\n\\t'",
+      "detection_method": "reflection_check",
+      "ai_report": {
+        "vulnerability_summary": "서버가 요청 파라미터 'C'의 값을 적절한 검증이나 HTML 엔티티 이스케이프 처리 없이 응답 본문에 그대로 반사(Reflection)하여 출력함으로써 악성 스크립트가 실행될 수 있는 취약점입니다.",
+        "root_cause": "DAST 스캔 결과, /dvwa 경로의 GET 요청 파라미터 'C'에 주입된 페이로드(<img src=x onerror=alert('XSS_TEST')>)가 서버 측에서 아무런 필터링이나 HTML 인코딩 처리를 거치지 않고 HTTP 응답 본문(Response Body)에 그대로 렌더링되는 것이 확인되었습니다. HTML 구조 내에서 특수문자(<, >, \", ' 등)가 일반 텍스트가 아닌 HTML 태그 및 속성으로 해석되어 브라우저 컨텍스트 내에서 임의의 자바스크립트 코드가 실행될 수 있는 상태입니다.",
+        "risk_level": "High",
+        "attack_scenario": "공격자는 악성 스크립트가 포함된 링크를 정교하게 제작하여 일반 사용자에게 전송할 수 있습니다. 사용자가 이 링크를 클릭하는 순간, 웹 브라우저 내에서 공격자가 의도한 악성 스크립트가 실행됩니다. 이를 통해 피해 사용자의 세션 토큰(Session Cookie) 탈취, CSRF(Cross-Site Request Forgery) 공격 연계, 웹 페이지 변조(Defacement) 또는 가짜 로그인 창 유도를 통한 사용자 크리덴셜 탈취 등의 심각한 비즈니스 피해가 발생할 수 있습니다.",
+        "secure_coding_guidance": "1단계: 사용자 입력값(특히 쿼리 파라미터 'C')이 HTML 본문, 링크(HREF), 속성(Attribute) 등 출력되는 컨텍스트(Context)를 정확히 식별합니다.\n2단계: 해당 컨텍스트에 부합하는 인코딩 솔루션을 적용합니다. HTML 본문에 출력되는 경우 HTML Entity Encoding을 적용하고, 속성 값으로 들어가는 경우 Attribute Encoding을 적용합니다.\n3단계: 사용 중인 개발 프레임워크나 템플릿 엔진(예: Thymeleaf, React, Django 등)에서 기본적으로 제공하는 자동 이스케이프(Auto-escaping) 기능이 활성화되어 있는지 확인하고, 날 것(Raw)의 데이터를 출력하는 기능(예: v-html, dangerouslySetInnerHTML 등)을 절대 사용하지 않습니다.\n4단계: 추가적인 방어선으로 HTTP 응답 헤더에 'Content-Security-Policy (CSP)'를 설정하여 신뢰할 수 없는 스크립트의 실행을 원천적으로 차단합니다.",
+        "fixed_code_example": "```html\n<!-- [안전하지 않은 기존 코드 예시 (PHP 환경 가정)] -->\n<!-- <a href=\"?C=<?php echo $_GET['C']; ?>\">Name</a> -->\n\n<!-- [올바른 보안 코딩 예시: HTML 엔티티 인코딩 적용] -->\n<a href=\"?C=<?php echo htmlspecialchars($_GET['C'], ENT_QUOTES, 'UTF-8'); ?>\">Name</a>\n\n<!-- \n  [시큐어 코딩 설명]\n  - htmlspecialchars() 함수를 사용하여 사용자가 입력한 특수문자(<, >, \", ', &)를 대응되는 안전한 HTML 엔티티(&lt;, &gt;, &quot;, &#039;, &amp;)로 변환합니다.\n  - ENT_QUOTES 옵션을 지정하여 싱글 쿼터와 더블 쿼터를 모두 변환함으로써 속성 값 내부에서의 인젝션을 방어합니다.\n  - UTF-8 인코딩을 명시하여 멀티바이트 인코딩 우회 공격을 예방합니다.\n-->\n```",
+        "validation_steps": "파라미터 'C'에 '<script>alert(1)</script>' 또는 '<img src=x onerror=alert(1)>'와 같은 특수문자가 포함된 테스트 페이로드를 전송한 후, 응답 HTML 소스코드에서 해당 문자들이 '&lt;script&gt;' 또는 '&lt;img' 등 HTML 엔티티로 변환되어 브라우저에 텍스트로 안전하게 출력되는지 확인합니다.\n웹 브라우저의 개발자 도구(F12) 콘솔 탭을 확인하여 페이로드 요청 시 경고창(alert)이 발생하거나 스크립트 실행 오류 등의 보안 정책 위반 로그 외에 악성 스크립트가 실행되지 않는지 확인합니다.",
+        "disclaimer": "본 리포트와 제안된 코드는 스캐너의 외부 관측 증거를 바탕으로 작성된 참고용 예시입니다. 실제 프로덕션 서비스에 적용하기 전 반드시 개발자 및 보안 담당자의 검토가 필요합니다."
+      }
+    }
+  ]
+}
