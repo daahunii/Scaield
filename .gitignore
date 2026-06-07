@@ -17,3 +17,10 @@ __pycache__/
 # Pipeline scan results & reports
 pipeline/results.json
 pipeline/report*
+
+# Scanner scan results
+scanner/scan*
+scans/*
+
+# Scanner dashboard
+scanner/dashboard.
