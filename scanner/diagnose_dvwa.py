@@ -2,8 +2,6 @@
 DVWA 스캔 진단 스크립트 — 단계별로 어디서 실패하는지 찾아냄
 """
 import sys
-import json
-sys.path.insert(0, "/Users/hong/Desktop/scaield/scanner")
 
 import requests
 from bs4 import BeautifulSoup
