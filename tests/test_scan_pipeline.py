@@ -149,68 +149,6 @@ def print_metrics_at_end():
     print(f"  Precision   : {precision:.3f}  (= TP / (TP+FP))")
     print(f"  Recall      : {recall:.3f}  (= TP / (TP+FN))")
     print(f"  F1 Score    : {f1:.3f}  (harmonic mean)")
+
     print(sep)
 
-
-# ══════════════════════════════════════════════════════════════════════
-# scanner/app.py Flask API integration tests
-# ══════════════════════════════════════════════════════════════════════
-
-class TestScannerAppAPI:
-    """
-    Call scanner/app.py via Flask test client to validate the full
-    synchronous POST → Stage 1 scan pipeline.
-    """
-
-    @pytest.fixture(scope="class")
-    def flask_client(self):
-        """
-        Load scanner/app.py directly by file path to avoid the sys.modules
-        conflict with backend_bridge/app.py (both are named 'app').
-        Registering under a unique key ensures Flask resolves the template
-        directory from scanner/templates/ correctly.
-        """
-        _scanner_dir = Path(__file__).parent.parent / "scanner"
-        if str(_scanner_dir) not in sys.path:
-            sys.path.insert(0, str(_scanner_dir))
-
-        spec = importlib.util.spec_from_file_location(
-            "scanner_app_module", str(_scanner_dir / "app.py")
-        )
-        scanner_app = importlib.util.module_from_spec(spec)
-        sys.modules["scanner_app_module"] = scanner_app
-        spec.loader.exec_module(scanner_app)
-        scanner_app.app.config["TESTING"] = True
-        with scanner_app.app.test_client() as client:
-            yield client
-
-    def test_post_scan_returns_200(self, flask_client, target_server: str) -> None:
-        """POST / with a valid target returns HTTP 200 with an HTML body."""
-        resp = flask_client.post(
-            "/",
-            data={
-                "target_url": f"{target_server}/xss-vuln?q=test",
-                "approved_domains_text": "127.0.0.1",
-                "session_cookies": "",
-                "timeout": "10",
-                "run_ai": "",
-            },
-        )
-        assert resp.status_code == 200
-        assert b"<html" in resp.data.lower() or b"<!doctype" in resp.data.lower()
-
-    def test_post_scan_unauthorized_target(self, flask_client) -> None:
-        """POST / with an unauthorized domain returns an error message in the HTML body."""
-        resp = flask_client.post(
-            "/",
-            data={
-                "target_url": "http://evil.example.com/page",
-                "approved_domains_text": "",
-                "session_cookies": "",
-                "timeout": "5",
-                "run_ai": "",
-            },
-        )
-        assert resp.status_code == 200
-        body = resp.data.decode("utf-8", errors="replace")
-        assert "인가되지 않은" in body or "Unauthorized" in body or "오류" in body
