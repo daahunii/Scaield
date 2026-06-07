@@ -1,36 +1,3 @@
-"""
-target_server.py — Flask test server for vulnerability scanner tests
-
-Exposes a mix of vulnerable and safe endpoints so the scanner's detection
-accuracy can be validated against a known ground-truth.
-
-Endpoints
----------
-Vulnerable:
-  GET  /xss-vuln?q=        — Reflected XSS (unescaped output)
-  GET  /sqli-error?id=     — SQLi error-based (raw string concat + error exposed)
-  GET  /sqli-boolean?id=   — SQLi boolean-based (numeric raw concat)
-  POST /login              — SQLi error-based on username field
-
-Safe:
-  GET  /xss-safe?q=        — XSS safe (HTML-escaped output)
-  GET  /sqli-safe?id=      — SQLi safe (parameterized query)
-  GET  /safe?name=         — Fully safe (escaped + parameterized)
-
-False-positive canaries:
-  GET  /fp-has-script?q=   — Safe but page contains a <script> tag
-  GET  /fp-has-sqlite?q=   — Safe but page body mentions "SQLite"
-
-Crawler test pages:
-  GET  /crawl-root         — Root page with a GET form and two sub-links
-  GET  /crawl-page         — POST form + hidden/submit inputs
-  GET  /crawl-deep         — Depth-2 page with a GET form
-  GET  /crawl-external-link — Page with an external domain link
-
-Misc:
-  GET  /slow?delay=N       — Responds after N seconds (timeout testing)
-"""
-
 from __future__ import annotations
 
 import sqlite3
@@ -59,14 +26,23 @@ def create_app() -> Flask:
 
     @app.route("/xss-vuln")
     def xss_vuln():
+        """Reflected XSS: user input rendered without HTML escaping."""
         q = request.args.get("q", "")
-        return f"<html><body><h1>Search Results</h1><p>You searched for: {q}</p></body></html>"
+        return (
+            f"<html><body>"
+            f"<h1>Search Results</h1>"
+            f"<p>You searched for: {q}</p>"
+            f"</body></html>"
+        )
 
     @app.route("/sqli-error")
     def sqli_error():
+        """SQLi error-based: raw string concatenation exposes SQLite error messages."""
         id_ = request.args.get("id", "1")
         try:
-            cur = conn.execute(f"SELECT name, email, role FROM users WHERE id = '{id_}'")
+            cur = conn.execute(
+                f"SELECT name, email, role FROM users WHERE id = '{id_}'"
+            )
             rows = cur.fetchall()
             if rows:
                 name, email, role = rows[0]
@@ -79,17 +55,25 @@ def create_app() -> Flask:
                 )
             return "<html><body><p>No user found.</p></body></html>"
         except sqlite3.OperationalError as exc:
-            # Intentionally expose the SQLite error message for scanner detection
-            return f"<html><body><p>SQLite error: {exc}</p></body></html>", 500
+            # Intentionally expose the SQLite error message so the scanner can detect it
+            return (
+                f"<html><body>"
+                f"<p>SQLite error: {exc}</p>"
+                f"</body></html>"
+            ), 500
 
     @app.route("/sqli-boolean")
     def sqli_boolean():
+        """SQLi boolean-based: numeric raw concatenation causes response size difference between true/false conditions."""
         id_ = request.args.get("id", "1")
         try:
-            cur = conn.execute(f"SELECT name, email, role FROM users WHERE id = {id_}")
+            cur = conn.execute(
+                f"SELECT name, email, role FROM users WHERE id = {id_}"
+            )
             rows = cur.fetchall()
             if rows:
                 name, email, role = rows[0]
+                # True condition: larger response body than the false condition
                 return (
                     f"<html><body>"
                     f"<p>User Found</p>"
@@ -97,32 +81,49 @@ def create_app() -> Flask:
                     f"<p>Status: Active</p>"
                     f"</body></html>"
                 )
+            # False condition: minimal response body
             return "<html><body><p>No user found.</p></body></html>"
         except sqlite3.OperationalError:
             return "<html><body><p>No user found.</p></body></html>"
 
     @app.route("/login", methods=["POST"])
     def login():
+        """SQLi error-based (POST): raw string concatenation on the username parameter."""
         username = request.form.get("username", "")
+        password = request.form.get("password", "")
         try:
-            cur = conn.execute(f"SELECT id, name FROM users WHERE name = '{username}'")
+            cur = conn.execute(
+                f"SELECT id, name FROM users WHERE name = '{username}'"
+            )
             rows = cur.fetchall()
             if rows:
                 return "<html><body><p>Login successful.</p></body></html>"
             return "<html><body><p>Login failed: invalid credentials.</p></body></html>"
         except sqlite3.OperationalError as exc:
-            return f"<html><body><p>SQLite error: {exc}</p></body></html>", 500
+            return (
+                f"<html><body>"
+                f"<p>SQLite error: {exc}</p>"
+                f"</body></html>"
+            ), 500
 
     @app.route("/xss-post", methods=["POST"])
     def xss_post():
+        """XSS vulnerable (POST): msg parameter rendered without escaping."""
         msg = request.form.get("msg", "")
-        return f"<html><body><p>Message: {msg}</p></body></html>"
+        return (
+            f"<html><body>"
+            f"<p>Message: {msg}</p>"
+            f"</body></html>"
+        )
 
-    # ── False-positive canary endpoints ───────────────────────────────
+    # ── False-positive canary endpoints (documents known scanner limitations) ──
 
     @app.route("/fp-has-script")
     def fp_has_script():
-        """Safe (escaped), but the page contains a <script> tag — baseline comparison must filter this."""
+        """
+        [FP risk] XSS-safe (escaped), but the page contains a <script> tag.
+        The token-matching logic in is_payload_reflected() may produce a false positive.
+        """
         q = request.args.get("q", "")
         return (
             "<html>"
@@ -135,7 +136,10 @@ def create_app() -> Flask:
 
     @app.route("/fp-has-sqlite")
     def fp_has_sqlite():
-        """Safe (parameterized query), but the page mentions 'SQLite' — baseline comparison must filter this."""
+        """
+        [FP risk] SQLi-safe (parameterized query), but the page body contains the word 'SQLite'.
+        The signature-matching logic in find_sql_error() may produce a false positive.
+        """
         q = request.args.get("q", "")
         cur = conn.execute("SELECT name FROM users WHERE id = ?", (1,))
         row = cur.fetchone()
@@ -151,6 +155,7 @@ def create_app() -> Flask:
 
     @app.route("/crawl-root")
     def crawl_root():
+        """Crawler root: two sub-links + one GET form."""
         return (
             "<html><body>"
             "<h1>Crawl Root</h1>"
@@ -165,6 +170,7 @@ def create_app() -> Flask:
 
     @app.route("/crawl-page")
     def crawl_page():
+        """Crawler sub-page: POST form with hidden and submit inputs."""
         return (
             "<html><body>"
             "<h1>Sub Page</h1>"
@@ -180,6 +186,7 @@ def create_app() -> Flask:
 
     @app.route("/crawl-deep")
     def crawl_deep():
+        """Crawler depth-2 page: one GET form."""
         return (
             "<html><body>"
             "<h1>Deep Page</h1>"
@@ -192,6 +199,7 @@ def create_app() -> Flask:
 
     @app.route("/crawl-external-link")
     def crawl_external_link():
+        """Crawler external-link test: external domain link + own GET form."""
         return (
             "<html><body>"
             "<a href='http://external.example.com/page'>External</a>"
@@ -215,14 +223,23 @@ def create_app() -> Flask:
 
     @app.route("/xss-safe")
     def xss_safe():
+        """XSS-safe: output is HTML-escaped via markupsafe.escape()."""
         q = request.args.get("q", "")
-        return f"<html><body><h1>Search Results</h1><p>You searched for: {escape(q)}</p></body></html>"
+        return (
+            f"<html><body>"
+            f"<h1>Search Results</h1>"
+            f"<p>You searched for: {escape(q)}</p>"
+            f"</body></html>"
+        )
 
     @app.route("/sqli-safe")
     def sqli_safe():
+        """SQLi-safe: uses a parameterized query."""
         id_ = request.args.get("id", "1")
         try:
-            cur = conn.execute("SELECT name, email, role FROM users WHERE id = ?", (id_,))
+            cur = conn.execute(
+                "SELECT name, email, role FROM users WHERE id = ?", (id_,)
+            )
             rows = cur.fetchall()
             if rows:
                 name, email, role = rows[0]
@@ -239,8 +256,13 @@ def create_app() -> Flask:
 
     @app.route("/safe")
     def safe_page():
+        """Fully safe: escaped output + parameterized query."""
         name = request.args.get("name", "")
-        return f"<html><body><p>Hello, {escape(name)}!</p></body></html>"
+        return (
+            f"<html><body>"
+            f"<p>Hello, {escape(name)}!</p>"
+            f"</body></html>"
+        )
 
     return app
 
