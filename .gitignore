@@ -24,6 +24,3 @@ pentest/**/*.json
 # Scanner scan results
 scanner/scan*
 scans/*
-
-# Scanner dashboard
-scanner/dashboard.
