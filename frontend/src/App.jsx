@@ -23,7 +23,7 @@ import {
   User,
   Zap,
 } from "lucide-react";
-import { getScanResult, getScanStatus, isMockApi, startScan } from "./api/scans.js";
+import { getScanResult, getScanStatus, isMockApi, startScan, getScanList } from "./api/scans.js";
 
 const scanSteps = [
   "Target URL 확인 중...",
@@ -94,10 +94,35 @@ function App() {
   const [aiReportReady, setAiReportReady] = useState(false);
   const [aiReportMessage, setAiReportMessage] = useState("");
 
+  // Archive States
+  const [archiveList, setArchiveList] = useState([]);
+  const [loadingArchive, setLoadingArchive] = useState(false);
+
   // Settings Configuration States (Inside settings tab)
   const [scanDepth, setScanDepth] = useState(3);
   const [sessionCookie, setSessionCookie] = useState("security=impossible; PHPSESSID=mock");
   const [customHeader, setCustomHeader] = useState("X-Scanner: Scaield-LLM");
+
+  const targetDomain = useMemo(() => {
+    try {
+      const parsed = new URL(targetUrl);
+      return parsed.host || "localhost:8080";
+    } catch (e) {
+      return "localhost:8080";
+    }
+  }, [targetUrl]);
+
+  const customHeaderParsed = useMemo(() => {
+    if (!customHeader) return null;
+    const splitIndex = customHeader.indexOf(":");
+    if (splitIndex === -1) {
+      return { name: "Custom-Header", value: customHeader };
+    }
+    return {
+      name: customHeader.substring(0, splitIndex).trim(),
+      value: customHeader.substring(splitIndex + 1).trim(),
+    };
+  }, [customHeader]);
 
   // Filtered vulnerability selection
   const selectedVulnerability = useMemo(() => {
@@ -115,11 +140,17 @@ function App() {
     const vulnerabilities = result?.vulnerabilities || [];
     return vulnerabilities.reduce(
       (summary, item) => {
+        const type = String(item.type || "").toLowerCase();
         summary.total += 1;
-        summary[item.type] = (summary[item.type] || 0) + 1;
+        if (type.includes("sql injection") || type.includes("sqli")) {
+          summary.sqli += 1;
+        }
+        if (type.includes("xss") || type.includes("cross-site scripting")) {
+          summary.xss += 1;
+        }
         return summary;
       },
-      { total: 0 }
+      { total: 0, sqli: 0, xss: 0 }
     );
   }, [result]);
 
@@ -190,73 +221,107 @@ function App() {
   }
 
   // Load a scan from the Archive list
-  function handleLoadArchiveScan(archiveItem) {
+  async function handleLoadArchiveScan(archiveItem) {
     setError("");
     setTargetUrl(archiveItem.target_url);
     
-    // Setup high quality mock result based on archive metadata
-    const mockResult = {
-      scan_id: archiveItem.scan_id,
-      target_url: archiveItem.target_url,
-      scan_time: archiveItem.scan_time,
-      total_pages: archiveItem.risk_level === "High" ? 12 : 5,
-      tested_inputs: archiveItem.risk_level === "High" ? 18 : 6,
-      risk_level: archiveItem.risk_level,
-      report_status: "AI 리포트 초안 생성",
-      vulnerabilities: archiveItem.risk_level === "High" ? [
-        {
-          id: "vuln-sqli-01",
-          type: "SQL Injection",
-          risk_level: "High",
-          endpoint: "/dvwa/vulnerabilities/sqli/",
-          parameter: "id",
-          payload: "' OR 1=1--",
-          status_code: 200,
-          evidence: "참 조건과 거짓 조건 요청의 응답 길이 차이 발생",
-          detection_method: "boolean_based",
-          ai_report: {
-            vulnerability_summary: "id 파라미터에서 SQL Injection 가능성이 탐지되었습니다.",
-            root_cause: "사용자 입력이 SQL 쿼리에 안전하게 바인딩되지 않고 동적으로 결합되어 실행되고 있습니다.",
-            attack_scenario: "공격자는 조건식을 조작해 인증을 우회하고 데이터베이스 구조를 덤프할 수 있습니다.",
-            secure_coding_guidance: "Prepared Statement 또는 Parameterized Query를 사용하여 사용자 입력을 바인딩 처리하십시오.",
-            fixed_code_example: "SELECT * FROM users WHERE id = ? 형태의 파라미터 바인딩을 적용합니다.",
-            validation_steps: "동일 payload로 재검사했을 때 데이터 누출이나 응답 차이가 유실되는지 재실험합니다.",
-            disclaimer: "이 리포트는 자동 스캔 데이터를 바탕으로 자동 조립되었습니다. 실제 보완 작업 시 검토가 수반되어야 합니다.",
+    if (isMockApi) {
+      // Setup high quality mock result based on archive metadata
+      const mockResult = {
+        scan_id: archiveItem.scan_id,
+        target_url: archiveItem.target_url,
+        scan_time: archiveItem.scan_time,
+        total_pages: archiveItem.risk_level === "High" ? 12 : 5,
+        tested_inputs: archiveItem.risk_level === "High" ? 18 : 6,
+        risk_level: archiveItem.risk_level,
+        report_status: "AI 리포트 초안 생성",
+        vulnerabilities: archiveItem.risk_level === "High" ? [
+          {
+            id: "vuln-sqli-01",
+            type: "SQL Injection",
+            risk_level: "High",
+            endpoint: "/dvwa/vulnerabilities/sqli/",
+            parameter: "id",
+            payload: "' OR 1=1--",
+            status_code: 200,
+            evidence: "참 조건과 거짓 조건 요청의 응답 길이 차이 발생",
+            detection_method: "boolean_based",
+            ai_report: {
+              vulnerability_summary: "id 파라미터에서 SQL Injection 가능성이 탐지되었습니다.",
+              root_cause: "사용자 입력이 SQL 쿼리에 안전하게 바인딩되지 않고 동적으로 결합되어 실행되고 있습니다.",
+              attack_scenario: "공격자는 조건식을 조작해 인증을 우회하고 데이터베이스 구조를 덤프할 수 있습니다.",
+              secure_coding_guidance: "Prepared Statement 또는 Parameterized Query를 사용하여 사용자 입력을 바인딩 처리하십시오.",
+              fixed_code_example: "SELECT * FROM users WHERE id = ? 형태의 파라미터 바인딩을 적용합니다.",
+              validation_steps: "동일 payload로 재검사했을 때 데이터 누출이나 응답 차이가 유실되는지 재실험합니다.",
+              disclaimer: "이 리포트는 자동 스캔 데이터를 바탕으로 자동 조립되었습니다. 실제 보완 작업 시 검토가 수반되어야 합니다.",
+            },
           },
-        },
-        {
-          id: "vuln-xss-01",
-          type: "Reflected XSS",
-          risk_level: "Medium",
-          endpoint: "/dvwa/vulnerabilities/xss_r/",
-          parameter: "name",
-          payload: "<script>alert('XSS_TEST')</script>",
-          status_code: 200,
-          evidence: "응답 HTML에 payload가 인코딩 필터 없이 그대로 반사됨",
-          detection_method: "reflection",
-          ai_report: {
-            vulnerability_summary: "name 파라미터에서 Reflected XSS 가능성이 탐지되었습니다.",
-            root_cause: "입력된 매개변수가 HTML 템플릿에 출력되기 전 적절하게 이스케이프되지 않았습니다.",
-            attack_scenario: "공격자가 조작된 피싱 URL을 사용자에게 유포하여 악성 스크립트를 세션 컨텍스트 내에서 실행시킬 수 있습니다.",
-            secure_coding_guidance: "출력 컨텍스트에 맞춰 특수 문자를 HTML Entity 형태로 치환(Escaping)하십시오.",
-            fixed_code_example: "htmlspecialchars($name, ENT_QUOTES, 'UTF-8') 형식의 필터를 거쳐 출력합니다.",
-            validation_steps: "브라우저 콘솔에서 스크립트 실행이 차단되고 렌더링 결과에 특수 문자가 치환되어 출력되는지 검증합니다.",
-            disclaimer: "클라이언트 사이드 환경과 Content Security Policy 규격에 따라 침투 가능 범위가 변경될 수 있습니다.",
-          },
-        }
-      ] : []
-    };
+          {
+            id: "vuln-xss-01",
+            type: "Reflected XSS",
+            risk_level: "Medium",
+            endpoint: "/dvwa/vulnerabilities/xss_r/",
+            parameter: "name",
+            payload: "<script>alert('XSS_TEST')</script>",
+            status_code: 200,
+            evidence: "응답 HTML에 payload가 인코딩 필터 없이 그대로 반사됨",
+            detection_method: "reflection",
+            ai_report: {
+              vulnerability_summary: "name 파라미터에서 Reflected XSS 가능성이 탐지되었습니다.",
+              root_cause: "입력된 매개변수가 HTML 템플릿에 출력되기 전 적절하게 이스케이프되지 않았습니다.",
+              attack_scenario: "공격자가 조작된 피싱 URL을 사용자에게 유포하여 악성 스크립트를 세션 컨텍스트 내에서 실행시킬 수 있습니다.",
+              secure_coding_guidance: "출력 컨텍스트에 맞춰 특수 문자를 HTML Entity 형태로 치환(Escaping)하십시오.",
+              fixed_code_example: "htmlspecialchars($name, ENT_QUOTES, 'UTF-8') 형식의 필터를 거쳐 출력합니다.",
+              validation_steps: "브라우저 콘솔에서 스크립트 실행이 차단되고 렌더링 결과에 특수 문자가 치환되어 출력되는지 검증합니다.",
+              disclaimer: "클라이언트 사이드 환경과 Content Security Policy 규격에 따라 침투 가능 범위가 변경될 수 있습니다.",
+            },
+          }
+        ] : []
+      };
 
-    setResult(mockResult);
-    setSelectedId(mockResult.vulnerabilities[0]?.id || null);
-    
-    // Jump straight to Dashboard for scanner tab
-    setActiveTab("scanner");
-    setActiveScreen("dashboard");
-    setAiReportReady(true);
-    setAiReportMessage("AI 리포트 초안 생성");
-    setIsAiGenerating(false);
+      setResult(mockResult);
+      setSelectedId(mockResult.vulnerabilities[0]?.id || null);
+      setActiveTab("scanner");
+      setActiveScreen("dashboard");
+      setAiReportReady(true);
+      setAiReportMessage("AI 리포트 초안 생성");
+      setIsAiGenerating(false);
+      return;
+    }
+
+    try {
+      const scanResult = await getScanResult(archiveItem.scan_id);
+      setResult(scanResult);
+      setSelectedId(scanResult.vulnerabilities[0]?.id || null);
+      
+      // Jump straight to Dashboard for scanner tab
+      setActiveTab("scanner");
+      setActiveScreen("dashboard");
+      setAiReportReady(scanResult.vulnerabilities.some((item) => item.ai_report));
+      setAiReportMessage(scanResult.report_status || "");
+      setIsAiGenerating(false);
+    } catch (loadError) {
+      alert(`스캔 결과 로딩 실패: ${loadError.message}`);
+    }
   }
+
+  const fetchArchiveList = async () => {
+    setLoadingArchive(true);
+    try {
+      const list = await getScanList();
+      setArchiveList(list);
+    } catch (err) {
+      console.error("Failed to load archive scans:", err);
+    } finally {
+      setLoadingArchive(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === "archive") {
+      fetchArchiveList();
+    }
+  }, [activeTab]);
 
   return (
     <div className="app-shell">
@@ -342,16 +407,43 @@ function App() {
                 </p>
               </div>
 
-              {/* Navigation Back Button for Report View */}
-              {activeScreen === "report" && (
+              {/* Navigation Back Buttons */}
+              {activeScreen === "dashboard" && (
                 <button
                   className="button-secondary-pill"
-                  onClick={() => setActiveScreen("dashboard")}
+                  onClick={() => {
+                    setActiveScreen("setup");
+                    setResult(null);
+                  }}
                   type="button"
                 >
                   <ArrowLeft size={16} />
-                  <span>대시보드로 돌아가기</span>
+                  <span>메인 화면으로 돌아가기</span>
                 </button>
+              )}
+
+              {activeScreen === "report" && (
+                <div style={{ display: "flex", gap: "12px" }}>
+                  <button
+                    className="button-secondary-pill"
+                    onClick={() => setActiveScreen("dashboard")}
+                    type="button"
+                  >
+                    <ArrowLeft size={16} />
+                    <span>대시보드로 돌아가기</span>
+                  </button>
+                  <button
+                    className="button-secondary-pill"
+                    onClick={() => {
+                      setActiveScreen("setup");
+                      setResult(null);
+                    }}
+                    type="button"
+                  >
+                    <ArrowLeft size={16} />
+                    <span>메인 화면으로 돌아가기</span>
+                  </button>
+                </div>
               )}
             </header>
 
@@ -532,7 +624,7 @@ function App() {
                     </div>
                     <strong className="metric-value tnum">{counts.total || 0}</strong>
                     <span className="metric-detail">
-                      SQLi: {counts["SQL Injection"] || 0}건 · XSS: {counts["Reflected XSS"] || 0}건
+                      SQLi: {counts.sqli}건 · XSS: {counts.xss}건
                     </span>
                   </article>
 
@@ -629,21 +721,9 @@ function App() {
                           </div>
                         </div>
 
-                        <div style={{ marginTop: "24px", display: "flex", gap: "12px" }}>
+                        <div className="detail-panel-actions">
                           <button
-                            className="button-ai-cta"
-                            style={{ width: "auto" }}
-                            disabled={!aiReportReady}
-                            onClick={() => setActiveScreen("report")}
-                            type="button"
-                          >
-                            <Sparkles size={14} />
-                            <span>이 취약점 AI 보안 솔루션 보기</span>
-                          </button>
-                          
-                          <button
-                            className="button-secondary-pill"
-                            style={{ borderColor: "rgba(255, 255, 255, 0.2)", color: "#ffffff", height: "38px" }}
+                            className="button-secondary-pill button-secondary-dark"
                             onClick={() => {
                               setActiveScreen("setup");
                               setResult(null);
@@ -767,29 +847,42 @@ function App() {
             <div className="sub-panel-view animated-view">
               <h3>과거 취약점 모의 스캔 리스트</h3>
               
-              <div className="archive-grid">
-                {mockArchive.map((archiveItem) => (
-                  <div
-                    key={archiveItem.scan_id}
-                    className="archive-card"
-                    onClick={() => handleLoadArchiveScan(archiveItem)}
-                  >
-                    <div className="archive-card-top">
-                      <h4>{archiveItem.target_url}</h4>
-                      <p>스캔 수행일자: {archiveItem.date}</p>
+              {loadingArchive ? (
+                <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "80px 40px", gap: "16px" }}>
+                  <RefreshCw className="spin-loader" size={32} style={{ color: "var(--colors-primary)" }} />
+                  <span style={{ fontSize: "14px", color: "var(--colors-ink-mute)" }}>보관된 리포트를 불러오는 중...</span>
+                </div>
+              ) : archiveList.length > 0 ? (
+                <div className="archive-grid">
+                  {archiveList.map((archiveItem) => (
+                    <div
+                      key={archiveItem.scan_id}
+                      className="archive-card"
+                      onClick={() => handleLoadArchiveScan(archiveItem)}
+                    >
+                      <div className="archive-card-top">
+                        <h4>{archiveItem.target_url}</h4>
+                        <p>스캔 수행일자: {archiveItem.date}</p>
+                      </div>
+                      
+                      <div className="archive-card-bottom">
+                        <span className="tnum" style={{ color: "var(--colors-ink-mute)" }}>
+                          스캔 수행 시간: {archiveItem.scan_time}
+                        </span>
+                        <span className={`risk-badge ${archiveItem.risk_level.toLowerCase()}`}>
+                          {archiveItem.risk_level} Risk
+                        </span>
+                      </div>
                     </div>
-                    
-                    <div className="archive-card-bottom">
-                      <span className="tnum" style={{ color: "var(--colors-ink-mute)" }}>
-                        스캔 수행 시간: {archiveItem.scan_time}
-                      </span>
-                      <span className={`risk-badge ${archiveItem.risk_level.toLowerCase()}`}>
-                        {archiveItem.risk_level} Risk
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="empty-state-card" style={{ padding: "80px 40px" }}>
+                  <Bot size={40} />
+                  <h4>보관된 리포트가 없습니다.</h4>
+                  <p>스캔을 완료하면 결과 리포트가 디스크 파일로 자동 보관됩니다.</p>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -804,61 +897,107 @@ function App() {
               </div>
             </header>
 
-            <div className="sub-panel-view animated-view" style={{ maxWidth: "720px" }}>
-              <h3>스캐닝 작동 세부 파라미터</h3>
+            <div className="settings-layout animated-view">
+              <div className="sub-panel-view settings-form-panel">
+                <h3>스캐닝 작동 세부 파라미터</h3>
 
-              <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                <div className="form-group">
-                  <label htmlFor="scan-depth-select">최대 크롤링 분석 깊이 (Max Depth)</label>
-                  <select
-                    id="scan-depth-select"
-                    className="select-input"
-                    value={scanDepth}
-                    onChange={(e) => setScanDepth(Number(e.target.value))}
-                  >
-                    <option value={1}>1단계 (단일 홈페이지만 진단)</option>
-                    <option value={2}>2단계 (서브도메인 한정)</option>
-                    <option value={3}>3단계 (기본 하위 디렉토리)</option>
-                    <option value={5}>5단계 (정밀 분석 깊이)</option>
-                  </select>
+                <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+                  <div className="form-group">
+                    <label htmlFor="scan-depth-select">최대 크롤링 분석 깊이 (Max Depth)</label>
+                    <select
+                      id="scan-depth-select"
+                      className="select-input"
+                      value={scanDepth}
+                      onChange={(e) => setScanDepth(Number(e.target.value))}
+                    >
+                      <option value={1}>1단계 (단일 홈페이지만 진단)</option>
+                      <option value={2}>2단계 (서브도메인 한정)</option>
+                      <option value={3}>3단계 (기본 하위 디렉토리)</option>
+                      <option value={5}>5단계 (정밀 분석 깊이)</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="session-cookie-input">대상 모의환경 인증용 Session Cookie 값</label>
+                    <input
+                      id="session-cookie-input"
+                      className="text-input"
+                      style={{ paddingLeft: "16px" }}
+                      value={sessionCookie}
+                      onChange={(e) => setSessionCookie(e.target.value)}
+                      placeholder="PHPSESSID=..."
+                    />
+                    <span style={{ fontSize: "11px", color: "var(--colors-ink-mute)" }}>
+                      DVWA 보안 단계 설정(예: security=low) 등을 브라우저 세션 정보와 동기화하기 위한 용도입니다.
+                    </span>
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="custom-header-input">스캐너 차단 우회용 커스텀 HTTP 헤더</label>
+                    <input
+                      id="custom-header-input"
+                      className="text-input"
+                      style={{ paddingLeft: "16px" }}
+                      value={customHeader}
+                      onChange={(e) => setCustomHeader(e.target.value)}
+                      placeholder="User-Agent: ..."
+                    />
+                  </div>
+
+                  <div style={{ marginTop: "12px" }}>
+                    <button
+                      className="button-primary-pill"
+                      style={{ width: "auto", padding: "0 28px" }}
+                      onClick={() => alert("스캐너 세부 설정이 저장되었습니다.")}
+                      type="button"
+                    >
+                      <span>설정 저장</span>
+                    </button>
+                  </div>
                 </div>
+              </div>
 
-                <div className="form-group">
-                  <label htmlFor="session-cookie-input">대상 모의환경 인증용 Session Cookie 값</label>
-                  <input
-                    id="session-cookie-input"
-                    className="text-input"
-                    style={{ paddingLeft: "16px" }}
-                    value={sessionCookie}
-                    onChange={(e) => setSessionCookie(e.target.value)}
-                    placeholder="PHPSESSID=..."
-                  />
-                  <span style={{ fontSize: "11px", color: "var(--colors-ink-mute)" }}>
-                    DVWA 보안 단계 설정(예: security=low) 등을 브라우저 세션 정보와 동기화하기 위한 용도입니다.
-                  </span>
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="custom-header-input">스캐너 차단 우회용 커스텀 HTTP 헤더</label>
-                  <input
-                    id="custom-header-input"
-                    className="text-input"
-                    style={{ paddingLeft: "16px" }}
-                    value={customHeader}
-                    onChange={(e) => setCustomHeader(e.target.value)}
-                    placeholder="User-Agent: ..."
-                  />
-                </div>
-
-                <div style={{ marginTop: "12px" }}>
-                  <button
-                    className="button-primary-pill"
-                    style={{ width: "auto", padding: "0 28px" }}
-                    onClick={() => alert("스캐너 세부 설정이 저장되었습니다.")}
-                    type="button"
-                  >
-                    <span>설정 저장</span>
-                  </button>
+              {/* Right Side: Request Simulation Console */}
+              <div className="sub-panel-view preview-panel">
+                <h3>스캐너 요청 헤더 시뮬레이션</h3>
+                
+                <div className="mockup-console">
+                  <div className="mockup-console-header">
+                    <span className="console-dot red" />
+                    <span className="console-dot yellow" />
+                    <span className="console-dot green" />
+                    <span className="console-title">Request HTTP Packet</span>
+                  </div>
+                  <div className="console-lines-container">
+                    <div className="console-line">
+                      <span className="console-keyword">GET</span> <span className="console-string">/dvwa/vulnerabilities/sqli/ HTTP/1.1</span>
+                    </div>
+                    <div className="console-line">
+                      <span className="console-keyword">Host:</span> <span className="console-string">{targetDomain}</span>
+                    </div>
+                    <div className="console-line">
+                      <span className="console-keyword">User-Agent:</span> <span className="console-string">Scaield-Vulnerability-Engine/1.2 (LLM-Powered)</span>
+                    </div>
+                    {sessionCookie && (
+                      <div className="console-line">
+                        <span className="console-keyword">Cookie:</span> <span className="console-string">{sessionCookie}</span>
+                      </div>
+                    )}
+                    {customHeaderParsed && (
+                      <div className="console-line">
+                        <span className="console-keyword">{customHeaderParsed.name}:</span> <span className="console-string">{customHeaderParsed.value}</span>
+                      </div>
+                    )}
+                    <div className="console-line">
+                      <span className="console-comment">// Max Crawl Depth: {scanDepth} stages</span>
+                    </div>
+                    <div className="console-line">
+                      <span className="console-keyword">Accept:</span> <span className="console-string">text/html,application/xhtml+xml,application/xml;q=0.9</span>
+                    </div>
+                    <div className="console-line">
+                      <span className="console-keyword">Connection:</span> <span className="console-string">keep-alive</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -875,62 +1014,135 @@ function App() {
               </div>
             </header>
 
-            <div className="sub-panel-view animated-view" style={{ maxWidth: "640px" }}>
-              <h3>사용자 계정 상태</h3>
-
-              <div style={{ display: "flex", gap: "24px", alignItems: "center", paddingBottom: "20px", borderBottom: "1px solid var(--colors-hairline)" }}>
-                <div
-                  style={{
-                    width: "80px",
-                    height: "80px",
-                    borderRadius: "50%",
-                    background: "linear-gradient(135deg, var(--colors-primary-soft), var(--colors-magenta))",
-                    display: "grid",
-                    placeItems: "center",
-                    fontSize: "28px",
-                    fontWeight: "600",
-                    color: "#ffffff"
-                  }}
-                >
-                  JH
+            <div className="profile-layout animated-view">
+              {/* Left Column: Glassmorphic Scaield ID Card */}
+              <div className="license-card">
+                <div className="license-card-header">
+                  <div className="license-card-logo">
+                    <div className="license-card-logo-glyph">S</div>
+                    <span className="license-card-logo-text">Scaield Identity</span>
+                  </div>
+                  <div className="license-badge-glow">Active</div>
                 </div>
 
-                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-                  <h4 style={{ fontSize: "18px", fontWeight: "500" }}>jonghyun</h4>
-                  <p style={{ fontSize: "13px", color: "var(--colors-primary)", fontWeight: "500" }}>
-                    Enterprise Plan (기업 무제한 펜테스트 라이선스)
-                  </p>
-                  <p style={{ fontSize: "11px", color: "var(--colors-ink-mute)" }}>
-                    인증 만료 일자: 2028년 12월 31일 (자동 연장 활성화)
-                  </p>
+                <div className="license-card-chip" />
+
+                <div className="license-card-body">
+                  <div className="license-user-name">jonghyun</div>
+                  <div style={{ fontSize: "14px", color: "var(--colors-magenta)", fontWeight: "500", letterSpacing: "-0.2px" }}>
+                    Enterprise Security Administrator
+                  </div>
+                </div>
+
+                <div className="license-card-footer">
+                  <div className="license-footer-item">
+                    <span className="license-footer-label">License ID</span>
+                    <span className="license-footer-value tnum">LIC-9482-JH26</span>
+                  </div>
+                  <div className="license-footer-item" style={{ alignItems: "flex-end" }}>
+                    <span className="license-footer-label">Valid Thru</span>
+                    <span className="license-footer-value tnum">2028. 12. 31</span>
+                  </div>
                 </div>
               </div>
 
-              <div>
-                <h4 style={{ fontSize: "14px", fontWeight: "500", marginBottom: "12px" }}>Scaield Core API 연동 설정</h4>
-                
-                <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
-                  <input
-                    className="text-input"
-                    style={{ paddingLeft: "16px", fontFamily: "monospace", fontSize: "12px" }}
-                    value="VITE_API_BASE_URL=http://localhost:8000"
-                    readOnly
-                  />
-                  <button
-                    className="button-secondary-pill"
-                    style={{ position: "absolute", right: "6px", height: "32px", fontSize: "11px" }}
-                    onClick={() => {
-                      navigator.clipboard.writeText("VITE_API_BASE_URL=http://localhost:8000");
-                      alert("API base URL 예시가 클립보드에 복사되었습니다.");
-                    }}
-                    type="button"
-                  >
-                    복사
-                  </button>
+              {/* Right Column: Credentials & Usage Stats */}
+              <div className="profile-right-panels">
+                {/* Credentials Card */}
+                <div className="sub-panel-view" style={{ padding: "32px" }}>
+                  <h3>Scaield Core API 연동 설정</h3>
+                  
+                  <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                    <div className="form-group">
+                      <label htmlFor="api-base-url-input">API Base Endpoint</label>
+                      <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                        <input
+                          id="api-base-url-input"
+                          className="text-input"
+                          style={{ paddingLeft: "16px", fontFamily: "monospace", fontSize: "12px" }}
+                          value="VITE_API_BASE_URL=http://localhost:8000"
+                          readOnly
+                        />
+                        <button
+                          className="button-secondary-pill"
+                          style={{ position: "absolute", right: "6px", height: "32px", fontSize: "11px" }}
+                          onClick={() => {
+                            navigator.clipboard.writeText("VITE_API_BASE_URL=http://localhost:8000");
+                            alert("API base URL 예시가 클립보드에 복사되었습니다.");
+                          }}
+                          type="button"
+                        >
+                          복사
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="form-group">
+                      <label htmlFor="api-token-input">Administrator API Token (Masked)</label>
+                      <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                        <input
+                          id="api-token-input"
+                          className="text-input"
+                          style={{ paddingLeft: "16px", fontFamily: "monospace", fontSize: "12px" }}
+                          value="sc_live_••••••••••••••••3ae4"
+                          readOnly
+                        />
+                        <button
+                          className="button-secondary-pill"
+                          style={{ position: "absolute", right: "6px", height: "32px", fontSize: "11px" }}
+                          onClick={() => {
+                            navigator.clipboard.writeText("sc_live_45aefb68d901c234a98b76543ae4");
+                            alert("클라이언트 API Token 복사 완료");
+                          }}
+                          type="button"
+                        >
+                          복사
+                        </button>
+                      </div>
+                    </div>
+
+                    <span style={{ fontSize: "11.5px", color: "var(--colors-ink-mute)", lineHeight: "1.4" }}>
+                      💡 실제 API key나 비밀값은 프론트엔드 환경변수에 직접 넣지 말고, 반드시 백엔드 미들웨어에서 거쳐 관리하도록 설정하는 것을 권장합니다.
+                    </span>
+                  </div>
                 </div>
-                <span style={{ fontSize: "11px", color: "var(--colors-ink-mute)", display: "block", marginTop: "8px" }}>
-                  실제 API key나 비밀값은 프론트엔드 환경변수에 넣지 말고 백엔드에서 관리하세요.
-                </span>
+
+                {/* Usage Stats Card */}
+                <div className="sub-panel-view" style={{ padding: "32px" }}>
+                  <h3>이번 달 플랜 사용 통계</h3>
+                  
+                  <div style={{ display: "flex", flexDirection: "column", gap: "16px", marginTop: "8px" }}>
+                    <div className="stat-item">
+                      <div className="stat-item-header">
+                        <span className="stat-label">모의 취약점 진단 횟수</span>
+                        <span className="stat-value tnum">45 / 무제한</span>
+                      </div>
+                      <div className="stat-progress-bar">
+                        <div className="stat-progress-fill" style={{ width: "100%" }} />
+                      </div>
+                    </div>
+
+                    <div className="stat-item">
+                      <div className="stat-item-header">
+                        <span className="stat-label">AI 리포트 생성 건수</span>
+                        <span className="stat-value tnum">128 / 무제한</span>
+                      </div>
+                      <div className="stat-progress-bar">
+                        <div className="stat-progress-fill" style={{ width: "100%" }} />
+                      </div>
+                    </div>
+
+                    <div className="stat-item">
+                      <div className="stat-item-header">
+                        <span className="stat-label">동시 최대 스캔 속도 (Rate Limit Limit)</span>
+                        <span className="stat-value tnum">30 req/s (최대 지원 속도)</span>
+                      </div>
+                      <div className="stat-progress-bar">
+                        <div className="stat-progress-fill" style={{ width: "100%" }} />
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
