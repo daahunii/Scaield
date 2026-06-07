@@ -2781,5 +2781,77 @@
         "extra_data": {}
       }
     ]
+  },
+  {
+    "timestamp": "2026-06-07 23:45:09",
+    "target_url": "http://127.0.0.1:55529/xss-vuln?q=test",
+    "approved_domains": [
+      "localhost",
+      "127.0.0.1"
+    ],
+    "timeout": 10,
+    "results": [
+      {
+        "url": "http://127.0.0.1:55529/xss-vuln?q=test",
+        "method": "GET",
+        "parameter": "q",
+        "parameter_type": "text",
+        "extra_data": {}
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-06-07 23:55:14",
+    "target_url": "http://127.0.0.1:55719/xss-vuln?q=test",
+    "approved_domains": [
+      "localhost",
+      "127.0.0.1"
+    ],
+    "timeout": 10,
+    "results": [
+      {
+        "url": "http://127.0.0.1:55719/xss-vuln?q=test",
+        "method": "GET",
+        "parameter": "q",
+        "parameter_type": "text",
+        "extra_data": {}
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-06-07 23:56:19",
+    "target_url": "http://127.0.0.1:55820/xss-vuln?q=test",
+    "approved_domains": [
+      "localhost",
+      "127.0.0.1"
+    ],
+    "timeout": 10,
+    "results": [
+      {
+        "url": "http://127.0.0.1:55820/xss-vuln?q=test",
+        "method": "GET",
+        "parameter": "q",
+        "parameter_type": "text",
+        "extra_data": {}
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-06-08 00:02:15",
+    "target_url": "http://127.0.0.1:55959/xss-vuln?q=test",
+    "approved_domains": [
+      "localhost",
+      "127.0.0.1"
+    ],
+    "timeout": 10,
+    "results": [
+      {
+        "url": "http://127.0.0.1:55959/xss-vuln?q=test",
+        "method": "GET",
+        "parameter": "q",
+        "parameter_type": "text",
+        "extra_data": {}
+      }
+    ]
   }
 ]

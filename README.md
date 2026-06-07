@@ -12,10 +12,9 @@ Scaield는 각 역할별로 완벽하게 캡슐화된 4개의 주요 서브시�
 
 ```
 Scaield/
-├── pipeline/
-│   ├── run.py                 # 전체 시스템 통합 실행 파이프라인 (Step 1 ~ Step 4 통합)
-│   ├── results_*.json         # [Output] DAST 스캐너 원시 결과 데이터 (버전화 저장)
-│   └── report_*.json          # [Output] Gemini AI 기반 구조화 분석 보고서 (버전화 저장)
+├── backend_bridge/
+│   ├── app.py                 # 전체 시스템 통합 실행 파이프라인 (Flask API 서버)
+│   └── README.md              # 백엔드 브릿지 명세서
 ├── scanner/
 │   └── scanner_core.py        # 정적/동적 DOM 크롤러 및 타겟 도메인 인가 검증 엔진
 ├── pentest/
@@ -37,13 +36,13 @@ Scaield/
 
 ## 2. 엔드투엔드 파이프라인 및 데이터 플로우
 
-통합 파이프라인(`pipeline/run.py`)은 실행 시 아래의 4단계를 연속적으로 수행하며 동작합니다.
+통합 파이프라인(`backend_bridge/app.py`)은 실행 시 아래의 4단계를 연속적으로 수행하며 동작합니다.
 
 ```mermaid
 sequenceDiagram
     autonumber
     actor User as 개발자 / 보안 담당자
-    participant Run as pipeline/run.py
+    participant Run as backend_bridge/app.py
     participant Core as scanner/scanner_core.py
     participant Pentest as pentest/engine.py
     participant LLM as LLMmodule/llm.py
@@ -192,23 +191,39 @@ GEMINI_API_KEY=your_gemini_api_key_here
 
 ---
 
-### 실전 실행 커맨드 예시
+### API 서버 실행
+
+우선 백엔드 통합 파이프라인 서버를 기동합니다:
+
+```bash
+python3 backend_bridge/app.py
+```
+(기본적으로 `0.0.0.0:8000`에서 실행됩니다)
+
+### 스캔 요청 예시 (cURL)
 
 #### 예시 A: 일반 비인가 영역 기본 통합 스캔
 ```bash
-python3 pipeline/run.py --url http://localhost:55000/
+curl -X POST http://localhost:8000/scan/start \
+  -H "Content-Type: application/json" \
+  -d '{"target_url": "http://localhost:55000/"}'
 ```
 
 #### 예시 B: DVWA 모의 침투 대상 계정 자동 세션 수집 및 심층 스캔
 Scaield의 자동 세션 기능(`LoginConfig`)을 적용하여 관리자 계정 로그인 후 세션 쿠키를 자동 물려받아 보안 진단 및 분석 리포트 제작까지 한 번에 동작시키는 예시입니다.
 ```bash
-python3 pipeline/run.py \
-  --url http://localhost:55000/ \
-  --login-url http://localhost:55000/login.php \
-  --login-user admin \
-  --login-pass password \
-  --login-user-field username \
-  --login-pass-field password
+curl -X POST http://localhost:8000/scan/start \
+  -H "Content-Type: application/json" \
+  -d '{
+    "target_url": "http://localhost:55000/",
+    "login": {
+      "login_url": "http://localhost:55000/login.php",
+      "username": "admin",
+      "password": "password",
+      "username_field": "username",
+      "password_field": "password"
+    }
+  }'
 ```
 
 ---

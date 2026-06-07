@@ -13,7 +13,7 @@
 
 | 기능 분류 | 주요 기술 스택 | 입력 데이터 | 출력 데이터 | 주요 목적 |
 | :--- | :--- | :--- | :--- | :--- |
-| 🧠 **AI 분석 엔진** | **google-generativeai** <br> (Gemini 3.5 Flash) | `pipeline/results.json` <br> (로컬 스캔 원시 데이터) | `pipeline/report.json` <br> (스키마 준수 JSON) | 대시보드 렌더링 및 PDF 상세 리포트 정보 구조화 |
+| 🧠 **AI 분석 엔진** | **google-generativeai** <br> (Gemini 3.5 Flash) | `results 데이터` <br> (스캔 원시 데이터) | `report 데이터` <br> (스키마 준수 JSON) | 대시보드 렌더링 및 PDF 상세 리포트 정보 구조화 |
 | 🛡️ **보안 지침** | **OWASP Secure Coding** | 스캔 증거 페이로드 | 프레임워크 맞춤형 대응 코드 | 실무 개발자가 즉시 패치할 수 있는 시큐어 코딩 가이드 제공 |
 | ⚙️ **데이터 정제** | **Python JSON Parser** | LLM API 원시 텍스트 | 정제된 정적 JSON | 마크다운 코드 블록 제거 및 구문 예외 처리 (강건성 확보) |
 
@@ -97,9 +97,9 @@ GEMINI_API_KEY=your_actual_gemini_api_key_here
 python LLMmodule/llm.py
 ```
 * **동작 순서:**
-  1. `pipeline/results.json`에 저장된 모의 침투 스캔 데이터를 읽어옵니다.
+  1. (테스트 환경의 경우) 예제 스캔 결과 데이터를 읽어옵니다.
   2. 설정된 `GEMINI_API_KEY`를 바탕으로 모델을 호출합니다.
-  3. LLM 출력을 파싱 및 가공하여 완벽한 규격의 **`pipeline/report.json`** 파일로 최종 저장합니다.
+  3. LLM 출력을 파싱 및 가공하여 완벽한 규격의 **JSON 데이터** 구조체로 반환/저장합니다.
 
 ---
 

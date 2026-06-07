@@ -21,7 +21,7 @@ def load_env():
 # Load environment variables on import
 load_env()
 
-def load_results(file_path="pipeline/results.json"):
+def load_results(file_path="results.json"):
     """
     Load the vulnerability scanning results from the specified JSON file.
     """
@@ -117,7 +117,7 @@ if __name__ == "__main__":
     print("Loading results.json...")
     # Adjust path if running from a different directory
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    results_path = os.path.join(base_dir, "pipeline", "results.json")
+    results_path = os.path.join(base_dir, "results.json")
     
     data = load_results(results_path)
     
@@ -129,7 +129,7 @@ if __name__ == "__main__":
         print(report)
         
         # Optionally, save to file
-        report_path = os.path.join(base_dir, "pipeline", "report.md")
+        report_path = os.path.join(base_dir, "report.md")
         try:
             with open(report_path, "w", encoding="utf-8") as f:
                 f.write(report)

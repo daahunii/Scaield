@@ -2,7 +2,7 @@
 
 React 프론트엔드와 기존 Scaield 모듈(`scanner`, `pentest`, `LLMmodule`)을 연결하는 Flask 브릿지 서버입니다.
 
-이 폴더는 Scaield 루트에 새로 추가된 백엔드 브릿지 전용 폴더입니다. 기존 `scanner`, `pentest`, `LLMmodule`, `pipeline`, 루트 README는 수정하지 않고 참조만 합니다.
+이 폴더는 Scaield 루트에 새로 추가된 백엔드 브릿지 전용 폴더입니다. 기존 `scanner`, `pentest`, `LLMmodule` 모듈들을 참조하여 파이프라인을 직접 오케스트레이션합니다.
 
 ## 제공 API
 
