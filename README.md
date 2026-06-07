@@ -8,29 +8,49 @@ Scaield(Scanner AI Shield)는 자동화된 **DAST(Dynamic Application Security T
 
 ## 1. 아키텍처 개요 및 디렉토리 구조
 
-Scaield는 각 역할별로 완벽하게 캡슐화된 4개의 주요 서브시스템 모듈로 분할 설계되어 있습니다.
+Scaield는 각 역할별로 완벽하게 캡슐화된 모듈로 분할 설계되어 있습니다.
 
 ```
-Scaield/
+Sca/
 ├── backend_bridge/
 │   ├── app.py                 # 전체 시스템 통합 실행 파이프라인 (Flask API 서버)
+│   ├── .env.example           # 환경 변수 설정 예시 파일
 │   └── README.md              # 백엔드 브릿지 명세서
 ├── scanner/
-│   └── scanner_core.py        # 정적/동적 DOM 크롤러 및 타겟 도메인 인가 검증 엔진
+│   ├── scanner_core.py        # 정적/동적 DOM 크롤러 및 타겟 도메인 인가 검증 엔진
+│   └── diagnose_dvwa.py       # DVWA 웹 취약점 진단 및 세션 획득 검증 스크립트
 ├── pentest/
 │   ├── engine.py              # 모의 침투(Pentest) 오케스트레이터
 │   ├── scanner.py             # XSS / SQLi (Error-based, Boolean-based) 모의 침투 스캐너
-│   ├── http_client.py         # 10 req/s 글로벌 Rate Limiter 내장 HTTP 클라이언트
+│   ├── http_client.py         # 글로벌 Rate Limiter 내장 HTTP 클라이언트
 │   ├── response_analyzer.py   # 응답 반사 체크, 에러 검출, Boolean 응답 논리 비교 분석 모듈
+│   ├── rate_limiter.py        # 속도 제한 제어용 모듈 (Token Bucket 등)
 │   ├── payload.py             # 보안 진단용 Exploit 페이로드 세트
 │   ├── models.py              # 데이터 구조체 모델 선언부 (Finding, InputPoint 등)
 │   └── adapter.py             # 모의 침투 결과 ➡️ AI 입력용 데이터 어댑터 레이어
 ├── LLMmodule/
 │   ├── llm.py                 # Gemini Pro API 연동 및 JSON 정제 모듈
 │   └── README.md              # AI 모듈 상세 명세서
+├── frontend/                  # React + Vite 기반의 관리용 웹 대시보드 프론트엔드
+│   ├── src/                   # 프론트엔드 소스 코드
+│   ├── index.html             # 메인 HTML 엔트리
+│   ├── package.json           # npm 패키지 의존성 파일
+│   └── README.md              # 프론트엔드 빌드 및 기동 명세서
+├── tests/                     # 전체 통합 및 유닛 테스트 스위트
+│   ├── conftest.py            # pytest 픽스처 및 모의 서버 구성
+│   ├── target_server.py       # 테스트용 Mock 취약 웹 서버
+│   ├── test_backend_api.py    # Backend Bridge API 테스트
+│   ├── test_crawler.py        # 크롤러 기능 검증 테스트
+│   ├── test_detection_functions.py # 탐지 및 분석 유닛 테스트
+│   ├── test_error_handling.py # 예외 및 Rate Limiting 검증 테스트
+│   ├── test_scan_pipeline.py  # 스캔 파이프라인 통합 테스트
+│   └── README.md              # 테스트 방법 및 환경 명세서
+├── common/                    # 공통 리소스 및 요구사항 백업 폴더
 ├── .env                       # API Key 및 환경 변수 파일 (Git 커밋 금지)
-└── .gitignore                 # 원시 결과 및 가상환경(.venv*) 추적 제외 필터 설정 파일
+├── .gitignore                 # 원시 결과 및 가상환경(.venv*) 추적 제외 필터 설정 파일
+└── requirements.txt           # Python 애플리케이션 라이브러리 의존성 명세
 ```
+
 
 ---
 
