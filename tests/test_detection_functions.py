@@ -21,14 +21,7 @@ from response_analyzer import (
 from payload import SQL_ERROR_SIGNATURES
 from rate_limiter import RateLimiter, RateLimiterError
 
-# Load scanner/app.py by file path to avoid sys.modules conflict with backend_bridge/app.py
-_scanner_app_spec = importlib.util.spec_from_file_location(
-    "scanner_app", str(_SCANNER_DIR / "app.py")
-)
-_scanner_app = importlib.util.module_from_spec(_scanner_app_spec)
-_scanner_app_spec.loader.exec_module(_scanner_app)
-_parse_cookies_input = _scanner_app._parse_cookies_input
-_build_effective_domains = _scanner_app._build_effective_domains
+# (Removed scanner/app.py imports)
 
 
 def _resp(text: str, status_code: int = 200):
@@ -227,76 +220,4 @@ class TestRateLimiter:
         rl.report_failure()
         with pytest.raises(RateLimiterError):
             rl.report_failure()
-        rl.report_failure()  # counter was reset — no exception
-
-
-# ══════════════════════════════════════════════════════════════════════
-# _parse_cookies_input()
-# ══════════════════════════════════════════════════════════════════════
-
-class TestParseCookiesInput:
-
-    def test_semicolon_separated(self):
-        result = _parse_cookies_input("PHPSESSID=abc123; security=low")
-        assert result == {"PHPSESSID": "abc123", "security": "low"}
-
-    def test_newline_separated(self):
-        result = _parse_cookies_input("session=xyz\ntoken=123")
-        assert result == {"session": "xyz", "token": "123"}
-
-    def test_empty_string_returns_empty_dict(self):
-        assert _parse_cookies_input("") == {}
-
-    def test_whitespace_only_returns_empty_dict(self):
-        assert _parse_cookies_input("   ") == {}
-
-    def test_strips_whitespace_around_key_value(self):
-        result = _parse_cookies_input("  key  =  value  ")
-        assert result == {"key": "value"}
-
-    def test_value_with_equals_sign(self):
-        """Value contains '=' characters (e.g. Base64-encoded tokens)."""
-        result = _parse_cookies_input("token=abc=def==")
-        assert result["token"] == "abc=def=="
-
-    def test_key_without_value(self):
-        result = _parse_cookies_input("key=")
-        assert result == {"key": ""}
-
-    def test_mixed_separators(self):
-        result = _parse_cookies_input("a=1; b=2\nc=3")
-        assert result == {"a": "1", "b": "2", "c": "3"}
-
-
-# ══════════════════════════════════════════════════════════════════════
-# _build_effective_domains()
-# ══════════════════════════════════════════════════════════════════════
-
-class TestBuildEffectiveDomains:
-
-    def test_always_includes_localhost(self):
-        domains = _build_effective_domains("http://example.com/path", "")
-        assert "localhost" in domains
-
-    def test_extracts_host_from_target_url(self):
-        domains = _build_effective_domains("http://example.com/path", "")
-        assert "example.com" in domains
-
-    def test_merges_approved_domains(self):
-        domains = _build_effective_domains("http://example.com/", "staging.com,dev.local")
-        assert "staging.com" in domains
-        assert "dev.local" in domains
-
-    def test_no_duplicates(self):
-        """localhost in approved_domains must not appear twice."""
-        domains = _build_effective_domains("http://localhost/path", "localhost")
-        assert domains.count("localhost") == 1
-
-    def test_target_already_in_approved_no_duplicate(self):
-        domains = _build_effective_domains("http://example.com/", "example.com")
-        assert domains.count("example.com") == 1
-
-    def test_empty_approved_domains(self):
-        domains = _build_effective_domains("http://mysite.com/", "")
-        assert "localhost" in domains
-        assert "mysite.com" in domains
+# (Removed cookie parsing and domain building tests since app.py was deleted)

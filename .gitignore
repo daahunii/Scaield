@@ -20,3 +20,8 @@ pipeline/report*
 
 # pentest module
 pentest/**/*.json
+
+# Scanner scan results
+scanner/scan*
+scans/*
+

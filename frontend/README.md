@@ -2,12 +2,12 @@
 
 Scaield의 React + Vite 기반 프론트엔드 전용 폴더입니다. URL 입력, 스캔 시작, 진행 상태 조회, 결과 대시보드, 취약점 상세, AI 리포트 표시, PDF 다운로드 UI를 제공합니다.
 
-이 폴더는 기존 `/Users/jonghyun/Desktop/Scaield` 프로젝트의 crawler, pentest, LLMmodule, scanner, prompt, backend 로직과 루트 README를 수정하지 않고 추가된 프론트엔드 전용 작업 공간입니다.
+이 폴더는 기존 `/Users/[username]/Desktop/Scaield` 프로젝트의 crawler, pentest, LLMmodule, scanner, prompt, backend 로직과 루트 README를 수정하지 않고 추가된 프론트엔드 전용 작업 공간입니다.
 
 ## 설치 방법
 
 ```bash
-cd /Users/jonghyun/Desktop/Scaield/frontend
+cd /Users/[username]/Desktop/Scaield/frontend
 npm install
 ```
 
@@ -40,7 +40,7 @@ VITE_API_BASE_URL=http://localhost:8000
 ## 실행 방법
 
 ```bash
-cd /Users/jonghyun/Desktop/Scaield/frontend
+cd /Users/[username]/Desktop/Scaield/frontend
 npm install
 cp .env.example .env
 npm run dev

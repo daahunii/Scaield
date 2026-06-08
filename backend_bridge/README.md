@@ -16,7 +16,7 @@ React 프론트엔드와 기존 Scaield 모듈(`scanner`, `pentest`, `LLMmodule`
 Scaield 루트에서 Python 가상환경을 만들고 의존성을 설치합니다. 기존 Scaield 모듈은 `str | None` 타입 문법을 사용하므로 Python 3.10 이상이 필요합니다.
 
 ```bash
-cd /Users/jonghyun/Desktop/Scaield
+cd /Users/[username]/Desktop/Scaield
 python3.12 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -27,7 +27,7 @@ pip install -r requirements.txt
 필요하면 `.env.example`을 복사해 로컬 환경 파일을 만듭니다.
 
 ```bash
-cd /Users/jonghyun/Desktop/Scaield/backend_bridge
+cd /Users/[username]/Desktop/Scaield/backend_bridge
 cp .env.example .env
 ```
 
@@ -38,7 +38,7 @@ PORT=8000
 FRONTEND_ORIGIN=http://localhost:5173
 ```
 
-AI 리포트까지 생성하려면 `/Users/jonghyun/Desktop/Scaield/.env` 또는 `backend_bridge/.env`에 `GEMINI_API_KEY`를 설정합니다. 실제 API key나 비밀값은 커밋하지 마세요.
+AI 리포트까지 생성하려면 `/Users/[username]/Desktop/Scaield/.env` 또는 `backend_bridge/.env`에 `GEMINI_API_KEY`를 설정합니다. 실제 API key나 비밀값은 커밋하지 마세요.
 
 AI 리포트를 실제 Gemini API로 생성하려면 추가 패키지도 설치합니다.
 
@@ -51,7 +51,7 @@ pip install google-genai
 ## 실행
 
 ```bash
-cd /Users/jonghyun/Desktop/Scaield
+cd /Users/[username]/Desktop/Scaield
 source .venv/bin/activate
 python backend_bridge/app.py
 ```
@@ -62,7 +62,7 @@ python backend_bridge/app.py
 http://localhost:8000/health
 ```
 
-프론트엔드는 `/Users/jonghyun/Desktop/Scaield/frontend/.env`에서 다음 값을 사용합니다.
+프론트엔드는 `/Users/[username]/Desktop/Scaield/frontend/.env`에서 다음 값을 사용합니다.
 
 ```env
 VITE_API_BASE_URL=http://localhost:8000
@@ -73,7 +73,7 @@ VITE_API_BASE_URL=http://localhost:8000
 터미널 1:
 
 ```bash
-cd /Users/jonghyun/Desktop/Scaield
+cd /Users/[username]/Desktop/Scaield
 source .venv/bin/activate
 python backend_bridge/app.py
 ```
@@ -81,7 +81,7 @@ python backend_bridge/app.py
 터미널 2:
 
 ```bash
-cd /Users/jonghyun/Desktop/Scaield/frontend
+cd /Users/[username]/Desktop/Scaield/frontend
 npm run dev
 ```
 

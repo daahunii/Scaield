@@ -25,9 +25,9 @@ import re
 import threading
 import time
 from collections import deque
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, Iterable, List, Optional, Set, Tuple
-from urllib.parse import parse_qs, quote, urlencode, urljoin, urlparse, urlunparse
+from urllib.parse import parse_qs, urlencode, urljoin, urlparse, urlunparse
 
 import requests
 from bs4 import BeautifulSoup
@@ -44,50 +44,14 @@ from selenium.webdriver.support.ui import WebDriverWait
 # ──────────────────────────────────────────────
 logger = logging.getLogger(__name__)
 
-# ──────────────────────────────────────────────
-# FR4: Detection patterns & baseline payloads
-# ──────────────────────────────────────────────
-SQL_ERROR_REGEX = re.compile(
-    r"(SQL syntax|mysql_fetch|ORA-[0-9]{4,5}|pg_query|"
-    r"sqlite3\.OperationalError|SQLSTATE|unclosed quotation mark)",
-    re.IGNORECASE,
-)
-
-BASELINE_SQLI_PAYLOADS: List[str] = [
-    "' OR '1'='1",
-    '" OR "1"="1',
-    "' OR 1=1--",
-    "1; DROP TABLE users--",
-]
-
-BASELINE_XSS_PAYLOADS: List[str] = [
-    # Classic reflected / stored XSS
-    "<script>alert('XSS_TEST')</script>",
-    '"><img src=x onerror=alert(1)>',
-    "<svg onload=alert(1)>",
-    # Tag-breaking variants (bypass basic sanitisers)
-    "'><script>alert('XSS_TEST')</script>",
-    "</title><script>alert('XSS_TEST')</script>",
-    # Event-handler variants
-    '" onmouseover="alert(1)',
-    "' onfocus='alert(1)' autofocus='",
-    # DOM XSS — JavaScript URI
-    "javascript:alert(document.domain)",
-]
-
-# Unique marker embedded in every XSS payload for reliable reflection detection.
-_XSS_MARKER = "XSS_TEST"
-
 # Heuristics for detecting that a response is a login/auth page redirect.
-# Use specific path/file patterns to avoid false positives on vulnerability
-# pages that happen to contain words like 'session' in their URL.
 _LOGIN_PAGE_MARKERS: List[str] = [
     "/login.php", "/signin", "/sign-in", "/auth/login",
     "please login", "please sign in", "로그인",
 ]
 
 # URLs matching this pattern will be skipped BEFORE making the request to
-# prevent session invalidation (e.g., visiting /logout.php logs the user out).
+# prevent session invalidation.
 _LOGOUT_URL_PATTERN = re.compile(
     r"(?:logout|signout|sign[-_]?out)(?:\.php|\b)",
     re.IGNORECASE,
@@ -107,16 +71,7 @@ _JS_ROUTE_PATTERN = re.compile(
 @dataclass
 class InputPoint:
     """
-    A single injectable attack point discovered by the crawler (FR3).
-
-    Attributes
-    ----------
-    url        : Absolute URL where the injection should be sent.
-    http_method: HTTP verb (GET / POST / PUT …).
-    parameter  : Name of the injectable parameter / field.
-    form_action: Resolved action URL of the enclosing <form>, if applicable.
-    input_type : HTML input type attribute (text, hidden, email …).
-    extra_data : Any extra context (e.g., API endpoint metadata).
+    A single injectable attack point discovered by the crawler.
     """
 
     url: str
@@ -125,19 +80,6 @@ class InputPoint:
     form_action: Optional[str] = None
     input_type: str = "text"
     extra_data: Dict[str, Any] = field(default_factory=dict)
-
-
-@dataclass
-class VulnerabilityFinding:
-    """Internal structured finding before JSON-adapter conversion (FR5)."""
-
-    target_url: str
-    vulnerability_type: str
-    parameter: str
-    payload: str
-    http_method: str
-    status_code: int
-    evidence: Dict[str, Any]
 
 
 @dataclass
@@ -903,37 +845,13 @@ class IntelligentCrawler:
 
 
 # ══════════════════════════════════════════════
-# FR5 / NFR3 / NFR5: JSON adapter
-# ══════════════════════════════════════════════
-
-class ScannerJSONAdapter:
-    """
-    FR5, NFR3, NFR5:
-    Converts internal VulnerabilityFinding objects to a provider-agnostic
-    JSON-serialisable dictionary schema.
-    """
-
-    @staticmethod
-    def to_standard_json(finding: VulnerabilityFinding) -> Dict[str, Any]:
-        return asdict(finding)
-
-    @staticmethod
-    def to_standard_json_list(
-        findings: List[VulnerabilityFinding],
-    ) -> List[Dict[str, Any]]:
-        return [ScannerJSONAdapter.to_standard_json(f) for f in findings]
-
-
-# ══════════════════════════════════════════════
-# Filter #2 — VulnerabilityScannerEngine (FR4)
+# VulnerabilityScannerEngine
 # ══════════════════════════════════════════════
 
 class VulnerabilityScannerEngine:
     """
     Core scanner orchestrator.
-
-    Receives the attack-surface mapping data (List[InputPoint]) from the
-    IntelligentCrawler pipe and injects SQLi / XSS payloads into each point.
+    Manages login session, target authorization and crawler orchestration.
     """
 
     def __init__(
@@ -951,12 +869,10 @@ class VulnerabilityScannerEngine:
         self.session_cookies: Dict[str, str] = session_cookies or {}
         self.login_config = login_config
         # Inject any provided session cookies into the shared requests.Session
-        # so that every HTTP request (crawl + scan) uses the authenticated session.
         if self.session_cookies:
             self.session.cookies.update(self.session_cookies)
         self.validator = AuthorizedTargetValidator(pre_approved_domains)
         self.crawler = IntelligentCrawler(self.session, timeout=timeout)
-        self.adapter = ScannerJSONAdapter()
         self.log_callback = log_callback
         # Expose last crawl context for the dashboard.
         self.last_scan_context: Dict[str, Any] = {"sub_links": [], "input_forms": []}
@@ -1120,290 +1036,13 @@ class VulnerabilityScannerEngine:
             self._log_info(f"[AUTH] Login request failed: {exc}")
             return False
 
-    # ──────────────────────────────────────────────
-    # HTTP helper (rate-limited)
-    # ──────────────────────────────────────────────
-
-    @rate_limited(10)  # NFR2
-    def _send_request(
-        self, point: InputPoint, payload: str
-    ) -> Optional[Response]:
-        """Send a single payload-injected HTTP request including all form defaults."""
-        try:
-            # Reconstruct the base parameters from the form
-            base_params = {}
-            if "form_inputs" in point.extra_data:
-                for inp in point.extra_data["form_inputs"]:
-                    base_params[inp["name"]] = inp["default"]
-            base_params[point.parameter] = payload
-
-            if point.http_method.upper() == "POST":
-                return self.session.post(
-                    point.url, data=base_params, timeout=self.timeout
-                )
-
-            parsed = urlparse(point.url)
-            query = parse_qs(parsed.query, keep_blank_values=True)
-            # Add existing URL query params to base_params
-            for k, v in query.items():
-                if k not in base_params:
-                    base_params[k] = v[0] if v else ""
-            
-            base_params[point.parameter] = payload
-            
-            # Using safe="..." so characters like =, (, ) are NOT encoded.
-            new_query = urlencode(base_params, doseq=True, safe="<>=()\"'/")
-            injected = urlunparse(
-                (
-                    parsed.scheme,
-                    parsed.netloc,
-                    parsed.path,
-                    parsed.params,
-                    new_query,
-                    parsed.fragment,
-                )
-            )
-            return self.session.get(injected, timeout=self.timeout)
-        except requests.RequestException as exc:
-            logger.debug("[SCAN] Request failed: %s", exc)
-            return None
-
-    # ──────────────────────────────────────────────
-    # FR4: SQLi scanning
-    # ──────────────────────────────────────────────
-
-    def _scan_sqli(self, point: InputPoint) -> List[VulnerabilityFinding]:
-        matches: List[VulnerabilityFinding] = []
-
-        for payload in BASELINE_SQLI_PAYLOADS:
-            self._log_info(
-                f"[SQLI] Param='{point.parameter}' Payload='{payload}'"
-            )
-            response = self._send_request(point, payload)
-            if response is None:
-                continue
-
-            # Error-based detection.
-            if SQL_ERROR_REGEX.search(response.text):
-                matches.append(
-                    VulnerabilityFinding(
-                        target_url=point.url,
-                        vulnerability_type="SQL Injection (Error-based)",
-                        parameter=point.parameter,
-                        payload=payload,
-                        http_method=point.http_method,
-                        status_code=response.status_code,
-                        evidence={
-                            "detection_method": "error_regex",
-                            "regex": SQL_ERROR_REGEX.pattern,
-                        },
-                    )
-                )
-                continue  # No need for boolean check if error already found.
-
-            # Boolean-based cross-validation.
-            true_resp = self._send_request(point, "' AND 1=1--")
-            false_resp = self._send_request(point, "' AND 1=2--")
-
-            if not true_resp or not false_resp:
-                continue
-
-            length_diff = abs(len(true_resp.text) - len(false_resp.text))
-            status_diff = true_resp.status_code != false_resp.status_code
-
-            if length_diff > 30 or status_diff:
-                matches.append(
-                    VulnerabilityFinding(
-                        target_url=point.url,
-                        vulnerability_type="SQL Injection (Boolean-based)",
-                        parameter=point.parameter,
-                        payload=payload,
-                        http_method=point.http_method,
-                        status_code=response.status_code,
-                        evidence={
-                            "detection_method": "boolean_cross_validation",
-                            "true_status_code": true_resp.status_code,
-                            "false_status_code": false_resp.status_code,
-                            "true_length": len(true_resp.text),
-                            "false_length": len(false_resp.text),
-                            "length_diff": length_diff,
-                        },
-                    )
-                )
-
-        return matches
-
-    # ──────────────────────────────────────────────
-    # FR4: XSS scanning
-    # ──────────────────────────────────────────────
-
-    def _scan_xss(self, point: InputPoint) -> List[VulnerabilityFinding]:
-        matches: List[VulnerabilityFinding] = []
-        # Track already-confirmed (url, param) pairs to avoid duplicate reports.
-        confirmed: set = set()
-
-        for payload in BASELINE_XSS_PAYLOADS:
-            self._log_info(
-                f"[XSS] Param='{point.parameter}' Payload='{payload}'"
-            )
-            response = self._send_request(point, payload)
-            if response is None:
-                continue
-
-            dedup_key = (point.url, point.parameter)
-
-            # ── Layer 1: Reflection check (fast, no browser needed) ──────
-            # If our exact marker string appears verbatim in the HTML response
-            # the application is reflecting user input without encoding.
-            if _XSS_MARKER in response.text and dedup_key not in confirmed:
-                confirmed.add(dedup_key)
-                matches.append(
-                    VulnerabilityFinding(
-                        target_url=point.url,
-                        vulnerability_type="Reflected XSS",
-                        parameter=point.parameter,
-                        payload=payload,
-                        http_method=point.http_method,
-                        status_code=response.status_code,
-                        evidence={
-                            "detection_method": "reflection_check",
-                            "reflected_marker": _XSS_MARKER,
-                            "payload": payload,
-                        },
-                    )
-                )
-                continue  # No need for slower Selenium check on same point.
-
-            # ── Layer 2: Selenium alert validation (definitive execution) ─
-            if dedup_key not in confirmed and self._validate_xss_with_selenium(
-                point, payload
-            ):
-                confirmed.add(dedup_key)
-                matches.append(
-                    VulnerabilityFinding(
-                        target_url=point.url,
-                        vulnerability_type="Reflected XSS",
-                        parameter=point.parameter,
-                        payload=payload,
-                        http_method=point.http_method,
-                        status_code=response.status_code,
-                        evidence={
-                            "detection_method": "selenium_alert",
-                            "alert_detected": True,
-                            "payload": payload,
-                        },
-                    )
-                )
-
-        return matches
-
-    def _validate_xss_with_selenium(
-        self, point: InputPoint, payload: str
-    ) -> bool:
-        """
-        Return True if injecting *payload* into *param* triggers a JS alert.
-
-        Session cookies (e.g., PHPSESSID for DVWA) are injected into the
-        Selenium driver so the browser uses the authenticated session.
-        """
-        driver: Optional[webdriver.Chrome] = None
-        try:
-            driver = _build_headless_driver(enable_performance_logs=False)
-
-            parsed_base = urlparse(point.url)
-
-            # ── Inject session cookies into Selenium ─────────────────────
-            # We must load the origin first before set_cookie() is accepted.
-            if self.session_cookies:
-                origin = f"{parsed_base.scheme}://{parsed_base.netloc}"
-                driver.get(origin)
-                for name, value in self.session_cookies.items():
-                    driver.add_cookie({"name": name, "value": value,
-                                       "domain": parsed_base.hostname})
-
-            # ── Intercept alert() in Headless Chrome ─────────────────────
-            # Headless Chrome can miss alerts that fire immediately (like svg onload).
-            # We inject a script that redefines alert() to change the document title.
-            driver.execute_cdp_cmd(
-                "Page.addScriptToEvaluateOnNewDocument",
-                {"source": "window.alert = function(msg) { document.title = 'XSS_TRIGGERED'; };"}
-            )
-
-            base_params = {}
-            if "form_inputs" in point.extra_data:
-                for inp in point.extra_data["form_inputs"]:
-                    base_params[inp["name"]] = inp["default"]
-
-            if point.http_method.upper() == "GET":
-                query = parse_qs(parsed_base.query, keep_blank_values=True)
-                for k, v in query.items():
-                    if k not in base_params:
-                        base_params[k] = v[0] if v else ""
-                
-                base_params[point.parameter] = payload
-                
-                # Use quote_via=quote so spaces become %20.
-                # Use safe="..." so characters like =, (, ) are NOT encoded.
-                # If they are encoded, apps using decodeURI() won't decode them back,
-                # which breaks DOM XSS payloads like <svg onload=alert(1)>.
-                test_url = urlunparse(
-                    (
-                        parsed_base.scheme,
-                        parsed_base.netloc,
-                        parsed_base.path,
-                        parsed_base.params,
-                        urlencode(base_params, doseq=True, quote_via=quote, safe="<>=()\"'/"),
-                        parsed_base.fragment,
-                    )
-                )
-                driver.get(test_url)
-            else:
-                base_params[point.parameter] = payload
-                driver.get(point.url)
-                
-                # Construct JS fetch dynamically
-                js_script = "const body = new URLSearchParams();\n"
-                js_args = []
-                idx = 0
-                for k, v in base_params.items():
-                    js_script += f"body.append(arguments[{idx}], arguments[{idx+1}]);\n"
-                    js_args.extend([k, v])
-                    idx += 2
-                    
-                js_script += """
-                fetch(window.location.href, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                    body: body.toString()
-                });
-                """
-                driver.execute_script(js_script, *js_args)
-
-            WebDriverWait(driver, 5).until(EC.title_is("XSS_TRIGGERED"))
-            return True
-        except TimeoutException:
-            return False
-        except WebDriverException as exc:
-            logger.debug("[XSS][SELENIUM] %s", exc)
-            return False
-        finally:
-            if driver is not None:
-                try:
-                    driver.quit()
-                except Exception:  # noqa: BLE001
-                    pass
-
-
 # ══════════════════════════════════════════════
 # Shared WebDriver factory
 # ══════════════════════════════════════════════
 
 def _build_headless_driver(enable_performance_logs: bool) -> webdriver.Chrome:
     """
-    Build a Selenium Chrome WebDriver configured for headless scanning (FR4).
-
-    Performance logs are only enabled when needed (dynamic crawl phase) to
-    reduce overhead during XSS validation passes.
+    Build a Selenium Chrome WebDriver configured for headless crawling.
     """
     options = ChromeOptions()
     options.add_argument("--headless=new")
@@ -1411,7 +1050,6 @@ def _build_headless_driver(enable_performance_logs: bool) -> webdriver.Chrome:
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--disable-gpu")
     options.add_argument("--window-size=1920,1080")
-    # Suppress verbose browser console output.
     options.add_experimental_option("excludeSwitches", ["enable-logging"])
 
     if enable_performance_logs:
@@ -1427,7 +1065,6 @@ def _build_headless_driver(enable_performance_logs: bool) -> webdriver.Chrome:
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
 
-    # Replace with your own pre-approved domain and target URL.
     engine = VulnerabilityScannerEngine(pre_approved_domains=["example.com"])
     try:
         result = engine.scan("http://localhost:8000/search?q=test")
