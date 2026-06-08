@@ -1,6 +1,7 @@
 import json
 import os
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
 def load_env():
     """
@@ -20,7 +21,7 @@ def load_env():
 # Load environment variables on import
 load_env()
 
-def load_results(file_path="pipeline/results.json"):
+def load_results(file_path="results.json"):
     """
     Load the vulnerability scanning results from the specified JSON file.
     """
@@ -52,10 +53,7 @@ def generate_report(results_data, api_key=None, model_name="gemini-3.5-flash"):
     if not api_key:
         return "Error: Gemini API key not provided and GEMINI_API_KEY not found in environment."
 
-    genai.configure(api_key=api_key)
-    
-    # Initialize the model
-    model = genai.GenerativeModel(model_name)
+    client = genai.Client(api_key=api_key)
 
     prompt = f"""
     [System Role]
@@ -104,7 +102,10 @@ def generate_report(results_data, api_key=None, model_name="gemini-3.5-flash"):
 
 
     try:
-        response = model.generate_content(prompt)
+        response = client.models.generate_content(
+            model=model_name,
+            contents=prompt,
+        )
         return response.text
     except Exception as e:
         return f"An error occurred during report generation: {e}"
@@ -116,7 +117,7 @@ if __name__ == "__main__":
     print("Loading results.json...")
     # Adjust path if running from a different directory
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    results_path = os.path.join(base_dir, "pipeline", "results.json")
+    results_path = os.path.join(base_dir, "results.json")
     
     data = load_results(results_path)
     
@@ -128,7 +129,7 @@ if __name__ == "__main__":
         print(report)
         
         # Optionally, save to file
-        report_path = os.path.join(base_dir, "pipeline", "report.md")
+        report_path = os.path.join(base_dir, "report.md")
         try:
             with open(report_path, "w", encoding="utf-8") as f:
                 f.write(report)

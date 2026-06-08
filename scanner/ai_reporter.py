@@ -16,7 +16,8 @@ import json
 import os
 from typing import Any, Dict, List, Optional
 
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
 
 # ---------------------------------------------------------------------------
@@ -73,7 +74,7 @@ class AIReporter:
     def __init__(
         self,
         api_key: Optional[str] = None,
-        model: str = "gemini-1.5-flash",
+        model: str = "gemini-3.5-flash",
     ) -> None:
         key = api_key or os.environ.get("GEMINI_API_KEY")
         if not key:
@@ -81,14 +82,12 @@ class AIReporter:
                 "Gemini API 키가 설정되지 않았습니다. "
                 "환경변수 GEMINI_API_KEY를 설정하거나 api_key를 직접 전달하세요."
             )
-        genai.configure(api_key=key)
-        self._model = genai.GenerativeModel(
-            model_name=model,
+        self._client = genai.Client(api_key=key)
+        self._model_name = model
+        self._config = types.GenerateContentConfig(
             system_instruction=_SYSTEM_INSTRUCTION,
-            generation_config=genai.GenerationConfig(
-                response_mime_type="application/json",
-                temperature=0.2,   # 낮은 temperature → 할루시네이션 감소
-            ),
+            response_mime_type="application/json",
+            temperature=0.2,   # 낮은 temperature → 할루시네이션 감소
         )
 
     # ------------------------------------------------------------------
@@ -138,7 +137,11 @@ class AIReporter:
         )
 
         try:
-            response = self._model.generate_content(prompt)
+            response = self._client.models.generate_content(
+                model=self._model_name,
+                contents=prompt,
+                config=self._config,
+            )
             data = json.loads(response.text)
             data = _fill_missing_fields(data)
             data["ai_analysis_success"] = True

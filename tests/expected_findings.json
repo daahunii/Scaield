@@ -1,0 +1,72 @@
+[
+  {
+    "endpoint_path": "/xss-vuln",
+    "method": "GET",
+    "parameter": "q",
+    "expected_vuln_types": ["Reflected XSS"],
+    "description": "XSS 취약 - 입력값 비이스케이프 출력"
+  },
+  {
+    "endpoint_path": "/xss-safe",
+    "method": "GET",
+    "parameter": "q",
+    "expected_vuln_types": [],
+    "description": "XSS 안전 - markupsafe.escape() 적용"
+  },
+  {
+    "endpoint_path": "/sqli-error",
+    "method": "GET",
+    "parameter": "id",
+    "expected_vuln_types": ["SQL Injection (Error-based)"],
+    "description": "SQLi Error-based 취약 - raw string concat + SQLite 에러 노출"
+  },
+  {
+    "endpoint_path": "/sqli-boolean",
+    "method": "GET",
+    "parameter": "id",
+    "expected_vuln_types": ["SQL Injection (Boolean-based)"],
+    "description": "SQLi Boolean-based 취약 - 숫자형 raw concat, 참/거짓 응답 크기 차이"
+  },
+  {
+    "endpoint_path": "/sqli-safe",
+    "method": "GET",
+    "parameter": "id",
+    "expected_vuln_types": [],
+    "description": "SQLi 안전 - 파라미터화 쿼리 사용"
+  },
+  {
+    "endpoint_path": "/safe",
+    "method": "GET",
+    "parameter": "name",
+    "expected_vuln_types": [],
+    "description": "완전 안전 - 이스케이프 + 파라미터화"
+  },
+  {
+    "endpoint_path": "/login",
+    "method": "POST",
+    "parameter": "username",
+    "expected_vuln_types": ["SQL Injection (Error-based)"],
+    "description": "SQLi Error-based 취약 (POST) - login username raw string concat"
+  },
+  {
+    "endpoint_path": "/xss-post",
+    "method": "POST",
+    "parameter": "msg",
+    "expected_vuln_types": ["Reflected XSS"],
+    "description": "XSS 취약 (POST) - msg 파라미터 비이스케이프 출력"
+  },
+  {
+    "endpoint_path": "/fp-has-script",
+    "method": "GET",
+    "parameter": "q",
+    "expected_vuln_types": [],
+    "description": "안전(이스케이프 적용) + 페이지에 <script> 태그 존재 — 베이스라인 비교로 오탐 제거"
+  },
+  {
+    "endpoint_path": "/fp-has-sqlite",
+    "method": "GET",
+    "parameter": "q",
+    "expected_vuln_types": [],
+    "description": "안전(파라미터화 쿼리) + 페이지에 'SQLite' 문자열 존재 — 베이스라인 비교로 오탐 제거"
+  }
+]

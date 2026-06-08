@@ -81,7 +81,7 @@ DEFAULT_GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash")
 
 def _is_llm_package_available() -> bool:
     try:
-        import google.generativeai  # noqa: F401
+        import google.genai  # noqa: F401
     except ModuleNotFoundError:
         return False
     return True
@@ -454,9 +454,9 @@ def _generate_scan_ai_report(
     try:
         from llm import generate_report as generate_llm_report
     except ModuleNotFoundError as exc:
-        if exc.name == "google.generativeai":
+        if exc.name == "google.genai":
             return _fallback_scan_report(
-                "google-generativeai 패키지가 설치되지 않아 AI 리포트를 생성하지 못했습니다. "
+                "google.genai 패키지가 설치되지 않아 AI 리포트를 생성하지 못했습니다. "
                 "스캔 결과는 AI 리포트 없이 반환됩니다."
             )
         raise
