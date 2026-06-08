@@ -1,0 +1,13 @@
+{
+  "scan_id": "557d9273-8763-4cdf-9c22-b5fa17698b8e",
+  "target_url": "https://juice-shop-e4eh.onrender.com",
+  "scan_time": "20초",
+  "started_at": "2026-06-08T02:09:00",
+  "finished_at": "2026-06-08T02:09:21",
+  "total_pages": 1,
+  "tested_inputs": 0,
+  "detected_counts": {},
+  "risk_level": "Low",
+  "report_status": "AI 리포트 미실행",
+  "vulnerabilities": []
+}
