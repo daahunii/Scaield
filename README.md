@@ -57,8 +57,6 @@ pip install -r requirements.txt
 pip install google-genai
 ```
 
-`google-genai`는 Gemini AI 리포트 생성을 위해 필요합니다.
-
 ---
 
 ## 4. Gemini 환경변수 설정
@@ -78,9 +76,6 @@ GEMINI_MODEL=gemini-2.5-flash
 PORT=8000
 FRONTEND_ORIGIN=http://localhost:5173
 ```
-
-제출 또는 시연 환경에서 실제 Gemini API key를 사용할 경우 `your_gemini_api_key_here` 부분에 전달받은 키를 그대로 넣으면 됩니다.
-키는 프론트엔드가 아니라 백엔드 브릿지에서만 읽습니다.
 
 ---
 
