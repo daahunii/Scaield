@@ -1,3 +1,7 @@
+## 2. 엔드투엔드 파이프라인 및 데이터 플로우
+
+통합 파이프라인(`backend_bridge/app.py`)은 실행 시 아래의 4단계를 연속적으로 수행하며 동작합니다.
+
 ```mermaid
 sequenceDiagram
     autonumber
