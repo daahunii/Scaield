@@ -8,7 +8,7 @@ Scaield(Scanner AI Shield)는 자동화된 **DAST(Dynamic Application Security T
 
 ## 1. 아키텍처 개요 및 디렉토리 구조
 
-Scaield는 각 역할별로 완벽하게 캡슐화된 4개의 주요 서브시스템 모듈로 분할 설계되어 있습니다.
+Scaield는 각 역할별로 완벽하게 캡슐화된 모듈들로 구성되어 있으며, 백엔드 엔진과 React 프론트엔드가 결합하여 강력한 실시간 스캔 환경을 제공합니다.
 
 ```
 Scaield/
@@ -16,18 +16,36 @@ Scaield/
 │   ├── app.py                 # 전체 시스템 통합 실행 파이프라인 (Flask API 서버)
 │   └── README.md              # 백엔드 브릿지 명세서
 ├── scanner/
-│   └── scanner_core.py        # 정적/동적 DOM 크롤러 및 타겟 도메인 인가 검증 엔진
+│   ├── scanner_core.py        # 정적/동적 DOM 크롤러 및 타겟 도메인 인가 검증 엔진
+│   ├── app.py                 # Flask 기반 독자 대시보드 웹 애플리케이션
+│   ├── dashboard.py           # Streamlit 기반 실시간 스캔 & 결과 시각화 대시보드
+│   ├── ai_reporter.py         # Stage 2: Gemini AI 기반 개별 취약점 분석 리포터
+│   └── diagnose_dvwa.py       # DVWA 취약점 진단 특화 스크립트
 ├── pentest/
 │   ├── engine.py              # 모의 침투(Pentest) 오케스트레이터
 │   ├── scanner.py             # XSS / SQLi (Error-based, Boolean-based) 모의 침투 스캐너
 │   ├── http_client.py         # 10 req/s 글로벌 Rate Limiter 내장 HTTP 클라이언트
+│   ├── rate_limiter.py        # 속도 제한 및 연속 실패 임계치(5회) 감시 서킷 브레이커
 │   ├── response_analyzer.py   # 응답 반사 체크, 에러 검출, Boolean 응답 논리 비교 분석 모듈
+│   ├── crawler.py             # BFS 기반 정적 HTML 폼 크롤러
 │   ├── payload.py             # 보안 진단용 Exploit 페이로드 세트
 │   ├── models.py              # 데이터 구조체 모델 선언부 (Finding, InputPoint 등)
 │   └── adapter.py             # 모의 침투 결과 ➡️ AI 입력용 데이터 어댑터 레이어
 ├── LLMmodule/
-│   ├── llm.py                 # Gemini Pro API 연동 및 JSON 정제 모듈
+│   ├── llm.py                 # Gemini Pro API 연동 및 JSON 정제 모듈 (통합 리포트 생성)
 │   └── README.md              # AI 모듈 상세 명세서
+├── backend_bridge/            # React 프론트엔드와 기존 Scaield 모듈을 연결하는 Flask 브릿지 서버
+│   ├── app.py                 # 브릿지 API 서버 (Port 8000)
+│   ├── .env.example           # 백엔드 브릿지 환경 변수 예시
+│   └── README.md              # 백엔드 브릿지 명세서
+├── frontend/                  # React + Vite 기반의 차세대 보안 진단 통합 웹 대시보드
+│   ├── src/
+│   │   ├── App.jsx            # 대시보드 메인 UI 및 스캔 관리 화면
+│   │   └── styles.css         # UI 스타일링 (CSS)
+│   ├── package.json           # 프론트엔드 의존성 및 스크립트 설정
+│   └── README.md              # 프론트엔드 설치 및 실행 가이드
+├── common/                    # 공유 패키지 의존성 파일
+├── scans/                     # [Output] 브릿지 서버를 통해 수행된 스캔 결과 아카이브 디렉토리
 ├── .env                       # API Key 및 환경 변수 파일 (Git 커밋 금지)
 └── .gitignore                 # 원시 결과 및 가상환경(.venv*) 추적 제외 필터 설정 파일
 ```
@@ -74,17 +92,57 @@ sequenceDiagram
     Run-->>User: 전체 프로세스 종료 및 결과 레포트 확인 안내
 ```
 
+### B. 웹 대시보드(Frontend/Backend Bridge) 비동기 스캔 흐름
+```mermaid
+sequenceDiagram
+    autonumber
+    actor User as 개발자 / 보안 담당자
+    participant FE as frontend (React)
+    participant BE as backend_bridge (Flask)
+    participant Core as scanner/scanner_core.py
+    participant Pentest as pentest/engine.py
+    participant LLM as LLMmodule/llm.py / ai_reporter.py
+    
+    User->>FE: 스캔 대상 URL 입력 및 시작 클릭
+    FE->>BE: POST /scan/start (URL, 로그인 정보 등)
+    BE-->>FE: scan_id 반환 (비동기 스캔 백그라운드 스레드 가동)
+    
+    loop 주기적 폴링 (Polling)
+        FE->>BE: GET /scan/{scan_id}/status
+        BE-->>FE: 진행 상태 (Progress, Current Step, Logs) 반환
+    end
+    
+    Note over BE, Core: [백그라운드 Step 1: 크롤링]
+    BE->>Core: 대상 URL 동적 크롤링 및 SPA 경로/입력점 수집
+    
+    Note over BE, Pentest: [백그라운드 Step 2: 모의 침투]
+    BE->>Pentest: 수집된 InputPoints에 페이로드 주입 및 XSS/SQLi 분석
+    
+    Note over BE, LLM: [백그라운드 Step 3: AI 분석 리포팅]
+    BE->>LLM: 취약점 Findings를 기반으로 Gemini API 호출
+    LLM-->>BE: 구조화된 AI 분석 결과 객체 반환
+    
+    Note over BE: [백그라운드 Step 4: 결과 저장]
+    BE->>BE: scans/scan_{scan_id}.json 형태로 결과 저장 및 상태를 completed로 갱신
+    
+    FE->>BE: GET /scan/{scan_id}/result (completed 감지 시)
+    BE-->>FE: 최종 스캔 결과 및 통합 AI 분석 리포트 객체 반환
+    FE->>User: 대시보드 시각화 및 PDF 다운로드 UI 제공
+```
+
 ---
 
 ## 3. 핵심 비기능적 요구사항 (Non-Functional Requirements)
 
-* **NFR1: 글로벌 속도 제한 (Global Rate Limiting)**
-  * 진단 시스템의 폭주나 타겟 서버의 마비를 예방하기 위해, `pentest/http_client.py`는 데코레이터 패턴과 락킹 매커니즘을 결합한 글로벌 Rate Limiter를 내장하고 있습니다.
-  * 모든 실시간 공격 요청은 **초당 최대 10회 요청(10 req/sec)** 범위 내에서 엄격하게 스케줄링 및 지연 처리가 이루어집니다.
-* **NFR2: 브라우저 가상 환경(Selenium) 크로스 검증**
-  * XSS 스캐너는 단순 정적 텍스트 매칭을 배제하고, 셀레늄 크롬 드라이버(`webdriver.Chrome`)를 백그라운드 무인(Headless) 모드로 띄워 실제 DOM 컨텍스트 내에서 스크립트 실행이 트리거되어 경고창(Alert)이 가상 시스템 상에 활성화되는지 물리적 이벤트를 직접 검출합니다.
-* **NFR3: 강건한 데이터 정제 시스템 (`clean_and_parse_json`)**
+* **NFR1: 글로벌 속도 제한 및 장애 내성 (Global Rate Limiting & Fault Tolerance)**
+  * 진단 시스템의 폭주나 타겟 서버의 마비를 예방하기 위해, `pentest/http_client.py`는 데코레이터 패턴과 락킹 매커니즘을 결합한 글로벌 Rate Limiter를 내장하여 **초당 최대 10회 요청(10 req/sec)** 범위 내에서 엄격하게 지연 처리가 이루어집니다.
+  * 또한 `pentest/rate_limiter.py`는 연속 실패 횟수가 설정된 임계치(기본 5회)를 초과할 경우 `RateLimiterError` 예외를 발생시키고 스캔을 즉시 조기 중단(Fail-fast)하여 불필요한 과부하를 차단합니다.
+* **NFR2: 브라우저 가상 환경(Selenium) 및 BFS 크롤러 이중화 검증**
+  * XSS 스캐너는 단순 정적 텍스트 매칭을 배제하고, 셀레늄 크롬 드라이버(`webdriver.Chrome`)를 백그라운드 무인(Headless) 모드로 띄워 실제 DOM 컨텍스트 내에서 스크립트 실행이 트리거되어 경고창(Alert)이 활성화되는지 물리적 이벤트를 직접 검출합니다.
+  * 추가적으로 `pentest/crawler.py`는 requests와 BeautifulSoup를 활용한 BFS 기반 크롤러를 도입하여 가벼우면서도 효과적인 페이지 탐색 및 폼 입력점 수집을 교차 지원합니다.
+* **NFR3: 강건한 데이터 정제 및 폴백(Fallback) 메커니즘**
   * LLM API 응답에 장식용 마크다운 백틱 기호(```` ```json ```` 등)가 섞여서 반환되는 고질적인 문제를 정적 패턴 매칭 필터로 안전하게 걸러내어, 저장되는 파일이 언제나 100% 온전하게 파싱 가능한 JSON 문법 규격을 유지하도록 보장합니다.
+  * `GEMINI_API_KEY`가 누락되었거나 구글 generativeai 라이브러리가 미설치된 환경, 혹은 API 통신 장애 발생 시에도 전체 진단 파이프라인이 다운되지 않고, `fallback`용 요약 안내 리포트를 생성하여 전체 시스템의 견고성(Robustness)을 유지합니다.
 
 ---
 
@@ -103,11 +161,12 @@ pip install -r requirements.txt
 ```
 
 ### 2단계: `.env` 환경 변수 설정
-프로젝트 루트 디렉토리에 `.env` 파일을 생성하고 구글 AI Studio에서 발급받은 Gemini API 키를 저장합니다.
+프로젝트 루트 디렉토리에 `.env` 파일을 생성하고 구글 AI Studio에서 발급받은 Gemini API 키와 프론트엔드 연결용 API URL을 설정합니다.
 
 ```env
 # Scaield AI API Key Configuration
 GEMINI_API_KEY=your_gemini_api_key_here
+VITE_API_BASE_URL=http://localhost:8000
 ```
 > [!NOTE]
 > Scaield의 환경 변수 로더는 안전망 코드가 보강되어 있어, `.env` 값에 실수로 큰따옴표(`"`)나 작은따옴표(`'`)를 감싸두더라도 로딩 시점에 자동으로 외따옴표를 벗겨내어 온전한 API 키만 API 호출 모듈에 전달합니다.
@@ -165,6 +224,48 @@ GEMINI_API_KEY=your_gemini_api_key_here
     ],
     "disclaimer": "법적 면책 사항 안내 고정구문 (string)"
   }
+}
+```
+
+### [웹 대시보드용 통합 스캔 결과 스키마] (`scans/scan_*.json`)
+```json
+{
+  "scan_id": "브릿지에서 부여한 고유 스캔 ID (string)",
+  "target_url": "진단 대상 주소 (string)",
+  "scan_time": "총 소요 시간 (e.g. 5초, 2분 10초)",
+  "started_at": "스캔 시작 시각 (ISO 8601 string)",
+  "finished_at": "스캔 종료 시각 (ISO 8601 string)",
+  "total_pages": "크롤링 완료된 하위 페이지 개수 (int)",
+  "tested_inputs": "테스트 완료된 인풋 포인트 수 (int)",
+  "detected_counts": {
+    "SQL Injection": 1,
+    "Cross-Site Scripting": 2
+  },
+  "risk_level": "High / Medium / Low",
+  "report_status": "AI 리포트 처리 현황 (string)",
+  "vulnerabilities": [
+    {
+      "id": "vuln-1",
+      "type": "취약점 종류 (string)",
+      "risk_level": "High / Medium / Low",
+      "endpoint": "발견된 엔드포인트 URL (string)",
+      "parameter": "취약 파라미터명 (string)",
+      "payload": "공격 페이로드 (string)",
+      "status_code": "서버 응답 상태 코드 (int)",
+      "evidence": "상세 오차 증거 및 응답 분석 내용 (string)",
+      "detection_method": "탐지 기법 (string)",
+      "ai_report": {
+        "vulnerability_summary": "취약점 설명 요약 (string)",
+        "root_cause": "근본 원인 분석 (string)",
+        "risk_level": "위험도 (string)",
+        "attack_scenario": "비즈니스 영향 및 공격 시나리오 (string)",
+        "secure_coding_guidance": "조치 방안 가이드 (string)",
+        "fixed_code_example": "시큐어 코딩 방어 코드 스니펫 (string)",
+        "validation_steps": "패치 검증 가이드라인 (string)",
+        "disclaimer": "법적 고지 (string)"
+      }
+    }
+  ]
 }
 ```
 
