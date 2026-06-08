@@ -38,9 +38,9 @@ export function Sidebar({ activeTab, onTabChange }) {
       </div>
 
       <div className="sidebar-profile">
-        <div className="sidebar-avatar">JH</div>
+        <div className="sidebar-avatar">DK</div>
         <div className="sidebar-profile-info">
-          <span className="sidebar-profile-name">jonghyun</span>
+          <span className="sidebar-profile-name">Dongkeun</span>
           <span className="sidebar-profile-role">
             <Zap size={11} /> Enterprise
           </span>

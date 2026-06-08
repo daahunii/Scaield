@@ -48,9 +48,11 @@ http://127.0.0.1:5000
 - Chrome 또는 Chromium 계열 브라우저
 
 Python 가상환경은 프로젝트 루트에 `.venv`로 생성합니다.
+아래 명령의 `PROJECT_ROOT`에는 사용자가 압축을 풀거나 다운로드한 Scaield 프로젝트 폴더 경로를 넣으면 됩니다.
 
 ```bash
-cd /Users/[username]/Desktop/Scaield
+export PROJECT_ROOT="/path/to/Scaield"
+cd "$PROJECT_ROOT"
 python3.12 -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
@@ -65,7 +67,7 @@ pip install google-genai
 프로젝트 루트에 `.env` 파일을 생성합니다.
 
 ```bash
-cd /Users/[username]/Desktop/Scaield
+cd "$PROJECT_ROOT"
 touch .env
 ```
 
@@ -88,13 +90,13 @@ FRONTEND_ORIGIN=http://localhost:5173
 폴더 위치:
 
 ```text
-/Users/[username]/Desktop/Scaield/testServer
+$PROJECT_ROOT/testServer
 ```
 
 실행합니다.
 
 ```bash
-cd /Users/[username]/Desktop/Scaield/testServer
+cd "$PROJECT_ROOT/testServer"
 python3.12 -m venv .venv
 source .venv/bin/activate
 pip install flask
@@ -104,7 +106,8 @@ python test.py
 만약 zip 파일에서 다시 압축을 풀어야 하는 경우에는 아래처럼 진행합니다.
 
 ```bash
-cd /Users/[username]/Downloads
+export ZIP_DIR="/path/to/download-folder"
+cd "$ZIP_DIR"
 unzip testServer.zip
 cd testServer
 python3.12 -m venv .venv
@@ -134,7 +137,7 @@ http://127.0.0.1:5000
 새 터미널을 열고 Scaield 백엔드 브릿지를 실행합니다.
 
 ```bash
-cd /Users/[username]/Desktop/Scaield
+cd "$PROJECT_ROOT"
 source .venv/bin/activate
 python backend_bridge/app.py
 ```
@@ -159,7 +162,7 @@ http://localhost:8000/health
 새 터미널을 열고 프론트엔드를 실행합니다.
 
 ```bash
-cd /Users/[username]/Desktop/Scaield/frontend
+cd "$PROJECT_ROOT/frontend"
 npm install
 cp .env.example .env
 npm run dev
@@ -190,7 +193,7 @@ http://127.0.0.1:5000
 ### 터미널 1: Test Server
 
 ```bash
-cd /Users/[username]/Desktop/Scaield/testServer
+cd "$PROJECT_ROOT/testServer"
 source .venv/bin/activate
 python test.py
 ```
@@ -198,7 +201,7 @@ python test.py
 ### 터미널 2: Backend Bridge
 
 ```bash
-cd /Users/[username]/Desktop/Scaield
+cd "$PROJECT_ROOT"
 source .venv/bin/activate
 python backend_bridge/app.py
 ```
@@ -206,7 +209,7 @@ python backend_bridge/app.py
 ### 터미널 3: Frontend
 
 ```bash
-cd /Users/[username]/Desktop/Scaield/frontend
+cd "$PROJECT_ROOT/frontend"
 npm run dev
 ```
 
@@ -229,14 +232,14 @@ http://127.0.0.1:5000
 프론트엔드 빌드:
 
 ```bash
-cd /Users/[username]/Desktop/Scaield/frontend
+cd "$PROJECT_ROOT/frontend"
 npm run build
 ```
 
 백엔드 문법 확인:
 
 ```bash
-cd /Users/[username]/Desktop/Scaield
+cd "$PROJECT_ROOT"
 source .venv/bin/activate
 python -m py_compile backend_bridge/app.py
 ```

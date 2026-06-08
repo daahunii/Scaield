@@ -21,7 +21,7 @@ export function ProfileView() {
           <div className="license-card-chip" />
 
           <div className="license-card-body">
-            <div className="license-user-name">jonghyun</div>
+            <div className="license-user-name">Dongkeun</div>
             <div
               style={{
                 fontSize: "14px",
@@ -37,7 +37,7 @@ export function ProfileView() {
           <div className="license-card-footer">
             <div className="license-footer-item">
               <span className="license-footer-label">License ID</span>
-              <span className="license-footer-value tnum">LIC-9482-JH26</span>
+              <span className="license-footer-value tnum">LIC-9482-DK26</span>
             </div>
             <div className="license-footer-item" style={{ alignItems: "flex-end" }}>
               <span className="license-footer-label">Valid Thru</span>
