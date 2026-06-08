@@ -32,6 +32,7 @@ http://127.0.0.1:5000
 | `scanner/`        | 대상 웹사이트를 크롤링하고 입력 폼, 링크, 파라미터 등 공격 가능한 진입점을 수집합니다.                                   |
 | `pentest/`        | 수집된 입력점에 SQLi/XSS payload를 주입하고 응답을 분석해 취약점 후보를 탐지합니다.                                      |
 | `LLMmodule/`      | Gemini API를 호출해 탐지 결과를 개발자용 보안 리포트 형태로 요약합니다.                                                  |
+| `testServer/`     | 스캐너 검증용 로컬 취약 Flask 서버입니다. XSS와 SQL Injection 테스트 엔드포인트가 포함되어 있습니다.                     |
 | `pipeline/`       | 과거 CLI 기반 실행 파이프라인과 결과 JSON/리포트 산출물이 들어 있습니다.                                                 |
 | `common/`         | 공통 리소스 및 보조 파일을 보관하는 폴더입니다.                                                                          |
 | `tests/`          | 유닛 테스트와 통합 테스트 코드가 있는 폴더입니다.                                                                        |
@@ -81,16 +82,26 @@ FRONTEND_ORIGIN=http://localhost:5173
 
 ## 5. Test Server 실행
 
-제공된 `testServer.zip`은 스캐너 검증용 취약 Flask 서버입니다.
+프로젝트의 `testServer/` 폴더는 스캐너 검증용 취약 Flask 서버입니다.
 의도적으로 XSS와 SQL Injection 취약점이 포함되어 있으므로 로컬에서만 실행하세요.
 
-예시 위치:
+폴더 위치:
 
 ```text
-/Users/[username]/Downloads/testServer.zip
+/Users/[username]/Desktop/Scaield/testServer
 ```
 
-압축을 풀고 실행합니다.
+실행합니다.
+
+```bash
+cd /Users/[username]/Desktop/Scaield/testServer
+python3.12 -m venv .venv
+source .venv/bin/activate
+pip install flask
+python test.py
+```
+
+만약 zip 파일에서 다시 압축을 풀어야 하는 경우에는 아래처럼 진행합니다.
 
 ```bash
 cd /Users/[username]/Downloads
@@ -179,7 +190,7 @@ http://127.0.0.1:5000
 ### 터미널 1: Test Server
 
 ```bash
-cd /Users/[username]/Downloads/testServer
+cd /Users/[username]/Desktop/Scaield/testServer
 source .venv/bin/activate
 python test.py
 ```
